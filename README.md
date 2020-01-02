@@ -10,7 +10,7 @@ Nebula is a neural network framework.
     * cuDNN for GPU (optional)
 
 # Install Nebula
-    #git clone https://github.com/bogilkim/Nebula.git
+    #git clone https://github.com/yonsei-icsl/nebula.git
 
 
 # Build Nebula
@@ -34,5 +34,3 @@ Nebula is a neural network framework.
     ./nebula.sh test [network] -load_weight(required)
     or
     cd benchmarks/[network] && ./[network] test network.cfg data.cfg input.wgh
-
-    gggggg
