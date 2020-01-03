@@ -10,29 +10,25 @@ get_target_id() {
 	echo -e "Get file ID of $1"
 	case $1 in 
 		lenet )
-			FILEID="1URezybxLRa7P-Aazhs8jAI0ocjbgz-Yx" ;;
+			exit 1 ;;
 		vgg_S )
-			FILEID="1yPVjxbpiuSrW1Qi9Q8Saj5TsNwIkhCzL" ;;
+            FILEID="1L6GzG0Je43jd6sVWICFC8oCVEtP507ee" ;;
 		vgg_M )
-			FILEID="1f4JDDC3aH_MtuVK2zh_5E2ffJzHq6vzC" ;;
+            FILEID="19gUDTtHQInK12y0PUgyOPtxomkwlLJhl" ;;
 		vgg_L )
-			FILEID="1DZoMJZBKHeUyFiLEABRsoWfwBhDTF6Z9" ;;
-		vgg )
-			FILEID="1v9MlkPA9oNen_zHRaL8IjOktbIWFz5WH" ;;
+            FILEID="1IfKa3pgt5W9kMtj1OVeuV1bNW4jfxhlD" ;;
 		mlp_S )
-			FILEID="1yP1wIk25tisGAQ006fw3UUboUtGZqFEq" ;;
+			exit 1 ;;
 		mlp_M )
-			FILEID="1nIPvpNSVxkguRKSW9zOjBqUT4W05DHJP" ;;
+			exit 1 ;;
 		mlp_L )
-			FILEID="1cyHNOJxTj1fsbSI1JPvvNjPhlbfSvosW" ;;
-		resnet )
-			exit 1 ;;
+		    exit 1 ;;
 		resnet_L )
-			exit 1 ;;
+			FILEID="1XYuSRsPm1HlDXQRLtvTx9sVmXbgXTCG2" ;;
 		resnet_M )
-			exit 1 ;;
+            FILEID="1KzzvRJkYE4Qu5n7kjwBwbfKyAYYbROui" ;;
 		resnet_S )
-			exit 1 ;;
+            FILEID="1DlERgUr2dOPZbPUP16EZ7y2EWjxR0Qy5" ;;
 		* )
 			echo -e "Error: unsupported weight"
 			exit 1

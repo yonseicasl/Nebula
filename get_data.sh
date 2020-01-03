@@ -7,22 +7,20 @@ datadir=$nebuladir/data
 get_data_ID() {
 	echo -e "Get data ID of $1"
 	case $1 in 
-		ImageNet )
-			DATAID="1_6XD4mIjcTrzJTmRnVgj6ME-nahJ8pCW" ;;
 		ImageNet_L )
-			DATAID="1s0f7kVMYfopFG40QuVX4hDVsEY7d_70B" ;;
+            DATAID="1FAOrcFcpRbR0mMaWv5vzUq-PeyIJHsFv" ;;
 		ImageNet_M )
-			DATAID="1ed4h30oumph7xdyq4cZUUTFA_WEsZuSE" ;;
+            DATAID="1UeFJa35DOhwR_iaxbX15_e30ETFSo4O8" ;;
 		ImageNet_S )
-			DATAID="1GU9nEOxrmhMsJhXyL2j13PqEXLoh8QcA" ;;
+			DATAID="1zCTB82sCmBcf0tCapOa0cd7tAcPp9ADe" ;;
 		NIST_L )
-			DATAID="1L16EtnjaE6f1OHo6ndMJ6eWIfzWDgY5o" ;;
+			exit 1 ;;
 		NIST_M )
-			DATAID="1ssCfVl4pkxQH6EmkdojN3U5sHqqZ8EqR" ;;
+		    exit 1 ;;
 		NIST_S )
-			DATAID="1L9hBx7zaXrpF9OW3KruMplDkptJIUCjH" ;;
+            exit 1 ;;			
 		MNIST )
-			DATAID="1Ya8Ts8-VjJsV0RcQabGtx359OcJJBVLe" ;;
+			exit 1 ;;
 		* )
 			echo -e "Error: unsupported dataset"
 			exit 1
