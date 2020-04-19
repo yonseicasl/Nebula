@@ -10,6 +10,7 @@ get_target_id() {
 	echo -e "Get file ID of $1"
 	case $1 in 
 		lenet )
+            echo -e "Does not support weight file of $1" 
 			exit 1 ;;
 		vgg_S )
             FILEID="1L6GzG0Je43jd6sVWICFC8oCVEtP507ee" ;;
@@ -18,10 +19,13 @@ get_target_id() {
 		vgg_L )
             FILEID="1IfKa3pgt5W9kMtj1OVeuV1bNW4jfxhlD" ;;
 		mlp_S )
+            echo -e "Does not support weight file of $1" 
 			exit 1 ;;
 		mlp_M )
+            echo -e "Does not support weight file of $1" 
 			exit 1 ;;
 		mlp_L )
+            echo -e "Does not support weight file of $1" 
 		    exit 1 ;;
 		resnet_L )
 			FILEID="1XYuSRsPm1HlDXQRLtvTx9sVmXbgXTCG2" ;;

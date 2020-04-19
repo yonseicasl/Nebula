@@ -26,7 +26,7 @@ lib=$libdir/libnebula.a
 # Nebula benchmark directory
 benchdir=$nebuladir/benchmarks
 # Nebula version
-ver=0.1.0
+ver=1.0.0
 
 
 ##### Nebula build options #####
