@@ -1,7 +1,9 @@
 #ifndef __DROPOUT_LAYER_H__
 #define __DROPOUT_LAYER_H__
 
-#include <curand.h>
+#ifdef GPU_ENABLED
+	#include <curand.h>
+#endif
 #include "layer.h"
 
 class dropout_layer_t : public layer_t {
