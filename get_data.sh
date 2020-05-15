@@ -14,14 +14,11 @@ get_data_ID() {
 		ImageNet_S )
 			DATAID="1zCTB82sCmBcf0tCapOa0cd7tAcPp9ADe" ;;
 		NIST_L )
-            echo -e "Does not support dataset of $1" 
-			exit 1 ;;
+			DATAID="1BiZkpBSoT562Qfacy95KHP7Z1-MoZwX8" ;;
 		NIST_M )
-            echo -e "Does not support dataset of $1" 
-		    exit 1 ;;
+			DATAID="1grcL1Ktahh1dgUbKqLIOv7BR7hzJmjo8" ;;
 		NIST_S )
-            echo -e "Does not support dataset of $1" 
-            exit 1 ;;			
+			DATAID="1pRW2Uovd8r1Fd-qKb6mMjFbFnXGd-JMu" ;;
 		MNIST )
             echo -e "Does not support dataset of $1" 
 			exit 1 ;;
