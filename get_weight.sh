@@ -32,11 +32,9 @@ get_target_id() {
 		mlp_L )
 			FILEID="1l8POYfrLT2ZEIRbljt-7ub7-dXpEA1l2" ;;
 		dbn_S )
-            echo -e "Does not support weight file of $1" 
-			exit 1 ;;
+			FILEID="1eT8bN0DPPtQNLumF92IEHQI31vTLV9gx" ;;
 		dbn_M )
-            echo -e "Does not support weight file of $1" 
-			exit 1 ;;
+			FILEID="1dertTo4oNPxb8u4I3RVP9g1absIyAV78" ;;
 		dbn_L )
             echo -e "Does not support weight file of $1" 
 		    exit 1 ;;
@@ -46,6 +44,24 @@ get_target_id() {
             FILEID="1KzzvRJkYE4Qu5n7kjwBwbfKyAYYbROui" ;;
 		resnet_S )
             FILEID="1DlERgUr2dOPZbPUP16EZ7y2EWjxR0Qy5" ;;
+		rnn_L )
+			echo -e "Does not support weight file of $1"
+			exit 1 ;;
+		rnn_M )
+			echo -e "Does not support weight file of $1"
+			exit 1 ;;
+		rnn_S )
+			echo -e "Does not support weight file of $1"
+			exit 1 ;;
+		lstm_L )
+			echo -e "Does not support weight file of $1"
+			exit 1 ;;
+		lstm_M )
+			echo -e "Does not support weight file of $1"
+			exit 1 ;;
+		lstm_S )
+			echo -e "Does not support weight file of $1"
+			exit 1 ;;
 		* )
 			echo -e "Error: unsupported weight"
 			exit 1
