@@ -36,8 +36,7 @@ get_target_id() {
 		dbn_M )
 			FILEID="1dertTo4oNPxb8u4I3RVP9g1absIyAV78" ;;
 		dbn_L )
-            echo -e "Does not support weight file of $1" 
-		    exit 1 ;;
+			FILEID="1b1Fhhxsn4SRTmjLtii6Bxmjh_i71bZmr" ;;
 		resnet_L )
 			FILEID="1XYuSRsPm1HlDXQRLtvTx9sVmXbgXTCG2" ;;
 		resnet_M )
