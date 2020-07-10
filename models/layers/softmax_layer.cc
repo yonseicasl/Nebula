@@ -2,15 +2,12 @@
     #include <cblas.h>
 #endif
 #include <cfloat>
-//#include <cmath>
-#include <math.h>
+#include <cmath>
 #include <cstring>
 #ifdef GPU_ENABLED
 #include <cuda_runtime.h>
 #endif
 #include "softmax_layer.h"
-
-using namespace std;
 
 softmax_layer_t::softmax_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type) {
@@ -31,8 +28,6 @@ void softmax_layer_t::init(section_config_t m_section_config) {
     // Initialize layer parameters.
     input_size = prev_layer ? prev_layer->output_size : network->input_size;
     output_size = input_size;  
-    
-    cout << "softmax : " << network->batch_size * output_size << " " << "0" << endl; 
     
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();

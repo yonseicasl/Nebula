@@ -1,5 +1,6 @@
 #include "activations.h"
 #include <cmath>
+
 void elu_activation(float *m_output, unsigned m_size){
     for(unsigned i =0; i < m_size; i++){
         m_output[i] = m_output[i] > 0.0 ?

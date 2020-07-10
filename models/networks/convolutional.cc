@@ -26,9 +26,6 @@
 #include "shortcut_layer.h"
 #include "pooling_layer.h"
 
-//using namespace std;
-//using namespace cv;
-
 convolutional_t::convolutional_t() {
 }
 

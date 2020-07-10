@@ -15,8 +15,6 @@
 #include "batchnorm.h"
 #include "gemm.h"
 
-using namespace std;
-
 connected_layer_t::connected_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     bias(NULL),
@@ -100,7 +98,7 @@ void connected_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("output", &output_size);
     m_section_config.get_setting("batch_normalize", &batch_normalize);  
     
-    string activation_str;
+    std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
@@ -108,8 +106,6 @@ void connected_layer_t::init(section_config_t m_section_config) {
     // Initialize layer parameters.
     input_size = prev_layer ? prev_layer->output_size : network->input_size;
     weight_size = input_size * output_size;
-
-	cout << "conn " << ": " << network->batch_size * output_size << " " << weight_size << endl; 
 
     bias        = new float[output_size]();
     bias_update = new float[output_size]();
@@ -185,7 +181,7 @@ void connected_layer_t::init(section_config_t m_section_config) {
 }
 
 // Initialize weight from weight file.
-void connected_layer_t::init_weight(fstream &m_input_weight) {
+void connected_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, output_size * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
     
@@ -210,8 +206,8 @@ void connected_layer_t::init_weight(fstream &m_input_weight) {
 
 // Initialized weight from scratch.
 void connected_layer_t::init_weight() {
-    minstd_rand rng(random_device{}());
-    uniform_real_distribution<float> dist(-1.0, 1.0);
+    std::minstd_rand rng(std::random_device{}());
+    std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
     // Initialize weight 
     for(unsigned i = 0; i < weight_size; i++) {
@@ -222,7 +218,7 @@ void connected_layer_t::init_weight() {
 #endif
 }
 
-void connected_layer_t::store_weight(fstream &m_output_weight) {
+void connected_layer_t::store_weight(std::fstream &m_output_weight) {
 #ifdef GPU_ENABLED
     cudaMemcpy(bias, bias_dev, output_size * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy(weight, weight_dev, weight_size * sizeof(float), cudaMemcpyDeviceToHost);

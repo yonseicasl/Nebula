@@ -18,6 +18,12 @@ public:
     void init_weight(std::fstream &m_input_weight);
     // Initialize weight from scratch.
     void init_weight();
+    // Sample hidden units using visible units value
+    void sample_hidden_units(unsigned m_step);
+    // Sample visible units using hidden units value
+    void sample_visible_units();
+    // Reconstruct the visible units and pretrain weight.
+    void pretrain();
     // Forward propagation.
     void forward();
     // Backward propagation.
@@ -27,12 +33,6 @@ public:
     // Store weight.
     void store_weight(std::fstream &m_weight_file);
 
-    // Sample hidden units using visible units value
-    void sample_hidden_units(unsigned m_step);
-    // Sample visible units using hidden units value
-    void sample_visible_units();
-    // Reconstruct the visible units and pretrain weight.
-    void pretrain();
 
 #ifdef GPU_ENABLED
     // Forward propagation.

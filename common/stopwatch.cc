@@ -2,8 +2,6 @@
 #include <iostream>
 #include "stopwatch.h"
 
-using namespace std;
-
 stopwatch_t::stopwatch_t() :
     total_time(0.0),
     interval_time(0.0) {

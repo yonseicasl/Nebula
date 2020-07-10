@@ -14,8 +14,6 @@
 #include "gemm.h"
 #include "activations.h"
 
-using namespace std;
-
 rbm_layer_t::rbm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     weight(NULL),
@@ -70,7 +68,7 @@ void rbm_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("output", &output_size);
     m_section_config.get_setting("k_step", &k_step);
     
-    string activation_str;
+    std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
@@ -89,8 +87,6 @@ void rbm_layer_t::init(section_config_t m_section_config) {
     
     weight_size = input_size * output_size;
 
-    cout << "rbm " << "output size : " << network->batch_size * output_size << " " << "weight_size : " << weight_size << endl;
-    
     output_data = new float[output_size * network->batch_size]();
     delta = new float[input_size * output_size]();
     
@@ -149,7 +145,7 @@ void rbm_layer_t::init(section_config_t m_section_config) {
 }
 
 // Initialize weight from weight file.
-void rbm_layer_t::init_weight(fstream &m_input_weight) {
+void rbm_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)hidden_bias, output_size * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
 #ifdef GPU_ENABLED
@@ -160,8 +156,8 @@ void rbm_layer_t::init_weight(fstream &m_input_weight) {
 
 // Initialize weight from scratch.
 void rbm_layer_t::init_weight() {
-    minstd_rand rng(random_device{}());
-    uniform_real_distribution<float> dist(-1.0, 1.0);
+    std::minstd_rand rng(std::random_device{}());
+    std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
     // Initialize weight 
     for(unsigned i = 0; i < weight_size; i++) {
@@ -173,7 +169,7 @@ void rbm_layer_t::init_weight() {
 }
 
 // Save weight to the weight file.
-void rbm_layer_t::store_weight(fstream &m_output_weight) {
+void rbm_layer_t::store_weight(std::fstream &m_output_weight) {
 #ifdef GPU_ENABLED
     cudaMemcpy(hidden_bias, hidden_bias_dev, output_size * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy(weight, weight_dev, weight_size * sizeof(float), cudaMemcpyDeviceToHost);
@@ -368,6 +364,7 @@ void rbm_layer_t::pretrain() {
    
     memcpy(output_data, hidden_mean_k_step, output_size * network->batch_size);
 }
+
 void rbm_layer_t::forward() {
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0, output_size * network->batch_size * sizeof(float));

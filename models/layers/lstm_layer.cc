@@ -11,8 +11,6 @@
 #include "lstm_layer.h"
 #include "activations.h"
 
-using namespace std;
-
 lstm_layer_t::lstm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     cell_state(NULL),
@@ -86,7 +84,7 @@ void lstm_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("output", &output_size);
     m_section_config.get_setting("batch_normalize", &batch_normalize);
     
-    string activation_str;
+    std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
@@ -112,6 +110,8 @@ void lstm_layer_t::init(section_config_t m_section_config) {
     unsigned temp_size = prev_layer ? prev_layer-> output_size : network->input_size;
     if(prev_layer) prev_layer->output_size = output_size;
     else network->input_size = output_size;
+
+    // Initialize each gate.
     input_gate_W->init(m_section_config);
     forget_gate_W->init(m_section_config);
     cell_gate_W->init(m_section_config);
@@ -189,7 +189,7 @@ void lstm_layer_t::init(section_config_t m_section_config) {
 #endif
 }
 
-void lstm_layer_t::init_weight(fstream &m_input_weight) {
+void lstm_layer_t::init_weight(std::fstream &m_input_weight) {
 
     input_gate_W->init_weight(m_input_weight);
     forget_gate_W->init_weight(m_input_weight);
@@ -213,6 +213,19 @@ void lstm_layer_t::init_weight() {
     forget_gate_U->init_weight();
     output_gate_U->init_weight();
     cell_gate_U->init_weight();
+}
+
+void lstm_layer_t::store_weight(std::fstream &m_weight_file) {
+
+    input_gate_W->store_weight(m_weight_file);
+    forget_gate_W->store_weight(m_weight_file);
+    output_gate_W->store_weight(m_weight_file);
+    cell_gate_W->store_weight(m_weight_file);
+
+    input_gate_U->store_weight(m_weight_file);
+    forget_gate_U->store_weight(m_weight_file);
+    output_gate_U->store_weight(m_weight_file);
+    cell_gate_U->store_weight(m_weight_file);
 }
 
 void lstm_layer_t::forward() {
@@ -497,15 +510,3 @@ void lstm_layer_t::update() {
     output_gate_U->update();
 }
 
-void lstm_layer_t::store_weight(fstream &m_weight_file) {
-
-    input_gate_W->store_weight(m_weight_file);
-    forget_gate_W->store_weight(m_weight_file);
-    output_gate_W->store_weight(m_weight_file);
-    cell_gate_W->store_weight(m_weight_file);
-
-    input_gate_U->store_weight(m_weight_file);
-    forget_gate_U->store_weight(m_weight_file);
-    output_gate_U->store_weight(m_weight_file);
-    cell_gate_U->store_weight(m_weight_file);
-}

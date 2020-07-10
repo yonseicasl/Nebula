@@ -11,16 +11,14 @@
 #include <cstring>
 #include "utils.h"
 
-using namespace std;
-
 // Convert string to lowercase.
-string& lowercase(string &m_str) {
+std::string& lowercase(std::string &m_str) {
     transform(m_str.begin(), m_str.end(), m_str.begin(), ::tolower);
     return m_str;
 }
 
 // Convert string to uppercase.
-string& uppercase(string &m_str) {
+std::string& uppercase(std::string &m_str) {
     transform(m_str.begin(), m_str.end(), m_str.begin(), ::toupper);
     return m_str;
 }
@@ -38,11 +36,11 @@ void shortcut(unsigned num_threads,
                       m_input_height : m_output_height;
     unsigned channel = m_input_channel < m_output_channel ?
                        m_input_channel : m_output_channel;
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(num_threads);
     for(unsigned tid = 0; tid < num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
-                                      const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
             for(unsigned i = begin; i < end; i++) {
                 for(unsigned c = 0; c < channel; c++) {
                     for(unsigned h = 0; h < height; h++) {
@@ -56,7 +54,7 @@ void shortcut(unsigned num_threads,
             }
         }, tid * m_batch / num_threads,
            (tid + 1) * m_batch / num_threads, tid));
-    }for_each(threads.begin(), threads.end(), [](thread& t) {t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
 //void shortcut(unsigned batch, unsigned w1, unsigned h1, unsigned c1, float *add, 
@@ -90,12 +88,12 @@ void im2col(float* m_im_data, unsigned m_channel, unsigned m_height, unsigned m_
     unsigned col_width = (m_width + 2 * m_padding - m_filter_size) / m_stride + 1;
     unsigned col_channel = m_channel * m_filter_size * m_filter_size;
 
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(m_num_threads);
 
     for(unsigned tid = 0; tid < m_num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
-                                      const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
             for (unsigned i = begin; i < end; i++) {
                 unsigned offset_w = i % m_filter_size;
                 unsigned offset_h = (i / m_filter_size) % m_filter_size;
@@ -120,7 +118,7 @@ void im2col(float* m_im_data, unsigned m_channel, unsigned m_height, unsigned m_
                 }
             }
         }, tid * col_channel / m_num_threads, (tid + 1) * col_channel / m_num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) { t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
 }
 
 // Fold data.
@@ -131,12 +129,12 @@ void col2im(float* m_col_data, unsigned m_channel, unsigned m_height, unsigned m
     unsigned col_width = (m_width + 2 * m_padding - m_filter_size) / m_stride + 1;
     unsigned col_channel = m_channel * m_filter_size * m_filter_size;
 
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(m_num_threads);
 
     for(unsigned tid = 0; tid < m_num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
-                                      const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
             for(unsigned i = begin; i < end; i++) {
                 unsigned offset_w = i % m_filter_size;
                 unsigned offset_h = (i / m_filter_size) % m_filter_size;
@@ -161,16 +159,16 @@ void col2im(float* m_col_data, unsigned m_channel, unsigned m_height, unsigned m
                 }
             }
         }, tid * col_channel / m_num_threads, (tid + 1) * col_channel / m_num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) { t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
 }
 
 void forward_bias(unsigned num_threads, float *m_output, float *m_bias,
                   unsigned m_channel, unsigned m_size, unsigned m_batch) {
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(num_threads);
     for(unsigned tid = 0; tid < num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
-                                      const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
             for(unsigned i = begin; i < end; i++) {
                 for(unsigned j = 0; j < m_channel; j++) {
                     for(unsigned k = 0; k < m_size; k++) {
@@ -180,15 +178,15 @@ void forward_bias(unsigned num_threads, float *m_output, float *m_bias,
             }
         }, tid * m_batch / num_threads,
            (tid + 1) * m_batch / num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) { t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
 }
 
 void backward_bias(unsigned num_threads, float *m_bias_update, float *m_delta, 
                    unsigned m_channel, unsigned m_size, unsigned m_batch){
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(num_threads);
     for(unsigned tid = 0; tid < num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin,const unsigned end, const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin,const unsigned end, const unsigned tid) {
             for(unsigned batch = begin; batch < end; batch++) {
                 for(unsigned channel = 0; channel < m_channel; channel++) {
                     for(unsigned size = 0; size < m_size; size++) {
@@ -198,6 +196,6 @@ void backward_bias(unsigned num_threads, float *m_bias_update, float *m_delta,
             }
         }, tid * m_batch / num_threads,
            (tid +1) * m_batch /num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) {t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 

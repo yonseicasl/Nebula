@@ -11,15 +11,13 @@
 #include <cstring>
 #include "batchnorm.h"
 
-using namespace std;
-
 void batchnorm_mean(unsigned num_threads, float *m_output, float *m_mean, 
                     unsigned m_channel, unsigned m_size, unsigned m_batch){
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(num_threads);
     for(unsigned tid = 0; tid < num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
-                                     const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
             for(unsigned i = begin; i < end; i++) {
                 m_mean[i] = 0.0;
                 for(unsigned j = 0; j < m_batch; j++) {
@@ -31,15 +29,15 @@ void batchnorm_mean(unsigned num_threads, float *m_output, float *m_mean,
             }
         }, tid * m_channel / num_threads,
            (tid + 1) * m_channel / num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) {t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
 void batchnorm_variance(unsigned num_threads, float *m_output, float *m_mean, float *m_variance, 
                         unsigned m_channel, unsigned m_size, unsigned m_batch){
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(num_threads);
     for(unsigned tid = 0; tid < num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
                                       const unsigned tid) {
             for(unsigned i=begin; i < end; i++) {
                 m_variance[i] = 0.0;
@@ -52,17 +50,17 @@ void batchnorm_variance(unsigned num_threads, float *m_output, float *m_mean, fl
             }
         }, tid * m_channel / num_threads,
            (tid + 1) * m_channel / num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) {t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
 void batchnorm_normalize(unsigned num_threads, float *m_output, float *m_mean, float *m_variance,
                          unsigned m_channel, unsigned m_size, unsigned m_batch){
     
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(num_threads);
     for(unsigned tid =0; tid < num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
-                                      const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
             for(unsigned i = begin; i < end; i++) {
                 for(unsigned j = 0; j < m_channel; j++) {
                     for(unsigned k = 0; k < m_size; k++) {
@@ -73,17 +71,17 @@ void batchnorm_normalize(unsigned num_threads, float *m_output, float *m_mean, f
             }
         }, tid * m_batch / num_threads,
            (tid + 1) * m_batch / num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) {t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
 void batchnorm_scale_down(unsigned num_threads, float *m_output, float *m_scale,
                           unsigned m_channel, unsigned m_size, unsigned m_batch){
 
-    vector<thread> threads;
+    std::vector<std::thread> threads;
     threads.reserve(num_threads);
     for(unsigned tid = 0; tid < num_threads; tid++) {
-        threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
-                                      const unsigned tid) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
             for(unsigned i = begin; i < end; i++) {
                 for(unsigned j = 0; j < m_channel; j++) {
                     for(unsigned k = 0; k <  m_size; k++) {
@@ -93,7 +91,7 @@ void batchnorm_scale_down(unsigned num_threads, float *m_output, float *m_scale,
             }
         }, tid * m_batch / num_threads,
            (tid + 1) * m_batch / num_threads, tid));
-    } for_each(threads.begin(), threads.end(), [](thread& t) { t.join(); });
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
 }
 
 void batchnorm_mean_delta(unsigned num_threads,  float *m_delta, float *m_variance, float *m_mean_delta, 

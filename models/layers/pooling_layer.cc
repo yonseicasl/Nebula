@@ -8,8 +8,6 @@
 #endif
 #include "pooling_layer.h"
 
-using namespace std;
-
 pooling_layer_t::pooling_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     index(NULL) {
@@ -62,7 +60,7 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     output_channel = input_channel;
     output_size = output_height * output_width * output_channel;
     
-	cout << "pool " << ": " << network->batch_size * output_size << " " << endl; 
+    std::cout << input_height << " * " << input_width << " * " << input_channel << std::endl;
     // Allocate memory for pooling layer.
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
@@ -83,7 +81,7 @@ void pooling_layer_t::init(section_config_t m_section_config) {
 #endif
 }
 
-void pooling_layer_t::init_weight(fstream &m_weight_file) {
+void pooling_layer_t::init_weight(std::fstream &m_weight_file) {
     //Nothing to do
 }
 
@@ -96,11 +94,13 @@ void pooling_layer_t::forward() {
     memset(delta, 0.0, output_size * network->batch_size * sizeof(float));
     
     float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    // Case 1: Max pooling
+    // Select the biggest element in the filter.
     if(layer_type == MAXPOOL_LAYER) {
-        vector<thread> threads;
+        std::vector<std::thread> threads;
         threads.reserve(num_threads);
         for(unsigned tid = 0; tid < num_threads; tid++) {
-            threads.emplace_back(bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
+            threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
                 for(unsigned b = begin; b < end; b++) {
                     for(unsigned c = 0; c < output_channel; c++) {
                         for(unsigned h = 0; h < output_height; h++) {
@@ -126,13 +126,15 @@ void pooling_layer_t::forward() {
                     }
                 }
             }, tid * network->batch_size / num_threads, (tid + 1) * network->batch_size / num_threads, tid));
-        } for_each(threads.begin(), threads.end(), [](thread& t) { t.join();});
+        } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join();});
     }
+    // Case 2: average pooling
+    // Calculate average value of elements in the filter..
     else if(layer_type == AVGPOOL_LAYER) {
-        vector<thread> threads;
+        std::vector<std::thread> threads;
         threads.reserve(num_threads);
         for(unsigned tid = 0; tid < num_threads; tid++) {
-            threads.emplace_back(bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
+            threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
                 for(unsigned b = begin; b < end; b++) {
                     for(unsigned c = 0; c < output_channel; c++) {
                         for(unsigned h = 0; h < output_height; h++) {
@@ -154,10 +156,10 @@ void pooling_layer_t::forward() {
                     }
                 }
             }, tid * network->batch_size / num_threads, (tid + 1) * network->batch_size / num_threads, tid));
-        } for_each(threads.begin(), threads.end(), [](thread& t) { t.join();});
+        } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join();});
     }
     else {
-        cerr << "undefined pooling layer type " << endl;
+        std::cerr << "undefined pooling layer type " << std::endl;
         exit(1);
     }
 }
@@ -165,20 +167,20 @@ void pooling_layer_t::forward() {
 void pooling_layer_t::backward() {
     float *prev_delta = prev_layer ? prev_layer->delta : NULL;
     if(layer_type == MAXPOOL_LAYER) {
-        vector<thread> threads;
+        std::vector<std::thread> threads;
         threads.reserve(num_threads);
         for(unsigned tid = 0; tid < num_threads; tid++) {
-            threads.emplace_back(bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
+            threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
                 for(unsigned i = begin; i < end; i++) { prev_delta[index[i]] += delta[i];}
             }, tid * output_size * network->batch_size / num_threads, 
                (tid + 1) * output_size * network->batch_size / num_threads, tid));
-        } for_each(threads.begin(), threads.end(), [](thread& t) {t.join(); });
+        } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
     }
     else if(layer_type == AVGPOOL_LAYER) {
-        vector<thread> threads;
+        std::vector<std::thread> threads;
         threads.reserve(num_threads);
         for(unsigned tid = 0; tid < num_threads; tid++) {
-            threads.emplace_back(bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
+            threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
                 for(unsigned i = begin; i < end; i++) {
                         for(unsigned j = 0; j < filter_size * filter_size; j++)
                         {
@@ -187,10 +189,10 @@ void pooling_layer_t::backward() {
                         }
                     }
             }, tid * output_size * network->batch_size / num_threads, (tid + 1) * output_size * network->batch_size / num_threads, tid));
-        } for_each(threads.begin(), threads.end(), [](thread& t) {t.join(); });
+        } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
     }
     else {
-        cerr << "undefined pooling layer type" <<endl;
+        std::cerr << "undefined pooling layer type" << std::endl;
         exit(1);
     }
 }
@@ -199,6 +201,6 @@ void pooling_layer_t::update() {
     //Nothing to do
 }
 
-void pooling_layer_t::store_weight(fstream &m_weight_file) {
+void pooling_layer_t::store_weight(std::fstream &m_weight_file) {
     //Nothing to do
 }

@@ -97,7 +97,7 @@ target=$1; shift
 # Use gdb for debug.
 use_debug=0
 # Use GPU.
-gpu_enabled=1
+gpu_enabled=0
 # Use custom blas.
 custom_blas=0
 # Do not load weight for training by default.

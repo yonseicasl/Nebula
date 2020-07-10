@@ -9,7 +9,6 @@
 #include "rnn_layer.h"
 #include "gemm.h"
 
-using namespace std;
 rnn_layer_t::rnn_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
 #ifdef GPU_ENABLED
@@ -35,7 +34,7 @@ void rnn_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("output", &output_size);
     m_section_config.get_setting("batch_normalize", &batch_normalize);
 
-    string activation_str;
+    std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
@@ -65,7 +64,7 @@ void rnn_layer_t::init(section_config_t m_section_config) {
 
 }
 
-void rnn_layer_t::init_weight(fstream &m_input_weight) {
+void rnn_layer_t::init_weight(std::fstream &m_input_weight) {
     input_gate->init_weight(m_input_weight);
     hidden_gate->init_weight(m_input_weight);
 }
@@ -73,6 +72,11 @@ void rnn_layer_t::init_weight(fstream &m_input_weight) {
 void rnn_layer_t::init_weight() {
     input_gate->init_weight();
     hidden_gate->init_weight();
+}
+
+void rnn_layer_t::store_weight(std::fstream &m_weight_file) {
+    input_gate->store_weight(m_weight_file);
+    hidden_gate->store_weight(m_weight_file);
 }
 
 void rnn_layer_t::forward() {
@@ -193,7 +197,3 @@ void rnn_layer_t:: update() {
     hidden_gate->update();
 }
 
-void rnn_layer_t::store_weight(fstream &m_weight_file) {
-    input_gate->store_weight(m_weight_file);
-    hidden_gate->store_weight(m_weight_file);
-}

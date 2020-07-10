@@ -15,8 +15,6 @@
 #include "batchnorm.h"
 #include "gemm.h"
 
-using namespace std;
-
 convolutional_layer_t::convolutional_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     workspace(NULL),
@@ -107,7 +105,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("padding", &padding);
     m_section_config.get_setting("stride", &stride);
 
-    string activation_str;
+    std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
@@ -136,9 +134,10 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     delta = new float[output_size * network->batch_size]();
     workspace = new float[workspace_size]();
 
-	cout << "conv " << ": " << network->batch_size * output_size << " " << weight_size << endl; 
-    //cout << input_height << " * " << input_width << " * " << input_channel << endl;
+    // Print out structure of the network.
+    std::cout << input_height << " * " << input_width << " * " << input_channel << std::endl;
 
+    // Initialize parameters for batch normalization.
     if(batch_normalize) {
         scale        = new float[num_filters]();
         scale_update = new float[num_filters]();
@@ -207,7 +206,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
 #endif
 }
 
-void convolutional_layer_t::init_weight(fstream &m_input_weight) {
+void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, num_filters * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
    
@@ -231,8 +230,8 @@ void convolutional_layer_t::init_weight(fstream &m_input_weight) {
 }
 
 void convolutional_layer_t::init_weight() {
-    minstd_rand rng(random_device{}());
-    normal_distribution<float> dist(0.0, 1.0);
+    std::minstd_rand rng(std::random_device{}());
+    std::normal_distribution<float> dist(0.0, 1.0);
     
     for(unsigned i = 0; i < weight_size; i++) {
         weight[i] = sqrt(2.0 / (filter_size * filter_size * input_channel / group)) * dist(rng);
@@ -242,7 +241,7 @@ void convolutional_layer_t::init_weight() {
 #endif
 }
 
-void convolutional_layer_t::store_weight(fstream &m_output_weight) {
+void convolutional_layer_t::store_weight(std::fstream &m_output_weight) {
 #ifdef GPU_ENABLED
     cudaMemcpy(bias, bias_dev, num_filters * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy(weight, weight_dev, weight_size * sizeof(float), cudaMemcpyDeviceToHost);

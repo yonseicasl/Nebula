@@ -7,8 +7,6 @@
 #endif
 #include "dropout_layer.h"
 
-using namespace std;
-
 dropout_layer_t::dropout_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type), 
     probability(0.0),
@@ -64,14 +62,16 @@ void dropout_layer_t::init_weight() {
 void dropout_layer_t::forward() {
     float scale = 1.0 / (1.0 - probability);
 
-    minstd_rand generator(random_device{}());
-    uniform_real_distribution<float> distribution(0.0, 1.0);
+    std::minstd_rand generator(std::random_device{}());
+    std::uniform_real_distribution<float> distribution(0.0, 1.0);
 
+// Pass the selected data to the next layer
+// in training phase.
     if(network->run_type == TRAIN_RUN) {
-        vector<thread> threads;
+        std::vector<std::thread> threads;
         threads.reserve(num_threads); 
         for(unsigned tid = 0; tid < num_threads; tid++) {
-            threads.emplace_back(bind([&](const unsigned begin, const unsigned end,
+            threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
                                           const unsigned tid) {
                 for(unsigned i = begin; i < end; i++) {
                     rand[i] = distribution(generator);
@@ -80,7 +80,7 @@ void dropout_layer_t::forward() {
                 }
             }, tid * input_size * network->batch_size / num_threads,
                (tid + 1) * input_size * network->batch_size / num_threads, tid));
-        } for_each(threads.begin(), threads.end(), [](thread& t) { t.join(); });
+        } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
     }
 }
 
@@ -103,7 +103,7 @@ void dropout_layer_t::update() {
 }
 
 // Store weight.
-void dropout_layer_t::store_weight(fstream &m_weight_file) {
+void dropout_layer_t::store_weight(std::fstream &m_weight_file) {
     // Nothing to do
 }
 

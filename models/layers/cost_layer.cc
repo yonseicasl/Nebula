@@ -7,8 +7,6 @@
 #endif
 #include "cost_layer.h"
 
-using namespace std;
-
 cost_layer_t::cost_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     cost_type(UNDEFINED_COST) {
@@ -26,7 +24,7 @@ cost_layer_t::~cost_layer_t() {
 // Initialize layer.
 void cost_layer_t::init(section_config_t m_section_config) {
     // Layer settings.
-    string cost_str;
+    std::string cost_str;
     if(m_section_config.get_setting("type", &cost_str)) {
         cost_type = (cost_type_t)get_type(cost_type_str, cost_str);
     }
@@ -35,8 +33,6 @@ void cost_layer_t::init(section_config_t m_section_config) {
     input_size = prev_layer ? prev_layer->output_size : network->input_size;
     output_size = input_size;
 	
-    cout << "cost : " << network->batch_size * output_size << " " << "0" << endl; 
-
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
 #ifdef GPU_ENABLED
@@ -76,7 +72,7 @@ void cost_layer_t::forward() {
              break;
         }
         default: {
-            cerr << "Error: undefined cost " << cost_type_str[cost_type] << endl;
+            std::cerr << "Error: undefined cost " << cost_type_str[cost_type] << std::endl;
             exit(1);
         } 
     }
@@ -100,7 +96,7 @@ void cost_layer_t::update() {
 }
 
 // Store weight.
-void cost_layer_t::store_weight(fstream &m_weight_file) {
+void cost_layer_t::store_weight(std::fstream &m_weight_file) {
     // Nothing to do
 }
 

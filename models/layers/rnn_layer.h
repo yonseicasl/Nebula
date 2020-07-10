@@ -15,14 +15,14 @@ public:
     void init_weight(std::fstream &m_input_weight);
     // Initialize weight from scratch.
     void init_weight();
+    // Store weight.
+    void store_weight(std::fstream &m_weight_file);
     // Forward propagation.
     void forward();
     // Backward propagation.
     void backward();
     // update layer's parameters.
     void update();
-    // Store weight.
-    void store_weight(std::fstream &m_weight_file);
 
 #ifdef GPU_ENABLED
     // Forward propagation.

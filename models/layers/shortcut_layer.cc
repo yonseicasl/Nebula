@@ -13,8 +13,6 @@
 #include "shortcut_layer.h"
 #include "gemm.h"
 
-using namespace std;
-
 shortcut_layer_t::shortcut_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type) {
 }
@@ -32,7 +30,7 @@ shortcut_layer_t::~shortcut_layer_t() {
 void shortcut_layer_t::init(section_config_t m_section_config) {
     // Get layer settings.
     m_section_config.get_setting("hops", &hops);
-    string activation_str;
+    std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
@@ -51,8 +49,6 @@ void shortcut_layer_t::init(section_config_t m_section_config) {
     output_size = output_height * output_width * output_channel;
     input_size = output_size;
 	
-	cout << "shortcut " << ": " << network->batch_size * output_size << " 0" << endl; 
-    
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
 
@@ -64,7 +60,7 @@ void shortcut_layer_t::init(section_config_t m_section_config) {
 #endif
 }
 
-void shortcut_layer_t::init_weight(fstream &m_weight_file){}
+void shortcut_layer_t::init_weight(std::fstream &m_weight_file){}
 void shortcut_layer_t::init_weight(){}
 
 void shortcut_layer_t::forward() {
@@ -94,4 +90,4 @@ void shortcut_layer_t::backward() {
 }
 
 void shortcut_layer_t::update(){}
-void shortcut_layer_t::store_weight(fstream &m_weight_file){}
+void shortcut_layer_t::store_weight(std::fstream &m_weight_file){}
