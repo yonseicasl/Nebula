@@ -15,6 +15,8 @@
 #include "batchnorm.h"
 #include "gemm.h"
 
+namespace nebula {
+
 connected_layer_t::connected_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     bias(NULL),
@@ -514,3 +516,6 @@ void connected_layer_t::increment(int step){
         normalize_x += num; 
     }
 }
+
+}
+//End of namespace nebula
