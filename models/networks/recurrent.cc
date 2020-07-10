@@ -23,8 +23,6 @@
 #include "softmax_layer.h"
 #include "cost_layer.h"
 
-using namespace std;
-using namespace cv;
 
 recurrent_t::recurrent_t() {
 }
@@ -42,8 +40,8 @@ recurrent_t::~recurrent_t() {
 
 
 // Run network.
-void recurrent_t::run(const string m_output_weight) {
-    cout << "Running network ..." << endl;
+void recurrent_t::run(const std::string m_output_weight) {
+    std::cout << "Running network ..." << std::endl;
     stopwatch.start();
 
     // Inference 
@@ -88,33 +86,33 @@ void recurrent_t::run(const string m_output_weight) {
     stopwatch.stop();
     float total_runtime = stopwatch.get_total_time();
 
-    cout << endl << "Total runtime: ";
+    std::cout << std::endl << "Total runtime: ";
     if(total_runtime < 1.0) {
-        cout << std::fixed << std::setprecision(6) << total_runtime*1e3 << "usec";
+        std::cout << std::fixed << std::setprecision(6) << total_runtime*1e3 << "usec";
     }
     else if(total_runtime < 1e3) {
-        cout << std::fixed << std::setprecision(6) << total_runtime << "msec";
+        std::cout << std::fixed << std::setprecision(6) << total_runtime << "msec";
     }
     else if(total_runtime < 60e3) {
-        cout << std::fixed << std::setprecision(6) << total_runtime/1e3 << "sec";
+        std::cout << std::fixed << std::setprecision(6) << total_runtime/1e3 << "sec";
     }
     else if(total_runtime < 3600e3) {
         unsigned min = total_runtime/60e3;
         unsigned sec = (total_runtime - min*60e3)/1e3;
-        cout << min << "min " << sec << "sec";
+        std::cout << min << "min " << sec << "sec";
     }
     else {
         unsigned hour = total_runtime/3600e3;
         unsigned min  = (total_runtime - hour*3600e3)/60e3;
         unsigned sec  = (total_runtime - min*60e3 - hour*3600e3)/1e3;
-        cout << hour << "h " << min << "min " << sec << "sec";
+        std::cout << hour << "h " << min << "min " << sec << "sec";
     }
-    cout << endl;
-    cout << endl << "Network " << run_type_str[run_type] << " done." << endl;
+    std::cout << std::endl;
+    std::cout << std::endl << "Network " << run_type_str[run_type] << " done." << std::endl;
 }
 
 // Initialize network.
-void recurrent_t::init_network(string m_network_config) {
+void recurrent_t::init_network(std::string m_network_config) {
     // Parse the configuration file.
     config_t config;
     config.parse(m_network_config);
@@ -161,7 +159,7 @@ void recurrent_t::init_network(string m_network_config) {
                 layer = new cost_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, COST_LAYER);
             }
             else {
-                cerr << "Error: unknown layer type " << section_config.name << endl;
+                std::cerr << "Error: unknown layer type " << section_config.name << std::endl;
                 exit(1);
             }
             // The first created layer becomes input layer.
@@ -179,7 +177,7 @@ void recurrent_t::init_network(string m_network_config) {
 
 // Load batch data.
 void recurrent_t::load_data(const unsigned m_batch_index) {
-    vector<string> batch_input_sentence;
+    std::vector<std::string> batch_input_sentence;
     batch_input_sentence.reserve(batch_size / time_step);
 
     memset(input_data, 0.0, input_size * batch_size * sizeof(float));
@@ -202,8 +200,8 @@ void recurrent_t::load_data(const unsigned m_batch_index) {
         }
     }
     else {
-        minstd_rand rng(random_device{}());
-        uniform_int_distribution<unsigned> uid(0, input_size - 1);
+        std::minstd_rand rng(std::random_device{}());
+        std::uniform_int_distribution<unsigned> uid(0, input_size - 1);
         //unsigned current_index = uid(rng);
         for(unsigned b = 0; b < stream; b++) {
             unsigned current_index = uid(rng);
@@ -233,112 +231,103 @@ void recurrent_t::print_results() {
             cumulative_cost += input_label[i] * output_layer->output_data[i];
         }
 
-        cout << "Iteration #" << iteration
-             << " (data #" << ((iteration+1) * batch_size) << "):" << endl;
-        cout << "  - perplexity : " << std::fixed << std::setprecision(2)
+        std::cout << "Iteration #" << iteration
+                  << " (data #" << ((iteration+1) * batch_size) << "):" << std::endl;
+        std::cout << "  - perplexity : " << std::fixed << std::setprecision(2)
              //<< cumulative_cost / ((iteration + 1) * batch_size) << endl;
-             << exp((-1) * log2(cumulative_cost / ((iteration + 1) * batch_size))) << endl;
+                  << exp((-1) * log2(cumulative_cost / ((iteration + 1) * batch_size))) << std::endl;
     }
     else {
         stopwatch.stop();
         float interval_runtime = stopwatch.get_interval_time();
 
         // Print results.
-        cout << "Iteration #" << iteration
-             << " (data #" << ((iteration+1) * batch_size) << "):" << endl;
-        cout << "  - loss (iteration): " << std::fixed << std::setprecision(6)
-             << cost / batch_size << endl;
-        cout << "  - loss (epoch: last " << cost_history.size() << " iterations): "
-             << std::fixed << std::setprecision(6)
-             << accumulate(cost_history.begin(), cost_history.end(), 0.0) /
-                (cost_history.size() * batch_size) << endl;
-        cout << "  - loss (cumulative): " << std::fixed << std::setprecision(6)
-             << cumulative_cost / (iteration + 1) / batch_size << endl;
-        cout << "  - runtime: ";
+        std::cout << "Iteration #" << iteration
+                  << " (data #" << ((iteration+1) * batch_size) << "):" << std::endl;
+        std::cout << "  - loss (iteration): " << std::fixed << std::setprecision(6)
+                  << cost / batch_size << std::endl;
+        std::cout << "  - loss (epoch: last " << cost_history.size() << " iterations): "
+                  << std::fixed << std::setprecision(6)
+                  << accumulate(cost_history.begin(), cost_history.end(), 0.0) /
+                     (cost_history.size() * batch_size) << std::endl;
+        std::cout << "  - loss (cumulative): " << std::fixed << std::setprecision(6)
+                  << cumulative_cost / (iteration + 1) / batch_size << std::endl;
+        std::cout << "  - runtime: ";
         if(interval_runtime < 1.0) {
-            cout << std::fixed << std::setprecision(6) << interval_runtime*1e3 << "usec";
+            std::cout << std::fixed << std::setprecision(6) << interval_runtime*1e3 << "usec";
         }
         else if(interval_runtime < 1e3) {
-            cout << std::fixed << std::setprecision(6) << interval_runtime << "msec";
+            std::cout << std::fixed << std::setprecision(6) << interval_runtime << "msec";
         }
         else if(interval_runtime < 60e3) {
-            cout << std::fixed << std::setprecision(6) << interval_runtime/1e3 << "sec";
+            std::cout << std::fixed << std::setprecision(6) << interval_runtime/1e3 << "sec";
         }
         else if(interval_runtime < 3600e3) {
-            cout << interval_runtime << endl;
+            std::cout << interval_runtime << std::endl;
             unsigned min = interval_runtime/60e3;
             unsigned sec = (interval_runtime - min*60e3)/1e3;
-            cout << min << "min " << sec << "sec";
+            std::cout << min << "min " << sec << "sec";
         }
         else {
             unsigned hour = interval_runtime/3600e3;
             unsigned min  = (interval_runtime - hour*3600e3)/60e3;
             unsigned sec  = (interval_runtime - min*60e3 - hour*3600e3)/1e3;
-            cout << hour << "h " << min << "min " << sec << "sec";
+            std::cout << hour << "h " << min << "min " << sec << "sec";
         }
-        cout << endl;
+        std::cout << std::endl;
 
         // Resume stopwatch.
         stopwatch.start();
     }
 }
 
-void recurrent_t::init_data(const string m_data_config){
+void recurrent_t::init_data(const std::string m_data_config){
     
     config_t config;
     config.parse(m_data_config);
     section_config_t section_config = config.sections[0];
 
     if((config.sections.size() != 1) || (config.sections[0].name != "data")) {
-        cerr << "Error : input config format error in " << m_data_config << endl;
+        std::cerr << "Error : input config format error in " << m_data_config << std::endl;
         exit(1);
     }
     
     // Read input configuration.
-    string input_list, label_list;
+    std::string input_list, label_list;
     if(run_type == TEST_RUN) { section_config.get_setting("test", &input_list);}
     else { section_config.get_setting("train", &input_list);}
     section_config.get_setting("labels", &label_list);
 
     // Read input file.
-    fstream input_list_file;
-    input_list_file.open(input_list.c_str(), fstream::in);
+    std::fstream input_list_file;
+    input_list_file.open(input_list.c_str(), std::fstream::in);
     if(!input_list_file.is_open()) {
-        cerr << "error : failed to open " << input_list << endl;
+        std::cerr << "error : failed to open " << input_list << std::endl;
         exit(1);
     }
     // Read input token from input file.
     // Save input token to vector named inputs.
-    string input;
-    /*
-    0518
-    while(!input_list_file.eof()) { 
-        getline(input_list_file, input, '\n');
-        inputs.push_back(input);
-    }
-    */
-    /**0519**/
+    std::string input;
     while(!input_list_file.eof()) {
         getline(input_list_file, input, ' ');
         input.erase(remove(input.begin(), input.end(), '\n'), input.end());
         inputs.push_back(lowercase(input));
     }
-    /**0519**/
     epoch_length = inputs.size() / batch_size;
            
     input_list_file.close();
 
     // Read label configuration.
-    fstream label_list_file;
-    label_list_file.open(label_list.c_str(), fstream::in);
+    std::fstream label_list_file;
+    label_list_file.open(label_list.c_str(), std::fstream::in);
     if(!label_list_file.is_open()) {
-        cerr << "error : failed to open " << label_list << endl;
+        std::cerr << "error : failed to open " << label_list << std::endl;
         exit(1);
     }
 
     // Read label words from label file.
     // Store label words to labels vector.
-    string label;
+    std::string label;
     while(!label_list_file.eof()) {
         getline(label_list_file, label, ' ');
         label.erase(remove(label.begin(), label.end(), '\n'), label.end());
@@ -350,7 +339,7 @@ void recurrent_t::init_data(const string m_data_config){
     label_list_file.close();
 
     input_size = labels.size();
-    cout << input_size  << ' ' << batch_size << endl;
+    std::cout << input_size  << ' ' << batch_size << std::endl;
     input_data  = new float[input_size * batch_size]();
     input_label = new float[input_size * batch_size]();
 #ifdef GPU_ENABLED

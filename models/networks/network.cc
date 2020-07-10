@@ -6,7 +6,6 @@
 #include "layer.h"
 #include "network.h"
 
-using namespace std;
 
 network_t::network_t() :
     run_type(UNDEFINED_RUN),
@@ -73,8 +72,8 @@ void network_t::update() {
 }
 
 // Initialize network.
-void network_t::init(const string m_run_type, const string m_network_config,
-                     const string m_data_config, const string m_input_weight) {
+void network_t::init(const std::string m_run_type,    const std::string m_network_config,
+                     const std::string m_data_config, const std::string m_input_weight) {
     std::cout << "Initializing network ..." << std::endl;
     // Set network run type.
     run_type = (run_type_t)get_type(run_type_str, m_run_type); 
@@ -90,11 +89,11 @@ void network_t::init(const string m_run_type, const string m_network_config,
 }
 
 // Initialize weight.
-void network_t::init_weight(const string m_input_weight) {
+void network_t::init_weight(const std::string m_input_weight) {
     if(m_input_weight.size()) {
         // Initialize weight from file.
-        fstream weight_file;
-        weight_file.open(m_input_weight.c_str(), fstream::in|fstream::binary);
+        std::fstream weight_file;
+        weight_file.open(m_input_weight.c_str(), std::fstream::in|std::fstream::binary);
         if(!weight_file.is_open()) {
             std::cerr << "Error: failed to open " << m_input_weight << std::endl;
             exit(1);
@@ -116,12 +115,12 @@ void network_t::init_weight(const string m_input_weight) {
 }
 
 // Store weight.
-void network_t::store_weight(const string m_output_weight) {
+void network_t::store_weight(const std::string m_output_weight) {
     // Skip storing weight if output weight file is not given.
     if(!m_output_weight.size()) { return; }
 
-    fstream weight_file;
-    weight_file.open(m_output_weight.c_str(), fstream::out|fstream::binary);
+    std::fstream weight_file;
+    weight_file.open(m_output_weight.c_str(), std::fstream::out|std::fstream::binary);
     if(!weight_file.is_open()) {
         std::cerr << "Error: failed to open " << m_output_weight << std::endl;
         exit(1);
@@ -133,3 +132,5 @@ void network_t::store_weight(const string m_output_weight) {
 
     weight_file.close();
 }
+
+
