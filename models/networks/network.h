@@ -43,7 +43,7 @@ public:
     unsigned input_size;                    // Input data size
     unsigned batch_size;                    // Batch size
 
-    unsigned time_step;                     // Time steps.
+    unsigned time_step;                     // Time steps used for recurrent networks
 
     float *input_data;                      // Input data
     float *input_label;                     // Input label
@@ -86,5 +86,6 @@ protected:
     float cumulative_cost;                  // Cumulative cost
     std::vector<float> cost_history;        // Latest cost history
 };
+
 
 #endif
