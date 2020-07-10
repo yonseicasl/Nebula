@@ -22,8 +22,6 @@
 #include "softmax_layer.h"
 #include "cost_layer.h"
 
-namespace nebula {
-
 fully_connected_t::fully_connected_t() :
     num_rbm_layers(0),
     num_pretrain_iterations(0) {
@@ -494,5 +492,3 @@ void fully_connected_t::print_results() {
     }
 }
 
-}
-// End of namespace nebula.

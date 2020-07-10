@@ -3,7 +3,6 @@
 
 #include "network.h"
 
-namespace nebula {
 
 class recurrent_t : public network_t {
 public:
@@ -31,7 +30,5 @@ private:
 
 };
 
-}
-// End of namespace nebula
 #endif
 
