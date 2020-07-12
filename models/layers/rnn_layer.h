@@ -4,6 +4,8 @@
 #include "layer.h"
 #include "connected_layer.h"
 
+namespace nebula {
+
 class rnn_layer_t : public layer_t {
 public:
     rnn_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type);
@@ -44,4 +46,6 @@ private:
     connected_layer_t *hidden_gate;
 };
 
+}
+// End of namespace nebula.
 #endif

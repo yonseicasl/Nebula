@@ -9,6 +9,8 @@
 #endif
 #include "softmax_layer.h"
 
+namespace nebula {
+
 softmax_layer_t::softmax_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type) {
 }
@@ -102,3 +104,6 @@ void softmax_layer_t::softmax() {
         }
     }
 }
+
+}
+// End of namespace nebula.

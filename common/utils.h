@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+namespace nebula {
+
 // Convert string to lowercase.
 std::string& lowercase(std::string &m_str);
 
@@ -48,5 +50,7 @@ void _backward_bias_(float *m_bias_update_dev, float *m_delta_dev,
                      unsigned m_channel, unsigned m_size, unsigned m_batch);
 #endif
 
+}
+// End of namespace nebula.
 #endif
 

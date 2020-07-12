@@ -3,6 +3,8 @@ extern "C++" {
 #include "def.h"
 }
 
+namespace nebula {
+
 __global__ void _unfold_(unsigned m_size, float* m_im_data, unsigned m_height, unsigned m_width,
                          unsigned m_filter_size, unsigned m_padding, unsigned m_stride,
                          unsigned m_col_height, unsigned m_col_width, float *m_col_data) {
@@ -123,3 +125,6 @@ void _backward_bias_(float *m_bias_update_dev, float *m_delta_dev,
     dim3 cuda_griddim = {(m_channel * m_size * m_batch - 1) / BLOCK_SIZE + 1, 1, 1};
     _add_delta_<<<cuda_griddim, BLOCK_SIZE>>>(m_bias_update_dev, m_delta_dev, m_channel, m_size, m_batch);
 }
+
+}
+// End of namespace nebula

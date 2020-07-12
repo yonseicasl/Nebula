@@ -4,6 +4,8 @@
 #include "layer.h"
 #include "gemm.h"
 
+namespace nebula {
+  
 class cost_layer_t : public layer_t {
 public :
     cost_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type);
@@ -36,6 +38,9 @@ public :
 private:
     cost_type_t cost_type;      // Cost type
 };
+
+}
+// End of namespace nebula.
 
 #endif
 

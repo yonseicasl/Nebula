@@ -3,6 +3,8 @@ extern "C++" {
 #include "gemm.h"
 }
 
+namespace nebula {
+
 extern "C++" void rnn_layer_t::_forward_() {
     network->batch_size /= network->time_step;
 
@@ -134,3 +136,6 @@ extern "C++" void rnn_layer_t::_update_() {
     input_gate->_update_();
     hidden_gate->_update_();
 }
+
+}
+// End of namespace nebula

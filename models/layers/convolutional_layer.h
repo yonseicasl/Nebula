@@ -3,6 +3,8 @@
 
 #include "layer.h"
 
+namespace nebula {
+
 class convolutional_layer_t : public layer_t {
 public:
     convolutional_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type);
@@ -90,6 +92,9 @@ private:
     float *workspace_dev;           // Workspace
 #endif
 };
+
+}
+// End of namespace nebula
 
 #endif
 

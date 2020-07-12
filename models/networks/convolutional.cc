@@ -26,6 +26,8 @@
 #include "shortcut_layer.h"
 #include "pooling_layer.h"
 
+namespace nebula {
+
 convolutional_t::convolutional_t() {
 }
 
@@ -465,3 +467,6 @@ void convolutional_t::print_results() {
         stopwatch.start();
     }
 }
+
+}
+// End of namespace nebula.

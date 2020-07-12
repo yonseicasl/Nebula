@@ -23,6 +23,7 @@
 #include "softmax_layer.h"
 #include "cost_layer.h"
 
+namespace nebula {
 
 recurrent_t::recurrent_t() {
 }
@@ -348,4 +349,8 @@ void recurrent_t::init_data(const std::string m_data_config){
     cudaMemset(input_data_dev, 0.0, input_size * batch_size * sizeof(float));
     cudaMemset(input_label_dev, 0.0, input_size * batch_size * sizeof(float));
 #endif
+
 }
+
+}
+// End of namespace nebula.

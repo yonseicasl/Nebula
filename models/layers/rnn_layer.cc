@@ -9,6 +9,8 @@
 #include "rnn_layer.h"
 #include "gemm.h"
 
+namespace nebula {
+
 rnn_layer_t::rnn_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
 #ifdef GPU_ENABLED
@@ -197,3 +199,5 @@ void rnn_layer_t:: update() {
     hidden_gate->update();
 }
 
+}
+// End of namespace nebula.

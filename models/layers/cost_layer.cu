@@ -2,6 +2,8 @@ extern "C++" {
 #include "cost_layer.h"
 }
 
+namespace nebula {
+
 __global__ void _l2_(unsigned m_total_size, float *m_input_data, float *m_label,
                      float *m_delta, float *m_output_data) {
     size_t tid = (blockIdx.x + blockIdx.y * gridDim.x) * blockDim.x + threadIdx.x;
@@ -68,3 +70,5 @@ extern "C++" void cost_layer_t::_update_() {
     // Nothing to do
 }
 
+}
+// End of namespace nebula.

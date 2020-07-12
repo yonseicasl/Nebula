@@ -7,6 +7,8 @@
 #include <vector>
 #include "utils.h"
 
+namespace nebula {
+
 // Configuration section
 class section_config_t {
 public:
@@ -45,5 +47,7 @@ public:
     std::vector<section_config_t> sections;
 };
 
+}
+// End of namespace nebula
 #endif
 

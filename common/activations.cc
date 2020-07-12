@@ -1,6 +1,8 @@
 #include "activations.h"
 #include <cmath>
 
+namespace nebula {
+
 void elu_activation(float *m_output, unsigned m_size){
     for(unsigned i =0; i < m_size; i++){
         m_output[i] = m_output[i] > 0.0 ?
@@ -152,3 +154,6 @@ void tanh_gradient(float *m_delta, float *m_output, unsigned m_size){
         m_delta[i] *= 1.0 - m_output[i] * m_output[i];
     }
 }
+
+}
+// End of namespace nebula.

@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 
+namespace nebula {
 
 #ifdef GPU_ENABLED
 
@@ -145,5 +146,7 @@ void gemm(bool TA, bool TB,
     } for_each(threads.begin(), threads.end(), [](std::thread& t) { t. join(); });
 }
 
+}
+// End of namespace nebula
 
 #endif

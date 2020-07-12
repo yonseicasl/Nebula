@@ -6,6 +6,8 @@
 #include "def.h"
 #include "network.h"
 
+namespace nebula {
+
 class layer_t {
 public:
     layer_t(network_t *m_network, layer_t *m_prev_layer,
@@ -82,4 +84,6 @@ protected:
     network_t   *network;               // Pointer to main network
 };
 
+}
+// End of namespace nebula.
 #endif

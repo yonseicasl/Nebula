@@ -2,6 +2,8 @@ extern "C++" {
 #include "pooling_layer.h"
 }
 
+namespace nebula {
+
 __global__ void _forward_maxpool_(unsigned m_total_size, unsigned m_input_height,
                                   unsigned m_input_width, unsigned m_input_channel,
                                   unsigned m_stride, unsigned m_filter_size, unsigned m_padding,
@@ -182,3 +184,6 @@ extern "C++" void pooling_layer_t::_backward_() {
 extern "C++" void pooling_layer_t::_update_(){
     // Nothing to do
 }
+
+}
+// End of namespace nebula.

@@ -8,6 +8,8 @@
 #endif
 #include "pooling_layer.h"
 
+namespace nebula {
+
 pooling_layer_t::pooling_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     index(NULL) {
@@ -204,3 +206,6 @@ void pooling_layer_t::update() {
 void pooling_layer_t::store_weight(std::fstream &m_weight_file) {
     //Nothing to do
 }
+
+}
+// End of namespace nebula.

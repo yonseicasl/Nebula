@@ -6,6 +6,8 @@
 #endif
 #include "layer.h"
 
+namespace nebula {
+
 class dropout_layer_t : public layer_t {
 public:
     dropout_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type);
@@ -43,6 +45,9 @@ private:
     float *rand_dev;
 #endif
 };
+
+}
+//End of namespace nebula.
 
 #endif
 

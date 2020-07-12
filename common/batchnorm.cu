@@ -3,6 +3,8 @@ extern "C++" {
 #include "def.h"
 }
 
+namespace nebula {
+
 // Calculate normalize mean value.
 __global__ void _mean_(float *m_output, float *m_mean, 
                        unsigned m_channel, unsigned m_size, unsigned m_batch){
@@ -189,3 +191,5 @@ void _batchnorm_normalize_delta_(float *m_x, float *m_normalize_mean, float *m_n
     _normalize_delta_<<<cuda_griddim, BLOCK_SIZE>>>(m_x, m_normalize_mean, m_normalize_variance, m_mean_delta, m_variance_delta, m_delta, m_channel, m_size, m_batch); 
 }
 
+}
+// End of namespace nebula.

@@ -4,6 +4,8 @@
 #define block_size 32
 #define grid_size 8
 
+namespace nebula {
+
 __global__ void axpy_(unsigned m_size, 
                        const float alpha, 
                        float *X, unsigned incx, 
@@ -149,3 +151,6 @@ extern "C++" void _gemm_(int TA, int TB, int M, int N, int K, float ALPHA,
         _gemm_tt_<<<grid_dim, block_dim>>>(M, N, K, ALPHA, A, lda, B, ldb, BETA, C, ldc);
     }
 }
+
+}
+// End of namespace nebula.

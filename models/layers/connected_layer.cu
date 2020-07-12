@@ -5,6 +5,7 @@ extern "C++" {
 #include "gemm.h"
 }
 
+namespace nebula {
 // Forward propagation
 extern "C++" void connected_layer_t::_forward_() {
     cudaMemset(output_data_dev, 0.0, output_size*network->batch_size*sizeof(float));
@@ -317,3 +318,6 @@ extern "C++" void connected_layer_t::_increment_(int step) {
         normalize_x_dev += num;
     }
 }
+
+}
+// End of namespace nebula.

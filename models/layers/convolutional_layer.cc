@@ -15,6 +15,8 @@
 #include "batchnorm.h"
 #include "gemm.h"
 
+namespace nebula { 
+
 convolutional_layer_t::convolutional_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     workspace(NULL),
@@ -454,3 +456,6 @@ void convolutional_layer_t::backward_batchnorm() {
                     mean_delta, variance_delta, delta, 
                     output_channel, num_patches, network->batch_size); 
 }
+
+}
+//End of namespace nebula.

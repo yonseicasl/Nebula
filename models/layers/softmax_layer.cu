@@ -2,6 +2,8 @@ extern "C++" {
 #include "softmax_layer.h"
 }
 
+namespace nebula {
+
 __global__ void _softmax_(float *m_input_data, unsigned m_input_size, unsigned m_batch_size,
                           float *m_output_data) {
     size_t tid = (blockIdx.x + blockIdx.y * gridDim.x) * blockDim.x + threadIdx.x;
@@ -55,3 +57,5 @@ void softmax_layer_t::_update_() {
     // Nothing to do
 }
 
+}
+// End of namespace nebula.

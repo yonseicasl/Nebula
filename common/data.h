@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 
+namespace nebula {
 
 template <typename T>
 class batch_t {
@@ -58,6 +59,7 @@ public:
     T     *vals;
 };
 
-
+}
+// End of namespace nebula.
 
 #endif
