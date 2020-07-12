@@ -5,6 +5,8 @@ extern "C++" {
 #include "gemm.h"
 }
 
+namespace nebula {
+
 // Forward propagation
 extern "C++" void convolutional_layer_t::_forward_() {
     cudaMemset(output_data_dev, 0, output_size*network->batch_size*sizeof(float));
@@ -216,3 +218,8 @@ extern "C++" void convolutional_layer_t::_backward_batchnorm_() {
                                 output_channel, num_patches, network->batch_size); 
 }
 
+<<<<<<< HEAD
+=======
+}
+// End of namespace nebula.
+>>>>>>> namespace

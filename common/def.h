@@ -8,6 +8,8 @@
 
 #define BLOCK_SIZE 512
 
+namespace nebula {
+
 // Run types
 enum run_type_t {
     UNDEFINED_RUN = 0,
@@ -118,5 +120,7 @@ static std::vector<std::string> cost_type_str __attribute__((unused)) = {
 #define get_type(m_vector, m_string) \
     distance(m_vector.begin(), find(m_vector.begin(), m_vector.end(), m_string.c_str()))
 
+}
+// End of namespace nebula.
 #endif
 

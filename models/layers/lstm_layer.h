@@ -4,6 +4,8 @@
 #include "layer.h"
 #include "connected_layer.h"
 
+namespace nebula {
+
 class lstm_layer_t : public layer_t {
 public:
     lstm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type);
@@ -76,4 +78,6 @@ private:
 
 };
 
+}
+// End of namespace nebula.
 #endif

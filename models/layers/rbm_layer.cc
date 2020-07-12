@@ -14,6 +14,8 @@
 #include "gemm.h"
 #include "activations.h"
 
+namespace nebula {
+
 rbm_layer_t::rbm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     weight(NULL),
@@ -468,3 +470,6 @@ void rbm_layer_t::update() {
     cblas_sscal(weight_size, network->momentum, weight_update, 1);
 #endif
 }
+
+}
+// End of namespace nebula.

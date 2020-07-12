@@ -11,6 +11,8 @@
 #include "lstm_layer.h"
 #include "activations.h"
 
+namespace nebula {
+
 lstm_layer_t::lstm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     cell_state(NULL),
@@ -510,3 +512,5 @@ void lstm_layer_t::update() {
     output_gate_U->update();
 }
 
+}
+// End of namespace nebula.

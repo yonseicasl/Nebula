@@ -11,6 +11,8 @@
 #include <cstring>
 #include "batchnorm.h"
 
+namespace nebula {
+
 void batchnorm_mean(unsigned num_threads, float *m_output, float *m_mean, 
                     unsigned m_channel, unsigned m_size, unsigned m_batch){
     std::vector<std::thread> threads;
@@ -134,3 +136,6 @@ void batchnorm_normalize_delta(unsigned num_threads, float *m_x, float *m_mean, 
         }
     }
 }
+
+}
+// End of namespace nebula.

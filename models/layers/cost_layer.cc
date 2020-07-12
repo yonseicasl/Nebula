@@ -7,6 +7,8 @@
 #endif
 #include "cost_layer.h"
 
+namespace nebula {
+
 cost_layer_t::cost_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     cost_type(UNDEFINED_COST) {
@@ -100,3 +102,5 @@ void cost_layer_t::store_weight(std::fstream &m_weight_file) {
     // Nothing to do
 }
 
+}
+// End of namespace nebula.

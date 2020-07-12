@@ -3,6 +3,8 @@
 
 #include "layer.h"
 
+namespace nebula {
+
 class pooling_layer_t : public layer_t {
 public:
     pooling_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type);
@@ -37,5 +39,10 @@ private:
 #ifdef GPU_ENABLED
     unsigned *index_dev;
 #endif
+
 };
+
+}
+// End of namespace nebula.
+
 #endif

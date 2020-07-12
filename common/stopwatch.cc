@@ -2,6 +2,8 @@
 #include <iostream>
 #include "stopwatch.h"
 
+namespace nebula {
+
 stopwatch_t::stopwatch_t() :
     total_time(0.0),
     interval_time(0.0) {
@@ -40,3 +42,5 @@ float stopwatch_t::get_total_time() const {
     return total_time;
 }
 
+}
+// End of namespace nebula.

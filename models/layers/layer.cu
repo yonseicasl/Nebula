@@ -3,6 +3,8 @@ extern "C++" {
 #include "activations.h"
 }
 
+namespace nebula {
+
 // Activate function
 extern "C++" void layer_t::_activate_() {
     switch(activation_type) {
@@ -129,4 +131,7 @@ extern "C++" void layer_t::_gradient_() {
         }
     }
 }
+
+}
+// End of namespace nebula.
 

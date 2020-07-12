@@ -9,6 +9,10 @@
 #include "def.h"
 #include "stopwatch.h"
 
+<<<<<<< HEAD
+=======
+namespace nebula {
+>>>>>>> namespace
 
 class layer_t;
 
@@ -88,5 +92,7 @@ protected:
     std::vector<float> cost_history;        // Latest cost history
 };
 
+}
+// End of namespace nebula. 
 
 #endif

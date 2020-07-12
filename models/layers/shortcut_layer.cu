@@ -3,6 +3,8 @@ extern "C++" {
 #include "gemm.h"
 }
 
+namespace nebula {
+
 __global__ void _shortcut_(unsigned m_width, unsigned m_height, unsigned m_channel, unsigned m_stride, unsigned m_sample,
                            unsigned m_input_width, unsigned m_input_height, unsigned m_input_channel, float *m_input_data_dev, 
                            unsigned m_output_width, unsigned m_output_height, unsigned m_output_channel, float *m_output_data_dev, unsigned m_batch) {
@@ -78,4 +80,10 @@ extern "C++" void shortcut_layer_t::_backward_() {
                             
 }
 
-extern "C++" void shortcut_layer_t::_update_() {}
+extern "C++" void shortcut_layer_t::_update_() {
+    // Nothing to do.    
+}
+
+
+}
+// End of namespace nebula.

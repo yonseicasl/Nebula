@@ -8,6 +8,8 @@ extern "C++" {
 #include <cuda_runtime.h>
 #include "activations.cu"
 
+namespace nebula {
+
 __global__ void _forward_bias_rbm_(float *m_output_data, float *m_bias, unsigned m_batch_size,
                                unsigned m_output_size) {
     unsigned i = (blockIdx.x + blockIdx.y * gridDim.x) * blockDim.x + threadIdx.x;
@@ -356,3 +358,6 @@ extern "C++" void rbm_layer_t::_update_() {
 #endif
 
 }
+
+}
+// End of namespace nebula.

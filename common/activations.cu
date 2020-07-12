@@ -3,6 +3,8 @@ extern "C++"{
 #include "def.h"
 }
 
+namespace nebula {
+
 __global__ void _elu_activate_(float *m_output, unsigned m_total_size) {
     size_t i = (blockIdx.x + blockIdx.y * gridDim.x) * blockDim.x + threadIdx.x;
     if(i >= m_total_size) { return; }
@@ -259,3 +261,6 @@ extern "C++" void _tanh_gradient_(float *m_output, float *m_delta, unsigned m_si
     dim3 cuda_griddim = {(m_size - 1) / BLOCK_SIZE + 1, 1, 1}; 
     _tanh_grad_<<<cuda_griddim, BLOCK_SIZE>>>(m_output, m_delta, m_size);
 }
+
+}
+// End of namespace nebula

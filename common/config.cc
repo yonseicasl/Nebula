@@ -7,6 +7,8 @@
 #include "config.h"
 #include "utils.h"
 
+namespace nebula {
+
 // Configuration section
 section_config_t::section_config_t(std::string m_name) :
     name(m_name) {
@@ -72,3 +74,5 @@ void config_t::parse(std::string m_config_name) {
     }
 }
 
+}
+// End of namespace nebula

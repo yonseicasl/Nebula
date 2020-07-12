@@ -5,6 +5,8 @@
 #include "def.h"
 #include <iomanip>
 
+namespace nebula {
+
 class stopwatch_t {
 public:
     stopwatch_t();
@@ -23,6 +25,7 @@ private:
     timeval end_time;
 };
 
-
+}
+// End of namespace nebula.
 #endif
 

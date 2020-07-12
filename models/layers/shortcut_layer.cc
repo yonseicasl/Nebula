@@ -13,6 +13,8 @@
 #include "shortcut_layer.h"
 #include "gemm.h"
 
+namespace nebula {
+
 shortcut_layer_t::shortcut_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type) {
 }
@@ -89,5 +91,12 @@ void shortcut_layer_t::backward() {
              input_width, input_height, input_channel, connection->delta, network->batch_size);
 }
 
-void shortcut_layer_t::update(){}
-void shortcut_layer_t::store_weight(std::fstream &m_weight_file){}
+void shortcut_layer_t::update(){
+    // Nothing to do.    
+}
+void shortcut_layer_t::store_weight(std::fstream &m_weight_file){
+    // Nothing to do,    
+}
+
+}
+// End of namespace nebula.

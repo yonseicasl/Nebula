@@ -2,6 +2,8 @@ extern "C++" {
 #include "dropout_layer.h"
 }
 
+namespace nebula {
+
 __global__ void _dropout_(float *m_input_data, unsigned m_total_size, float *m_rand,
                           float m_probability, float m_scale) {
     size_t tid = (blockIdx.x + blockIdx.y * gridDim.x) * blockDim.x + threadIdx.x;
@@ -38,3 +40,5 @@ extern "C++" void dropout_layer_t::_update_() {
     // Nothing to do
 }
 
+}
+// End of namespace nebula.

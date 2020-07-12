@@ -3,6 +3,8 @@ extern "C++" {
 #include "activations.h"
 }
 
+namespace nebula {
+
 __global__ void _multiply_(unsigned m_size, 
                            float *X, unsigned incx, 
                            float *Y, unsigned incy){
@@ -333,3 +335,6 @@ extern "C++" void lstm_layer_t::_update_() {
 
     network->batch_size *= network->time_step;
 }
+
+}
+// End of namespace nebula.

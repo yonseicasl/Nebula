@@ -1,6 +1,7 @@
 #ifndef __BATCHNORM_H__
 #define __BATCHNORM_H__
 
+namespace nebula {
 
 void batchnorm_mean(unsigned num_threads, float *m_output, float *m_mean, 
                     unsigned m_channel, unsigned m_size, unsigned m_batch);
@@ -39,6 +40,9 @@ void _batchnorm_variance_delta_(float *m_x, float *m_delta, float *m_mean, float
 void _batchnorm_normalize_delta_(float *m_x, float *m_normalize_mean, float *m_normalize_variance, float *m_mean_delta, float *m_variance_delta, float *m_delta, unsigned m_channel, unsigned m_size, unsigned m_batch);
 
 #endif
+
+}
+// End of namespace nebula
 
 #endif
 

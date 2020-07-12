@@ -1,6 +1,8 @@
 #ifndef __ACTIVATIONS_H__
 #define __ACTIVATIONS_H__
 
+namespace nebula {
+
 // Activation function
 void elu_activation(float *m_output, unsigned m_size);
 void hardtan_activation(float *m_output, unsigned m_size);
@@ -61,4 +63,10 @@ void _relu_gradient_(float *m_output, float *m_delta, unsigned m_size);
 void _stair_gradient_(float *m_output, float *m_delta, unsigned m_size);
 void _tanh_gradient_(float *m_output, float *m_delta, unsigned m_size);
 #endif
+
+}
+// End of namespace nebula.
+
+
 #endif
+

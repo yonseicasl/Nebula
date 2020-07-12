@@ -11,6 +11,8 @@
 #include <cstring>
 #include "utils.h"
 
+namespace nebula {
+
 // Convert string to lowercase.
 std::string& lowercase(std::string &m_str) {
     transform(m_str.begin(), m_str.end(), m_str.begin(), ::tolower);
@@ -199,3 +201,5 @@ void backward_bias(unsigned num_threads, float *m_bias_update, float *m_delta,
     } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
+}
+// End of namespace nebula.

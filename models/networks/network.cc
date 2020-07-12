@@ -6,6 +6,11 @@
 #include "layer.h"
 #include "network.h"
 
+<<<<<<< HEAD
+=======
+namespace nebula {
+
+>>>>>>> namespace
 network_t::network_t() :
     run_type(UNDEFINED_RUN),
     num_threads(1),
@@ -132,3 +137,8 @@ void network_t::store_weight(const std::string m_output_weight) {
     weight_file.close();
 }
 
+<<<<<<< HEAD
+=======
+}
+// End of namespace nebula.
+>>>>>>> namespace
