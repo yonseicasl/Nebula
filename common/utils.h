@@ -15,8 +15,18 @@ std::string& uppercase(std::string &m_str);
 void shortcut(unsigned num_threads, 
               unsigned m_input_width, unsigned m_input_height, unsigned m_input_channel, float *m_input_data,
               unsigned m_output_width, unsigned m_output_height, unsigned m_output_channel, float *m_output_data, unsigned m_batch);
-//void shortcut(unsigned batch, unsigned w1, unsigned h1, unsigned c1, float *add, 
-//                  unsigned w2, unsigned h2, unsigned c2, float *out);
+
+// Sampling the selected data 
+void sampling(float *m_sample, float *m_probability, unsigned m_size, unsigned num_threads);
+
+#ifdef GPU_ENABLED
+
+void _sampling_(float *m_sample, float *m_probability, unsigned m_size);
+
+void _update_bias_unit_(float *m_bias_unit, float *m_zero_value, float *m_k_value, unsigned m_size, unsigned m_batch);
+
+#endif
+
 // Unfold data.
 void im2col(float *m_im_data, unsigned m_channel, unsigned m_height, unsigned m_width,
             unsigned m_filter_size, unsigned m_stride, unsigned m_padding, float *m_col_data,

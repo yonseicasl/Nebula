@@ -5,6 +5,32 @@ extern "C++" {
 
 namespace nebula {
 
+__global__ void _sample_(float *m_sample, float *m_probability, unsigned m_size) {
+    size_t i = (blockIdx.x + blockIdx.y * gridDim.x) * blockDim.x + threadIdx.x;
+    if(i >= m_size) { return; }
+    m_sample[i] = m_sample[i] < m_probability[i] ? 1.0 : 0.0;
+}
+
+void _sampling_(float *m_sample, float *m_probability, unsigned m_size) {
+    dim3 cuda_griddim = {(m_size - 1) / BLOCK_SIZE + 1, 1, 1};
+    _sample_<<<cuda_griddim, BLOCK_SIZE>>>(m_sample, m_probability, m_size);
+}
+
+__global__ void _update_unit_(float *m_bias_unit, float *m_zero_value, float *m_k_value, unsigned m_size, unsigned m_batch) {
+    size_t index = (blockIdx.x + blockIdx.y * gridDim.x) * blockDim.x + threadIdx.x;
+    if(index >= m_size) { return; }
+
+    for(unsigned i = 0; i < m_batch; i++) {
+         m_bias_unit[index] += m_zero_value[i * m_size + index] - m_k_value[i * m_size + index];
+    }
+}
+
+void _update_bias_unit_(float *m_bias_unit, float *m_zero_value, float *m_k_value, unsigned m_size, unsigned m_batch) {
+    dim3 cuda_griddim = {(m_size - 1) / BLOCK_SIZE + 1, 1, 1}; 
+    _update_unit_<<<cuda_griddim, BLOCK_SIZE>>>(m_bias_unit, m_zero_value, m_k_value, m_size, m_batch);
+
+}
+
 __global__ void _unfold_(unsigned m_size, float* m_im_data, unsigned m_height, unsigned m_width,
                          unsigned m_filter_size, unsigned m_padding, unsigned m_stride,
                          unsigned m_col_height, unsigned m_col_width, float *m_col_data) {

@@ -218,8 +218,5 @@ extern "C++" void convolutional_layer_t::_backward_batchnorm_() {
                                 output_channel, num_patches, network->batch_size); 
 }
 
-<<<<<<< HEAD
-=======
 }
 // End of namespace nebula.
->>>>>>> namespace

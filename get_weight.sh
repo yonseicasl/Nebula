@@ -15,8 +15,7 @@ get_target_id() {
 			echo -e "Does not support weight file of $1"
 			exit 1;;
 		alexnet_M )
-			echo -e "Does not support weight file of $1"
-			exit 1;;
+            FILEID="1MYFsiV-LHt4sK-OumUlbfWooOcsFze7Y" ;;
 		alexnet_L )
 			FILEID="1CJyYVci0vgjZAf3kl_i1_VJaowFkZ6qV" ;;
 		vgg_S )
@@ -31,12 +30,12 @@ get_target_id() {
 			FILEID="1Re0I0q0_ngt2NRcAd22AQthpxCtoeTi6" ;;
 		mlp_L )
 			FILEID="1l8POYfrLT2ZEIRbljt-7ub7-dXpEA1l2" ;;
-		dbn_S )
-			FILEID="1eT8bN0DPPtQNLumF92IEHQI31vTLV9gx" ;;
-		dbn_M )
-			FILEID="1dertTo4oNPxb8u4I3RVP9g1absIyAV78" ;;
 		dbn_L )
 			FILEID="1b1Fhhxsn4SRTmjLtii6Bxmjh_i71bZmr" ;;
+		dbn_M )
+			FILEID="1dertTo4oNPxb8u4I3RVP9g1absIyAV78" ;;
+		dbn_S )
+			FILEID="1eT8bN0DPPtQNLumF92IEHQI31vTLV9gx" ;;
 		resnet_L )
 			FILEID="1XYuSRsPm1HlDXQRLtvTx9sVmXbgXTCG2" ;;
 		resnet_M )

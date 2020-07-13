@@ -23,11 +23,8 @@
 #include "softmax_layer.h"
 #include "cost_layer.h"
 
-<<<<<<< HEAD
-=======
 namespace nebula {
 
->>>>>>> namespace
 recurrent_t::recurrent_t() {
 }
 
@@ -356,8 +353,5 @@ void recurrent_t::init_data(const std::string m_data_config){
 }
 
 }
-<<<<<<< HEAD
 
-=======
 // End of namespace nebula.
->>>>>>> namespace

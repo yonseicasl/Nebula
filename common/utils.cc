@@ -59,28 +59,23 @@ void shortcut(unsigned num_threads,
     } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
-//void shortcut(unsigned batch, unsigned w1, unsigned h1, unsigned c1, float *add, 
-//                  unsigned w2, unsigned h2, unsigned c2, float *out)
-//{
-//    unsigned stride = w1/w2 > 1 ? w1/w2 : 1;
-//    unsigned sample = w2/w1 > 1 ? w2/w1 : 1;
-//
-//    unsigned min_width = (w1 < w2) ? w1 : w2;
-//    unsigned min_height = (h1 < h2) ? h1 : h2;
-//    unsigned min_channel = (c1 < c2) ? c1 : c2;
-//
-//    for(unsigned b = 0; b < batch; ++b){
-//        for(unsigned k = 0; k < min_channel; ++k){
-//            for(unsigned j = 0; j < min_height; ++j){
-//                for(unsigned i = 0; i < min_width; ++i){
-//                    unsigned out_index = i*sample + w2*(j*sample + h2*(k + c2*b));
-//                    unsigned add_index = i*stride + w1*(j*stride + h1*(k + c1*b));
-//                    out[out_index] += add[add_index];
-//                }
-//            }
-//        }
-//    }
-//}
+// Sampling the selected data 
+void sampling(float *m_sample, float *m_probability, unsigned m_size, unsigned num_threads) {
+    std::minstd_rand generator(std::random_device{}());
+    std::uniform_real_distribution<float> distribution(0.0, 1.0);
+
+    std::vector<std::thread> threads;
+    threads.reserve(num_threads);
+    for(unsigned tid = 0; tid < num_threads; tid++) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
+            for(unsigned i = begin; i < end; i++) {
+                if(distribution(generator) < m_probability[i]) {m_sample[i] = 1.0;}
+                else {m_sample[i] = 0.0;}
+            }
+        }, tid * m_size / num_threads, (tid + 1) * m_size / num_threads, tid));
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
+}
 
 // Unfold data.
 void im2col(float* m_im_data, unsigned m_channel, unsigned m_height, unsigned m_width,

@@ -19,6 +19,15 @@ get_data_ID() {
 			DATAID="1grcL1Ktahh1dgUbKqLIOv7BR7hzJmjo8" ;;
 		NIST_S )
 			DATAID="1pRW2Uovd8r1Fd-qKb6mMjFbFnXGd-JMu" ;;
+		PTB_L )
+            echo -e "Does not support dataset of $1" 
+			exit 1 ;;
+		PTB_M )
+            echo -e "Does not support dataset of $1" 
+			exit 1 ;;
+		PTB_S )
+            echo -e "Does not support dataset of $1" 
+			exit 1 ;;
 		MNIST )
             echo -e "Does not support dataset of $1" 
 			exit 1 ;;
@@ -33,13 +42,15 @@ if [[ ! -d $datadir ]]; then
 fi
 
 # Choose a database type.
-read -p "Which dataset? [ImageNet[I] / NIST[N] / MNIST[M]] " ans
+read -p "Which dataset? [ImageNet[I] / NIST[N] / MNIST[M]] / PTB[P] " ans
 if [[ $ans = "ImageNet" || $ans = "I" ]]; then
 	dataset=ImageNet
 elif [[ $ans = "NIST" || $ans = "N" ]]; then
 	dataset=NIST
 elif [[ $ans = "MNIST" || $ans = "M" ]]; then
 	dataset=MNIST
+elif [[ $ans = "PTB" || $ans = "P" ]]; then
+	dataset=PTB
 else
 	echo -e "Wrong option for dataset"
 	exit 1

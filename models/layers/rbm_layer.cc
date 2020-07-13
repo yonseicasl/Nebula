@@ -95,13 +95,13 @@ void rbm_layer_t::init(section_config_t m_section_config) {
     weight = new float[input_size * output_size]();
     weight_update = new float[input_size * output_size]();
     
-    hidden_units           = new float[network->batch_size * output_size]();
-    hidden_mean_zero_step  = new float[network->batch_size * output_size]();
-    hidden_mean_k_step     = new float[network->batch_size * output_size]();
+    hidden_units           = new float[output_size * network->batch_size]();
+    hidden_mean_zero_step  = new float[output_size * network->batch_size]();
+    hidden_mean_k_step     = new float[output_size * network->batch_size]();
    
-    visible_units_zero_step = new float[network->batch_size * input_size]();
-    visible_units_k_step    = new float[network->batch_size * input_size]();
-    visible_mean            = new float[network->batch_size * input_size]();
+    visible_units_zero_step = new float[input_size * network->batch_size]();
+    visible_units_k_step    = new float[input_size * network->batch_size]();
+    visible_mean            = new float[input_size * network->batch_size]();
 
     visible_bias = new float[input_size]();
     hidden_bias = new float[output_size]();
@@ -119,16 +119,16 @@ void rbm_layer_t::init(section_config_t m_section_config) {
     cudaMemset(weight_dev, 0.0, input_size * output_size * sizeof(float));
     cudaMemset(weight_update_dev, 0.0, input_size * output_size * sizeof(float));
     
-    cudaMalloc((void**)&hidden_units_dev, output_size * network->batch_size *sizeof(float));
-    cudaMalloc((void**)&hidden_mean_zero_step_dev, output_size * network->batch_size *sizeof(float));
-    cudaMalloc((void**)&hidden_mean_k_step_dev, output_size * network->batch_size *sizeof(float));
+    cudaMalloc((void**)&hidden_units_dev, output_size * network->batch_size * sizeof(float));
+    cudaMalloc((void**)&hidden_mean_zero_step_dev, output_size * network->batch_size * sizeof(float));
+    cudaMalloc((void**)&hidden_mean_k_step_dev, output_size * network->batch_size * sizeof(float));
     cudaMemset(hidden_units_dev, 0.0, output_size * network->batch_size * sizeof(float));
     cudaMemset(hidden_mean_zero_step_dev, 0.0, output_size * network->batch_size * sizeof(float));
     cudaMemset(hidden_mean_k_step_dev, 0.0, output_size * network->batch_size * sizeof(float));
     
-    cudaMalloc((void**)&visible_units_zero_step_dev, input_size* network->batch_size *sizeof(float));
-    cudaMalloc((void**)&visible_units_k_step_dev, input_size* network->batch_size *sizeof(float));
-    cudaMalloc((void**)&visible_mean_dev, input_size* network->batch_size *sizeof(float));
+    cudaMalloc((void**)&visible_units_zero_step_dev, input_size* network->batch_size * sizeof(float));
+    cudaMalloc((void**)&visible_units_k_step_dev, input_size* network->batch_size * sizeof(float));
+    cudaMalloc((void**)&visible_mean_dev, input_size* network->batch_size * sizeof(float));
     cudaMemset(visible_units_zero_step_dev, 0.0, input_size * network->batch_size * sizeof(float));
     cudaMemset(visible_units_k_step_dev, 0.0, input_size * network->batch_size * sizeof(float));
     cudaMemset(visible_mean_dev, 0.0, input_size * network->batch_size * sizeof(float));
@@ -180,23 +180,6 @@ void rbm_layer_t::store_weight(std::fstream &m_output_weight) {
     m_output_weight.write((char*)weight, weight_size * sizeof(float));
 }
 
-// Sampling using the conditional probability
-void sampling(float *sample, float *probability, unsigned size) {
-    
-    srand(static_cast <unsigned> (time(0)));
-
-    for(unsigned i = 0; i < size; i++) {
-        if(probability[i] < 0.0 || probability[i] > 1.0) {
-            return;
-        }
-
-        // choose random floats in the half-open interval [0.0,1.0)
-        float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX+1.0);
-        if ( r < probability[i]) sample[i] = 1.0;
-        else sample[i] = 0.0;
-    }
-}
-
 // Sample hidden units using visible units value
 void rbm_layer_t::sample_hidden_units(unsigned m_step) {
     memset(hidden_units, 0.0, output_size * network->batch_size * sizeof(float));
@@ -234,7 +217,7 @@ void rbm_layer_t::sample_hidden_units(unsigned m_step) {
     
     forward_bias(num_threads, t_hidden_mean, hidden_bias, output_size, 1, network->batch_size); 
     logistic_activation(t_hidden_mean, network->batch_size * output_size);
-    sampling(hidden_units, t_hidden_mean, network->batch_size * output_size);
+    sampling(hidden_units, t_hidden_mean, output_size * network->batch_size, network->num_threads);
 }
 
 // Sample visible units using hidden units value
@@ -261,34 +244,25 @@ void rbm_layer_t::sample_visible_units() {
 #endif
     
     forward_bias(num_threads, visible_mean, visible_bias, input_size, 1, network->batch_size);
-    logistic_activation(visible_mean, network->batch_size * input_size);
-    sampling(visible_units_k_step, visible_mean, network->batch_size * input_size);
+    logistic_activation(visible_mean, input_size * network->batch_size);
+    sampling(visible_units_k_step, visible_mean, input_size * network->batch_size, network->num_threads);
 }
 
 // Reconstruct the visible units and pretrain weight.
 void rbm_layer_t::pretrain() {
-    memset(output_data, 0, output_size * network->batch_size * sizeof(float));
-    memset(delta , 0, output_size * network->batch_size * sizeof(float));
+    memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
+    memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
 
     float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
     
     memcpy(visible_units_zero_step, input_data, input_size * network->batch_size * sizeof(float));
 
     // K-step contrastive divergence_gradient approximation for weight update and bias update
-    for(unsigned t = 0; t < k_step; t++)
-    {
-        if(!t)
-        {
-            sample_hidden_units(t);
-            sample_visible_units();
-        }
-        else
-        {
-            sample_hidden_units(t);
-            sample_visible_units();
-        }
-        sample_hidden_units(1);
+    for(unsigned t = 0; t < k_step; t++) {
+        sample_hidden_units(t);
+        sample_visible_units();
     }
+    sample_hidden_units(1);
     
 #ifdef CUSTOM_BLAS
     gemm(1, 0, 
@@ -326,15 +300,16 @@ void rbm_layer_t::pretrain() {
 #endif
      
     // Calculate bias update 
-    for(unsigned i = 0; i < network->batch_size; i++)
-    {
-        for(unsigned j = 0; j < output_size; j++)
-        {
-			hidden_bias_update[j] += hidden_mean_zero_step[i*output_size +j] - hidden_mean_k_step[i*output_size +j];
+    for(unsigned i = 0; i < network->batch_size; i++) {
+        // Update hidden bias.
+        for(unsigned j = 0; j < output_size; j++) {
+			hidden_bias_update[j] += hidden_mean_zero_step[i * output_size + j] 
+                                     - hidden_mean_k_step[i * output_size + j];
         }
-        for(unsigned k = 0; k < input_size; k++)
-        {
-			visible_bias_update[k] += visible_units_zero_step[i*input_size +k] - visible_units_k_step[i*input_size +k];
+        // Update visible bias.
+        for(unsigned k = 0; k < input_size; k++) { 
+			visible_bias_update[k] += visible_units_zero_step[i * input_size + k] 
+                                      - visible_units_k_step[i * input_size + k];
         }
     }
     
@@ -441,7 +416,7 @@ void rbm_layer_t::backward() {
 #else
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 
                     network->batch_size, input_size, output_size, 
-                    1.0, 
+                    1.0,
                     delta, output_size, 
                     weight, input_size, 
                     1.0, 

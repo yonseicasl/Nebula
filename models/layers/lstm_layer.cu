@@ -322,7 +322,6 @@ extern "C++" void lstm_layer_t::_backward_() {
 
 extern "C++" void lstm_layer_t::_update_() {
 
-    network->batch_size /= network->time_step;
     input_gate_W->_update_();
     forget_gate_W->_update_();
     cell_gate_W->_update_();
@@ -333,7 +332,6 @@ extern "C++" void lstm_layer_t::_update_() {
     cell_gate_U->_update_();
     output_gate_U->_update_();
 
-    network->batch_size *= network->time_step;
 }
 
 }

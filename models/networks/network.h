@@ -9,10 +9,7 @@
 #include "def.h"
 #include "stopwatch.h"
 
-<<<<<<< HEAD
-=======
 namespace nebula {
->>>>>>> namespace
 
 class layer_t;
 

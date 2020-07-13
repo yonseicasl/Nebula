@@ -319,8 +319,5 @@ extern "C++" void connected_layer_t::_increment_(int step) {
     }
 }
 
-<<<<<<< HEAD
-=======
 }
 // End of namespace nebula.
->>>>>>> namespace

@@ -517,8 +517,5 @@ void connected_layer_t::increment(int step){
     }
 }
 
-<<<<<<< HEAD
-=======
 }
 // End of namespace nebula.
->>>>>>> namespace

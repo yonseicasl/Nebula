@@ -468,8 +468,5 @@ void convolutional_t::print_results() {
     }
 }
 
-<<<<<<< HEAD
-=======
 }
 // End of namespace nebula.
->>>>>>> namespace

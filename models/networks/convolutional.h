@@ -3,10 +3,7 @@
 
 #include "network.h"
 
-<<<<<<< HEAD
-=======
 namespace nebula {
->>>>>>> namespace
 
 class convolutional_t : public network_t {
 public:
@@ -29,12 +26,7 @@ private:
     std::vector<std::string> inputs;                        // List of input data
 };
 
-<<<<<<< HEAD
-
-#endif
-=======
 }
 // End of namespace nebula.
->>>>>>> namespace
 
 #endif
