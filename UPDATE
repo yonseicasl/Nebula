@@ -8,5 +8,6 @@
 #######################################################
 
 Update history:
-* Version 1.0 (TBD)
+* Version 1.0 (July 09, 2020)
     - Initial release
+    - Support convolutional and fully-connected networks.
