@@ -44,6 +44,7 @@ private:
     bool batch_normalize; 
     connected_layer_t *input_gate;
     connected_layer_t *hidden_gate;
+    connected_layer_t *output_gate;
 };
 
 }

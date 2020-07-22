@@ -45,14 +45,18 @@ void rnn_layer_t::init(section_config_t m_section_config) {
     state = new float[output_size * network->batch_size / network->time_step]();
     prev_state = new float[output_size * network->batch_size / network->time_step]();
 
+    // Initialize all gates of rnn cell.
     input_gate  = new connected_layer_t(network, prev_layer ? prev_layer : NULL, CONNECTED_LAYER); 
     hidden_gate = new connected_layer_t(network, input_gate, CONNECTED_LAYER); 
+    output_gate = new connected_layer_t(network, hidden_gate, CONNECTED_LAYER);
 
     input_gate->init(m_section_config);
     hidden_gate->init(m_section_config);
+    output_gate->init(m_section_config);
 
-    output_data = hidden_gate->output_data;
-    delta = hidden_gate->delta;
+    output_data = output_gate->output_data;
+    delta = output_gate->delta;
+
 #ifdef GPU_ENABLED
     cudaMalloc((void**)&state_dev, output_size * network->batch_size * sizeof(float) / network->time_step);
     cudaMalloc((void**)&prev_state_dev, output_size * network->batch_size * sizeof(float) / network->time_step);
@@ -60,8 +64,8 @@ void rnn_layer_t::init(section_config_t m_section_config) {
     cudaMemset(state_dev, 0.0, output_size * network->batch_size * sizeof(float) / network->time_step);
     cudaMemset(prev_state_dev, 0.0, output_size * network->batch_size * sizeof(float) / network->time_step);
 
-    output_data_dev = hidden_gate->output_data_dev;
-    delta_dev = hidden_gate->delta_dev;
+    output_data_dev = output_gate->output_data_dev;
+    delta_dev = output_gate->delta_dev;
 #endif
 
 }
@@ -69,23 +73,23 @@ void rnn_layer_t::init(section_config_t m_section_config) {
 void rnn_layer_t::init_weight(std::fstream &m_input_weight) {
     input_gate->init_weight(m_input_weight);
     hidden_gate->init_weight(m_input_weight);
+    output_gate->init_weight(m_input_weight);
 }
 
 void rnn_layer_t::init_weight() {
     input_gate->init_weight();
     hidden_gate->init_weight();
+    output_gate->init_weight();
 }
 
 void rnn_layer_t::store_weight(std::fstream &m_weight_file) {
     input_gate->store_weight(m_weight_file);
     hidden_gate->store_weight(m_weight_file);
+    output_gate->store_weight(m_weight_file);
 }
 
 void rnn_layer_t::forward() {
     network->batch_size /= network->time_step;
-
-    connected_layer_t *t_input_gate = input_gate;
-    connected_layer_t *t_hidden_gate = hidden_gate;
 
     if(network->run_type == TRAIN_RUN) {
         memset(delta, 0.0, output_size * network->batch_size * sizeof(float));
@@ -93,19 +97,25 @@ void rnn_layer_t::forward() {
     }
    
     for(unsigned step = 0; step < network->time_step; step++) {
-        t_input_gate->forward();
+        // Forward propagation of input gate in rnn cell.
+        input_gate->forward();
+
         // Forward propagation of hidden gate in hidden layer.
-        if(step) {t_hidden_gate->forward(state);}
-        else{t_hidden_gate->forward();}
+        if(step) {hidden_gate->forward(state);}
+        else{hidden_gate->forward();}
        
         // Add hidden gate and input gate.
         // The result of addition becomes input of output gate in hidden layer.
+        memset(state, 0.0, output_size * network->batch_size * sizeof(float));
 #ifdef CUSTOM_BLAS
-        axpy(output_size * network->batch_size, 1.0, t_input_gate->output_data, 1, t_hidden_gate->output_data, 1);
+        axpy(output_size * network->batch_size, 1.0, input_gate->output_data, 1, state, 1);
+        axpy(output_size * network->batch_size, 1.0, hidden_gate->output_data, 1, state, 1);
 #else
-        cblas_saxpy(output_size * network->batch_size, 1.0, t_input_gate->output_data, 1, t_hidden_gate->output_data, 1);
+        cblas_saxpy(output_size * network->batch_size, 1.0, input_gate->output_data, 1, state, 1);
+        cblas_saxpy(output_size * network->batch_size, 1.0, hidden_gate->output_data, 1, state, 1);
 #endif
-        memcpy(state, t_hidden_gate->output_data, output_size * network->batch_size * sizeof(float));
+        if(step) {output_gate->forward(state);}
+        else {output_gate->forward();}
 
         if(prev_layer) {
             prev_layer->output_data += prev_layer->output_size * network->batch_size;
@@ -114,12 +124,19 @@ void rnn_layer_t::forward() {
             network->input_data += network->input_size * network->batch_size;
         }
 
-        t_input_gate->increment(1);
-        t_hidden_gate->increment(1);
+        input_gate->increment(1);
+        hidden_gate->increment(1);
+        output_gate->increment(1);
     }
 
+    // Move the pointer to the head.
     if(prev_layer) { prev_layer->output_data -= prev_layer->output_size * network->batch_size * network->time_step; }
     else { network->input_data -= network->input_size * network->batch_size * network->time_step; }
+
+    input_gate->increment(-network->time_step);
+    hidden_gate->increment(-network->time_step);
+    output_gate->increment(-network->time_step);
+
     network->batch_size *= network->time_step; 
 }
 
@@ -128,10 +145,9 @@ void rnn_layer_t::backward() {
 
     network->batch_size /= network->time_step;
 
-    connected_layer_t *t_input_gate = input_gate;
-    connected_layer_t *t_hidden_gate = hidden_gate;
-    t_input_gate->increment(network->time_step);
-    t_hidden_gate->increment(network->time_step);
+    input_gate->increment(network->time_step);
+    hidden_gate->increment(network->time_step);
+    output_gate->increment(network->time_step);
 
     if(prev_layer) { prev_layer->output_data += prev_layer->output_size * network->batch_size * network->time_step; }
     else { network->input_data += network->input_size * network->batch_size * network->time_step; }
@@ -139,22 +155,30 @@ void rnn_layer_t::backward() {
     for(int step = network->time_step - 1; step >=0; step--) {
         input_gate->increment(-1);
         hidden_gate->increment(-1);
-
+        output_gate->increment(-1);
+        
         if(prev_layer) {
             prev_layer->output_data -= prev_layer->output_size * network->batch_size;
         }
         else {
             network->input_data -= network->input_size * network->batch_size;
         }
+
         memset(state, 0.0, output_size * network->batch_size * sizeof(float));
         // Add output data of input gate and hidden gate in hidden layer.
         // The sum is input of output gate in hidden layer.
 #ifdef CUSTOM_BLAS
-        axpy(output_size * network->batch_size, 1.0, t_input_gate->output_data, 1, t_hidden_gate->output_data, 1);
+        axpy(output_size * network->batch_size, 1.0, 
+             input_gate->output_data, 1, state, 1);
+        axpy(output_size * network->batch_size, 1.0,
+             hidden_gate->output_data, 1, state, 1);
 #else
-        cblas_saxpy(output_size * network->batch_size, 1.0, t_input_gate->output_data, 1, t_hidden_gate->output_data, 1);
+        cblas_saxpy(output_size * network->batch_size, 1.0, 
+                    input_gate->output_data, 1, state, 1);
+        cblas_saxpy(output_size * network->batch_size, 1.0,
+                    hidden_gate->output_data, 1, state, 1);
 #endif
-        memcpy(state, hidden_gate->output_data, output_size * network->batch_size * sizeof(float));
+        output_gate->backward(state, 0);
 
         // Backward propagation of output gate of hidden layer.
         if(step == 0) { 
@@ -163,11 +187,15 @@ void rnn_layer_t::backward() {
         else {
             memset(state, 0.0, output_size * network->batch_size * sizeof(float));
 #ifdef CUSTOM_BLAS
-            axpy(output_size * network->batch_size, 1.0, input_gate->output_data - output_size * network->batch_size, 1, state, 1);
-            axpy(output_size * network->batch_size, 1.0, hidden_gate->output_data - output_size * network->batch_size, 1, state, 1);
+            axpy(output_size * network->batch_size, 1.0, 
+                 input_gate->output_data - output_size * network->batch_size, 1, state, 1);
+            axpy(output_size * network->batch_size, 1.0, 
+                 hidden_gate->output_data - output_size * network->batch_size, 1, state, 1);
 #else
-            cblas_saxpy(output_size * network->batch_size, 1, input_gate->output_data - output_size * network->batch_size, 1, state, 1);
-            cblas_saxpy(output_size * network->batch_size, 1, hidden_gate->output_data - output_size * network->batch_size, 1, state, 1);
+            cblas_saxpy(output_size * network->batch_size, 1, 
+                        input_gate->output_data - output_size * network->batch_size, 1, state, 1);
+            cblas_saxpy(output_size * network->batch_size, 1, 
+                        hidden_gate->output_data - output_size * network->batch_size, 1, state, 1);
 #endif
         }
 
@@ -184,11 +212,15 @@ void rnn_layer_t::backward() {
     }
     memset(state, 0.0, output_size * network->batch_size * sizeof(float));
 #ifdef CUSTOM_BLAS
-    axpy(output_size * network->batch_size, 1.0, input_gate->output_data, 1, state, 1);
-    axpy(output_size * network->batch_size, 1.0, hidden_gate->output_data, 1, state, 1);
+    axpy(output_size * network->batch_size, 1.0, 
+         input_gate->output_data, 1, state, 1);
+    axpy(output_size * network->batch_size, 1.0, 
+         hidden_gate->output_data, 1, state, 1);
 #else
-    cblas_saxpy(output_size * network->batch_size, 1, input_gate->output_data, 1, state, 1);
-    cblas_saxpy(output_size * network->batch_size, 1, hidden_gate->output_data, 1, state, 1);
+    cblas_saxpy(output_size * network->batch_size, 1, 
+                input_gate->output_data, 1, state, 1);
+    cblas_saxpy(output_size * network->batch_size, 1, 
+                hidden_gate->output_data, 1, state, 1);
 #endif
 
     network->batch_size *= network->time_step;
@@ -197,6 +229,7 @@ void rnn_layer_t::backward() {
 void rnn_layer_t:: update() {
     input_gate->update();
     hidden_gate->update();
+    output_gate->update();
 }
 
 }

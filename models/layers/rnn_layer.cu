@@ -8,9 +8,6 @@ namespace nebula {
 extern "C++" void rnn_layer_t::_forward_() {
     network->batch_size /= network->time_step;
 
-    connected_layer_t *t_input_gate = input_gate;
-    connected_layer_t *t_hidden_gate = hidden_gate;
-   
     if(network->run_type == TRAIN_RUN) {
         cudaMemset(delta_dev, 0.0, output_size * network->batch_size * sizeof(float));
         cudaMemcpy(prev_state_dev, state_dev, 
@@ -19,11 +16,11 @@ extern "C++" void rnn_layer_t::_forward_() {
     
     for(unsigned step = 0; step < network->time_step; step++) {
 
-        t_input_gate->_forward_();
+        input_gate->_forward_();
 
         // Forward propagation of hidden layer in rnn layer.
-        if(step) { t_hidden_gate->_forward_(state_dev); }
-        else {t_hidden_gate->_forward_(); }
+        if(step) {hidden_gate->_forward_(state_dev);}
+        else {hidden_gate->_forward_();}
 
         cudaMemset(state_dev, 0.0, output_size * network->batch_size * sizeof(float));
 
@@ -31,17 +28,17 @@ extern "C++" void rnn_layer_t::_forward_() {
 
         //Add input gate and hidden gate.
 #ifdef CUSTOM_BLAS
-        _axpy_(output_size * network->batch_size, alpha, t_input_gate->output_data_dev, 1, state_dev, 1);
-        _axpy_(output_size * network->batch_size, alpha, t_hidden_gate->output_data_dev, 1, state_dev, 1);
+        _axpy_(output_size * network->batch_size, alpha, 
+               input_gate->output_data_dev, 1, state_dev, 1);
+        _axpy_(output_size * network->batch_size, alpha, 
+               hidden_gate->output_data_dev, 1, state_dev, 1);
 #else
         cublasSaxpy(network->cublas_handle, output_size * network->batch_size, &alpha, 
-                    t_input_gate->output_data_dev, 1, state_dev, 1);
+                    input_gate->output_data_dev, 1, state_dev, 1);
         cublasSaxpy(network->cublas_handle, output_size * network->batch_size, &alpha, 
-                    t_hidden_gate->output_data_dev, 1, state_dev, 1); 
+                    hidden_gate->output_data_dev, 1, state_dev, 1); 
 #endif
-        cudaMemcpy(state_dev, t_hidden_gate->output_data_dev, output_size * network->batch_size * sizeof(float), cudaMemcpyDeviceToDevice);
-
-
+        output_gate->_forward_(state_dev);
         // Jump to next time step.
         if(prev_layer) {
             prev_layer->output_data_dev += prev_layer->output_size * network->batch_size;
@@ -50,12 +47,18 @@ extern "C++" void rnn_layer_t::_forward_() {
             network->input_data_dev += network->input_size * network->batch_size;
         }
     
-        t_input_gate->_increment_(1);
-        t_hidden_gate->_increment_(1);
+        input_gate->_increment_(1);
+        hidden_gate->_increment_(1);
+        output_gate->_increment_(1);
     }
     
     if(prev_layer) { prev_layer->output_data_dev -= prev_layer->output_size * network->batch_size * network->time_step; }
     else { network->input_data_dev -= network->input_size * network->batch_size * network->time_step;}
+
+    input_gate->_increment_(-network->time_step);
+    hidden_gate->_increment_(-network->time_step);
+    output_gate->_increment_(-network->time_step);
+
     network->batch_size *= network->time_step;
 
 }

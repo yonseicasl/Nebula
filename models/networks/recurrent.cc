@@ -134,9 +134,8 @@ void recurrent_t::init_network(std::string m_network_config) {
             section_config.get_setting("input_size", &input_size);
             section_config.get_setting("time_steps", &time_step);
             section_config.get_setting("num_iterations", &num_iterations);
-                section_config.get_setting("batch", &batch_size);
-            if(run_type == TRAIN_RUN) {
-            }
+            section_config.get_setting("batch", &batch_size);
+
             batch_size *= time_step;
         }
         // Layer configuration
@@ -178,6 +177,7 @@ void recurrent_t::init_network(std::string m_network_config) {
 
 // Load batch data.
 void recurrent_t::load_data(const unsigned m_batch_index) {
+    // Input sentences per batch.
     std::vector<std::string> batch_input_sentence;
     batch_input_sentence.reserve(batch_size / time_step);
 
@@ -185,17 +185,22 @@ void recurrent_t::load_data(const unsigned m_batch_index) {
     memset(input_label, 0.0, input_size * batch_size * sizeof(float));
     unsigned stream = batch_size / time_step;
     // Use one hot encoding when write input value to input data array.
+    // Inference
     if(run_type == TEST_RUN) {
         unsigned current_index = m_batch_index * batch_size;
         for(unsigned b = 0; b < stream; b++) {
             for(unsigned step = 0; step < time_step; step++) {
+                // Find the index of input data.
+                // and set 1 of input array.
                 iter = find(labels.begin(), labels.end(), inputs[current_index % inputs.size()]);
                 unsigned index = distance(labels.begin(), iter);
-                //cout << labels[index] << endl;
                 input_data[step * stream * input_size + b * input_size + index] = 1.0;
+
+                // Find the index of label.
                 iter = find(labels.begin(), labels.end(), inputs[(current_index+1) % inputs.size()]);
                 index = distance(labels.begin(), iter);
                 input_label[step * stream * input_size + b * input_size + index] = 1.0;
+
                 current_index++;
             }
         }
@@ -203,13 +208,16 @@ void recurrent_t::load_data(const unsigned m_batch_index) {
     else {
         std::minstd_rand rng(std::random_device{}());
         std::uniform_int_distribution<unsigned> uid(0, input_size - 1);
-        //unsigned current_index = uid(rng);
+     
         for(unsigned b = 0; b < stream; b++) {
             unsigned current_index = uid(rng);
             for(unsigned step = 0; step < time_step; step++) {
+                // Find the index of input data.
                 iter = find(labels.begin(), labels.end(), inputs[current_index % inputs.size()]);
                 unsigned index = distance(labels.begin(), iter);
                 input_data[step * stream * input_size + b * input_size + index] = 1.0;
+
+                // Find the index of label.
                 iter = find(labels.begin(), labels.end(), inputs[(current_index + 1) % inputs.size()]);
                 index = distance(labels.begin(), iter);
                 input_label[step * stream * input_size + b * input_size + index] = 1.0;
@@ -232,10 +240,10 @@ void recurrent_t::print_results() {
             cumulative_cost += input_label[i] * output_layer->output_data[i];
         }
 
+        // Print results.
         std::cout << "Iteration #" << iteration
                   << " (data #" << ((iteration+1) * batch_size) << "):" << std::endl;
         std::cout << "  - perplexity : " << std::fixed << std::setprecision(2)
-             //<< cumulative_cost / ((iteration + 1) * batch_size) << endl;
                   << exp((-1) * log2(cumulative_cost / ((iteration + 1) * batch_size))) << std::endl;
     }
     else {
@@ -312,7 +320,9 @@ void recurrent_t::init_data(const std::string m_data_config){
     while(!input_list_file.eof()) {
         getline(input_list_file, input, ' ');
         input.erase(remove(input.begin(), input.end(), '\n'), input.end());
-        inputs.push_back(lowercase(input));
+        if(find(inputs.begin(), inputs.end(), lowercase(input)) == inputs.end()) {
+            inputs.push_back(lowercase(input));
+        }
     }
     epoch_length = inputs.size() / batch_size;
            
@@ -340,7 +350,7 @@ void recurrent_t::init_data(const std::string m_data_config){
     label_list_file.close();
 
     input_size = labels.size();
-    std::cout << input_size  << ' ' << batch_size << std::endl;
+    
     input_data  = new float[input_size * batch_size]();
     input_label = new float[input_size * batch_size]();
 #ifdef GPU_ENABLED
