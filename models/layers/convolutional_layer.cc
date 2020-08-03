@@ -137,7 +137,8 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     workspace = new float[workspace_size]();
 
     // Print out structure of the network.
-    std::cout << input_height << " * " << input_width << " * " << input_channel << std::endl;
+    //std::cout << input_height << " * " << input_width << " * " << input_channel << std::endl;
+    std::cout << input_height << " " << input_width << " " << input_channel << " " << filter_size << " " << filter_size << " " << num_filters << std::endl;
 
     // Initialize parameters for batch normalization.
     if(batch_normalize) {
