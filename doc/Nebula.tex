@@ -118,14 +118,17 @@ $ cp data/ImageNet_S/*.lst benchmarks/resnet_S/
 \end{Verbatim}
 
 \subsection{Preparing Weight for Inference} \label{subsec:weight}
-You can download weight file using the 
+When you want to run the neural network in inference phase, you need a weight file.
+You can download weight file using the shell script \emph{get\_weight.sh}.
+The weight file is downloaded as \emph{input.wgh} at each benchmark directory.
+Following shows the example of downloading weight file of Small VGG.
 
 \begin{Verbatim}[frame=single,fontsize=\small]
 
 $ ./get_weight.sh
 
 Get file ID of vgg_S
-/home/bogil/Publication/nebula/benchmarks/vgg
+/home/bogil/Publication/nebula/benchmarks/vgg_S
 --2020-04-16 19:23:32--  https://docs.google.com/uc?export=download&confirm=&id=1L6GzG
 0Je43jd6sVWICFC8oCVEtP507ee
 Resolving docs.google.com (docs.google.com)... 172.217.25.206, 2404:6800:4004:81a::200
@@ -145,6 +148,7 @@ input.wgh                      [           <=>                  ]  11.74M  5.31M
 
 \end{Verbatim}
 
+\subsection{Running the Neural Network} \label{subsec:running_network}
 
 With input files (i.e., network configuration file, dataset image, and weight file of network), you can run variable-sized neural networks.
 After executing the network, Nebula prints out the result of execution depending on the execution model (i.e., inference and training).

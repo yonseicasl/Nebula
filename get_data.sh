@@ -3,6 +3,19 @@
 nebuladir=$PWD
 datadir=$nebuladir/data
 
+print_help() {
+    echo -e "The supported datasets are : "
+    echo -e "ImageNet-L, ImageNet-M, ImageNet-S"
+    echo -e "NIST-L, NIST-M, NIST-S"
+    echo -e "PTB-L, PTb-M, and PTB-S"
+    exit 0
+}
+
+
+if [[ $1 = '-h' || $1 = '--help' ]]; then
+    print_help
+fi
+
 ##### Translate google drive link ID #####
 get_data_ID() {
 	echo -e "Get data ID of $1"
