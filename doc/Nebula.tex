@@ -82,6 +82,12 @@ $ ./nebula.sh build <benchmark>
 \end{Verbatim}
 The Nebula suite consists of seven representative neural networks including AlexNet, VGG, ResNet, MLP, DBN, RNN, and LSTM.
 Each network offers three size options; Large, Medium, and Small.
+All benchmarks and size should be type in lowercase.
+For example, if you want to build Small version of VGG, use following command.
+
+\begin{Verbatim}[frame=single,fontsize=\small]
+$ ./nebula.sh build vgg_S
+\end{Verbatim}
 
 \section{Running Nebula Framework} \label{sec:running}
 
@@ -128,7 +134,7 @@ Dataset list includes \emph{train.lst}, \emph{test.lst}, and \emph{labels.lst}.
 
 \begin{Verbatim}[frame=single,fontsize=\small]
 $ cd nebula/
-$ cp data/ImageNet_S/*.lst benchmarks/resnet_S/
+$ cp data/ImageNet_S/*.lst benchmarks/vgg_S/
 \end{Verbatim}
 
 \subsection{Preparing Weight for Inference} \label{subsec:weight}
