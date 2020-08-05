@@ -62,11 +62,13 @@ After typing the command, data/ folder is created in the nebula directory. Now y
     $ cd nebula/
     $ cp data/ImageNet_S/.lst benchmarks/vgg_S
 
+<!--
 ## Preparing Weight (Optional)
 You can download weight file using the shell script <em>get_weight.sh</em>. The weight file is downloaded at each benchmark directory with the name <em>input.wgh</em>. Following shows the commands to get weight and example. Convolutional and fully connected networks' weight files are available now. The weight files of recurrent networks will be updated soon.
 
     $ ./get_weight.sh <benchmarks>
     (example) $ ./get_weight.sh vgg_S
+-->
 
 ## Training
 With input files (i.e., config file and dataset), you can run variable-sized neural networks. After training the networks, an instantaneous loss, and a cumulative loss, and runtime are printed out at the end of every iteration. And after training, <em>output.wgh</em> file is created which is a trained weight file. Following describes the command for training Nebula benchmarks.
