@@ -1,63 +1,93 @@
 #!/bin/bash
 
+
+print_help() {
+    echo -e "Usage: $0 <network> <size>"
+    echo -e ""
+    echo -e "<network> options: alexnet, dbn, mlp, resnet, vgg"
+    echo -e "<size> options: large, medium, small"
+    exit 0
+}
+
+if [[ "$#" -lt 2 || $1 = '-h' || $1 = '--help' ]]; then
+    print_help
+fi
+
+### Default arguments ###
+# Read lowercase of network type.
+network=${1,,}; shift
+
+# Read lowercase of size options.
+size=${1,,}; shift
+
+### Concatenate size option to network type.
+if [[ $size = 'large' ]]; then
+    network+=_large
+elif [[ $size = 'medium' ]]; then
+    network+=_medium
+elif [[ $size = 'small' ]]; then
+    network+=_small
+else
+    echo -e "Error : Wrong size option $size"
+    exit 1
+fi
+
 # Nebula main directory
 nebuladir=$PWD
-# benchmark directory
-benchdir=$PWD/benchmarks/$1
+# Benchmark directory
+benchdir=$PWD/benchmarks/$network
 
 ##### Translate google drive ID of Nebula benchmark #####
-get_target_id() {
-	echo -e "Get file ID of $1"
+weight_ID() {
 	case $1 in 
 		lenet )
 			FILEID="1i1FvFqeyjlTAqyh0Dji9FUo97uhbFXxR" ;;
-		alexnet_S )
-			echo -e "Does not support weight file of $1"
-			exit 1;;
-		alexnet_M )
-            FILEID="1MYFsiV-LHt4sK-OumUlbfWooOcsFze7Y" ;;
-		alexnet_L )
+		alexnet_large )
 			FILEID="1CJyYVci0vgjZAf3kl_i1_VJaowFkZ6qV" ;;
-		vgg_S )
-            FILEID="1L6GzG0Je43jd6sVWICFC8oCVEtP507ee" ;;
-		vgg_M )
-            FILEID="19gUDTtHQInK12y0PUgyOPtxomkwlLJhl" ;;
-		vgg_L )
+		alexnet_medium )
+            FILEID="1MYFsiV-LHt4sK-OumUlbfWooOcsFze7Y" ;;
+		alexnet_small )
+            FILEID="1fjJPJnJ914w8BsS7yDe-m9Cre3KZVOZi" ;;
+		vgg_large )
             FILEID="1IfKa3pgt5W9kMtj1OVeuV1bNW4jfxhlD" ;;
-		mlp_S )
-			FILEID="1Rvx5gzy-ActdGjHWWiz5uJTfV5AD-oQ_" ;;
-		mlp_M )
-			FILEID="1Re0I0q0_ngt2NRcAd22AQthpxCtoeTi6" ;;
-		mlp_L )
+		vgg_medium )
+            FILEID="19gUDTtHQInK12y0PUgyOPtxomkwlLJhl" ;;
+		vgg_small )
+            FILEID="1L6GzG0Je43jd6sVWICFC8oCVEtP507ee" ;;
+		mlp_large )
 			FILEID="1l8POYfrLT2ZEIRbljt-7ub7-dXpEA1l2" ;;
-		dbn_L )
+		mlp_medium )
+			FILEID="1Re0I0q0_ngt2NRcAd22AQthpxCtoeTi6" ;;
+		mlp_small )
+			FILEID="1Rvx5gzy-ActdGjHWWiz5uJTfV5AD-oQ_" ;;
+		dbn_large )
 			FILEID="1b1Fhhxsn4SRTmjLtii6Bxmjh_i71bZmr" ;;
-		dbn_M )
+		dbn_medium )
 			FILEID="1dertTo4oNPxb8u4I3RVP9g1absIyAV78" ;;
-		dbn_S )
+		dbn_small )
 			FILEID="1eT8bN0DPPtQNLumF92IEHQI31vTLV9gx" ;;
-		resnet_L )
+		resnet_large )
 			FILEID="1XYuSRsPm1HlDXQRLtvTx9sVmXbgXTCG2" ;;
-		resnet_M )
+		resnet_medium )
             FILEID="1KzzvRJkYE4Qu5n7kjwBwbfKyAYYbROui" ;;
-		resnet_S )
+		resnet_small )
             FILEID="1DlERgUr2dOPZbPUP16EZ7y2EWjxR0Qy5" ;;
-		rnn_L )
+		rnn_large )
 			echo -e "Does not support weight file of $1"
 			exit 1 ;;
-		rnn_M )
+		rnn_medium )
 			echo -e "Does not support weight file of $1"
 			exit 1 ;;
-		rnn_S )
+		rnn_small )
 			echo -e "Does not support weight file of $1"
 			exit 1 ;;
-		lstm_L )
+		lstm_large )
 			echo -e "Does not support weight file of $1"
 			exit 1 ;;
-		lstm_M )
+		lstm_medium )
 			echo -e "Does not support weight file of $1"
 			exit 1 ;;
-		lstm_S )
+		lstm_small )
 			echo -e "Does not support weight file of $1"
 			exit 1 ;;
 		* )
@@ -66,23 +96,11 @@ get_target_id() {
 	esac
 } 
 
-##### get weight usage #####
-print_help() {
-	echo -e "Usage: $0 <target name>"
-}
-
-# Print usage help
-if [[ "$#" -lt 1 ]]; then
-	print_help
-	exit 1
-fi
-
 # Get google drive ID of nebula benchmark target.
-get_target_id $1
+weight_ID $network
 
 # Download Nebula benchmark weight from google drive.
 # store the weight to each benchmark directory with the name of <input.wgh>.
-echo -e "$benchdir"
 cd $benchdir
 
 # Get weight from google drive.

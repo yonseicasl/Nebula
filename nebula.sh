@@ -89,8 +89,28 @@ if [[ $action != build && $action != clean && $action != test && $action != trai
 	print_help
 fi
 
-# Benchmark to take action
-target=$1; shift
+# Read lowercase of network type.
+network=${1,,}; shift
+target=$network
+
+# Read lowercase of size option.
+size=${1,,}; shift
+
+# Concat the size option to the benchmark.
+if [[ $target != 'lib' && $target != 'all' ]]; then
+    if [[ $size = 'small' ]]; then
+        target+=_small
+    elif [[ $size = 'medium' ]]; then
+        target+=_medium
+    elif [[ $size = 'large' ]]; then
+        target+=_large
+    else
+        echo -e "Error: Nebula benchmark does not support the size option $size"
+        echo -e "Usage: $0 $action $network <size>"
+        echo -e "<size> options: large, medium, small"
+        exit 1
+    fi
+fi
 
 
 ##### Optional arguments #####
@@ -173,6 +193,7 @@ if [[ $action = 'clean' ]]; then
 		echo -e "\n# Cleaning Nebula benchmark $target"
 		cd $benchdir/$target; eval EXE=$target make clean
 	fi
+
 # Build the Nebula benchmark
 elif [[ $action = 'build' ]]; then
 	# Build everything.
@@ -195,11 +216,12 @@ elif [[ $action = 'build' ]]; then
 		if [[ ! -d $benchdir/$target ]]; then 
 			echo -e "Error: Nebula benchmark $target does not exist"
 			exit 1
+        # Build the particular benchmark.
 		else 
 			#check if Nebula library was built.
 			if [[ ! -f $lib ]]; then
 				read -p "Build Nebula library first? [Y/N] " ans
-				if [[ $ans = 'y' || $ans = 'Y' ]]; then
+				if [[ ${ans,,} = 'y' ]]; then
 					echo -e "Build Nebula library"
 					cd $libdir; eval $mflag $ccflag $cuarch $std make -j$(nproc)
 				else 
@@ -216,10 +238,27 @@ elif [[ $action = 'build' ]]; then
 elif [[ $action = 'train' ]]; then
 	print_banner
 	# Executable file does not exist.
-	if [[ ! -f $benchdir/$target/$target ]]; then
-		echo -e "Error: Nebula benchmark $target does not exist"
-		exit 1
+	if [[ ! -f $benchdir/$target/$target ]]; then 
+        read -p "Build benchmark first? [Y/N] " ans
+        if [[ ${ans,,} = 'y' ]]; then
+            if [[ ! -f $lib ]]; then 
+                read -p "Build Nebula library first? [Y/n] " ans
+                if [[ ${ans,,} = 'y' ]]; then
+					echo -e "Build Nebula library"
+					cd $libdir; eval $mflag $ccflag $cuarch $std make -j$(nproc)
+                else 
+                    echo -e "Error: $lib does not exist"
+                    exit 1
+                fi
+            fi
+            echo -e "\n# Building Nebula benchmark $target"
+			cd $benchdir/$target; eval $mflag $ccflag $cuarch $ldflag $libflag $std EXE=$target make -j$(nproc)
+        else 
+            echo -e "Error: Executable file $target does not exist"
+            exit 1
+        fi
 	fi
+    # Training the Nebula benchmark.
 	echo -e "\n# Training Nebula benchmark $target ..."
 	cd $benchdir/$target
 	# Training the nebula benchmark target.
@@ -228,24 +267,38 @@ elif [[ $action = 'train' ]]; then
 	else 
 		eval ./$target train network.cfg data.cfg input.wgh input.wgh
 	fi
+
 # Inference the Nebula benchmark
 elif  [[ $action = 'test' ]]; then
 	print_banner
 	# Executable file does not exist.
 	if [[ ! -f $benchdir/$target/$target ]]; then 
-		echo -e "Error: Nebula benchmark $target does not exist"
-		echo -e "Build Nebula benchmark first"
-		exit 1
+        read -p "Build benchmark first? [Y/N] " ans
+        if [[ ${ans,,} = 'y' ]]; then
+            if [[ ! -f $lib ]]; then 
+                read -p "Build Nebula library first? [Y/n] " ans
+                if [[ ${ans,,} = 'y' ]]; then
+					echo -e "Build Nebula library"
+					cd $libdir; eval $mflag $ccflag $cuarch $std make -j$(nproc)
+                else 
+                    echo -e "Error: $lib does not exist"
+                    exit 1
+                fi
+            fi
+            echo -e "\n# Building Nebula benchmark $target"
+			cd $benchdir/$target; eval $mflag $ccflag $cuarch $ldflag $libflag $std EXE=$target make -j$(nproc)
+        else 
+            echo -e "Error: Executable file $target does not exist"
+            exit 1
+        fi
 	fi
 	cd $benchdir/$target
 	# Download weight from google drive if the benchmark doesn't have input weight.
 	if [[ ! -f $benchdir/$target/input.wgh ]]; then
-		echo -e "Weight of $target does not exist"
-		read -p "Wanna get weight file? [Y/N] " ans
+		read -p "Want to download weight? [Y/N] " ans
 		if [[ $ans = 'y' || $ans = 'Y' ]]; then
-			echo -e "Get weight from google drive"
 			cd $nebuladir
-			./get_weight.sh $target input.wgh
+			./weight.sh $network $size
 			cd $benchdir/$target
 			echo -e "Downloading the weight is done."
 		else 

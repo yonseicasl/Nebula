@@ -47,17 +47,17 @@ Nebula provides a script file named nebula.sh to facilitate the build and run pr
 
 Alternatively, you may specify a benchmark of a particular size to build it by typing a command in the following format.
 
-    $ ./nebula.sh build <benchmark> <size>
+    $ ./nebula.sh build <network> <size>
 
-For instance, a small benchmark of AlexNet can be built as follows. Possible options for the <benchmark> and <size> fields are listed after the example.
+For instance, a small benchmark of AlexNet can be built as follows. Possible options for the <network> and <size> fields are listed after the example.
 
     $ ./nebula.sh build alexnet small
 
-Nebula v1.0 includes seven different types of neural networks, and each network has three different size options, i) large (L), medium (M), and small (S). The large benchmark of a given network type represents the full-fledged neural network, and the medium and small benchmarks are down-sized representations. Small benchmarks on average about 10-15x faster to run than full-fldged counterparts, while exhibiting similar hardware performance and characteristics. Medium benchmarks in general reduce the runtime by 3-5x with more similar emulation of full-fledged networks. The benchmarks have been rigorously validated across a variety of platforms including CPUs, GPUs, FPGAs, and NPUs. The following lists possible <benchmark> and <size> options to put in the script run command shown above.
- 
-    Build command: ./nebula.sh build <benchmark> <size>
-    
-    <benchmark> options: alexnet, dbn, lstm, mlp, resnet, rnn, vgg
+Nebula v1.0 includes seven different types of neural networks, and each network has three different size options, i) large (L), medium (M), and small (S). The large benchmark of a given network type represents the full-fledged neural network, and the medium and small benchmarks are down-sized representations. Small benchmarks on average about 10-15x faster to run than full-fldged counterparts, while exhibiting similar hardware performance and characteristics. Medium benchmarks in general reduce the runtime by 3-5x with more similar emulation of full-fledged networks. The benchmarks have been rigorously validated across a variety of platforms including CPUs, GPUs, FPGAs, and NPUs. The following lists possible <network> and <size> options to put in the script run command shown above.
+
+    Build command: ./nebula.sh build <network> <size>
+
+    <network> options: alexnet, dbn, lstm, mlp, resnet, rnn, vgg
     <size> options: large, medium, small
 
 
@@ -68,41 +68,41 @@ A dataset is a group of input data consumed by the neural network. Nebula uses I
 
     $ ./dataset.sh <dataset> <size>
 
-For instance, a small-sized ImageNet can be obtained using the script as follows. Executing the script creates a directory named nebula/dataset/ (if it does not exist), and it places downloaded dataset files in the directory. Possible options for the <dataset> and <size> fields are listed after the example. 
+For instance, a small-sized ImageNet can be obtained using the script as follows. Executing the script creates a directory named nebula/dataset/ (if it does not exist), and it places downloaded dataset files in the directory. Possible options for the <dataset> and <size> fields are listed after the example.
 
     $ ./dataset.sh imagenet small
-    
+
 The following shows possible <dataset> and <size> options to put in the script run command shown above.
 
     Dataset command: ./dataset.sh <dataset> <size>
-    
+
     <dataset> options: imagenet, nist, ptb
     <size> options: large, medium, small
 
 Nebula provides a set of pre-trained weights for user convenience. The weights can be used for inference of neural network benchmarks or optionally as initial states of training. Similar to the process of obtaining a dataset, weights can be downloaded using the weight.sh script file as follows.
-  
+
     $ ./weight.sh <network> <size>
 
 The following lists possible <network> and <size> options to put in the script run command shown above.
 
     Weight command: weight.sh <network> <size>
-    
-    <benchmark> options: alexnet, dbn, lstm, mlp, resnet, rnn, vgg
+
+    <network> options: alexnet, dbn, lstm, mlp, resnet, rnn, vgg
     <size> options: large, medium, small
 
 
 ## Run
-After a Nebula benchmark is built and dataset and weight files are downloaded, the benchmark becomes ready to execute either for inference or training. The nebula.sh script facilitates the execution of Nebula benchmark. A run command to execute the benchmark follows the format shown below. The <run type> field in the command specifies an execution type, i.e., test or train. The <benchmark> field indicates a target benchmark to run, such as alexnet_small for small-sized AlexNet.
+After a Nebula benchmark is built and dataset and weight files are downloaded, the benchmark becomes ready to execute either for inference or training. The nebula.sh script facilitates the execution of Nebula benchmark. A run command to execute the benchmark follows the format shown below. The <run type> field in the command specifies an execution type, i.e., test or train. The <benchmark> field indicates a target benchmark to run, such as vgg small for small-sized vgg.
 
-    $ ./nebula.sh <run type> <benchmark>
+    $ ./nebula.sh <run type> <benchmark> <small>
 
-For example, the following command runs the inference of small-sized benchmark of AlexNet.
+For example, the following command runs the inference of small-sized benchmark of VGG.
 
-    $ ./nebula.sh test alexnet_small
+    $ ./nebula.sh test vgg small
 
 Similarly, training a medium-sized ResNet can be done using the following command.
 
-    $ ./nebula.sh train resnet_medium
+    $ ./nebula.sh train resnet medium
 
 
 ## Reference and Contact
@@ -117,4 +117,3 @@ Our paper introducing the Nebula benchmark suite and its methodology is currentl
     }
 
 For troubleshooting, bug reports, or any questions regarding the use of Nebula benchmark suite, please contact Bogil Kim via email: bogilkim {\at} yonsei {\dot} ac {\dot} kr. Or, visit our lab webpage: https://icsl.yonsei.ac.kr
-
