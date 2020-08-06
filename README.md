@@ -1,7 +1,7 @@
 # Nebula: Lightweight Neural Network Benchmarks
 Developed by Bogil Kim, Sungjae Lee, Chanho Park, Hyeonjin Kim, and William J. Song\
 Intelligent Computing Systems Lab, Yonsei University\
-Current release: v1.0 (July, 2020)
+Current release: v1.1 (Aug., 2020)
 
 ## Introduction
 The evolution of computing systems and explosive data production propel the advance of machine learning. As neural networks become increasingly important applications, developing neural network benchmarks has emerged as an imminent engineering challenge to tackle. Recent neural networks tend to form deeper networks to enhance accuracy and applicability, but such approaches impose great challenges on the modeling, simulation, and analysis of computing systems since they require unbearably long execution time to process a large amount of operations and sizable data. Neural networks are mostly comprised of matrix and vector calculations that repeat numerous times on multi-dimensional data across channels, layers, batches, etc. This observation becomes a motive to develop a lightweight neural network benchmark suite named Nebula.
@@ -30,9 +30,9 @@ To install an NVIDIA driver package for cuBLAS and cuDNN libraries, refer to the
 
 
 ## Download
-The latest release of Nebula benchmark suite is v1.0 (as of July, 2020). To obatin a copy of Nebula v1.0, use the following git command in a terminal.
+The latest release of Nebula benchmark suite is v1.1 (as of Aug., 2020). To obatin a copy of Nebula v1.1, use the following git command in a terminal.
 
-    $ git clone --branch v1.0 https://github.com/yonsei-icsl/nebula
+    $ git clone --branch v1.1 https://github.com/yonsei-icsl/nebula
 
 Or, if you wish to use the latest development version, simply clone the git respository as is.
 
