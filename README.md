@@ -53,31 +53,31 @@ For instance, a small benchmark of AlexNet can be built as follows. Possible opt
 
 Nebula v1.0 includes seven different types of neural networks, and each network has three different size options, i) large (L), medium (M), and small (S). The large benchmark of a given network type represents the full-fledged neural network, and the medium and small benchmarks are down-sized representations. Small benchmarks on average about 10-15x faster to run than full-fldged counterparts, while exhibiting similar hardware performance and characteristics. Medium benchmarks in general reduce the runtime by 3-5x with more similar emulation of full-fledged networks. The benchmarks have been rigorously validated across a variety of platforms including CPUs, GPUs, FPGAs, and NPUs. The following lists possible <benchmark> and <size> options to put in the script run command shown above.
  
-    Build command: nebula.sh build <benchmark> <size>
+    Build command: ./nebula.sh build <benchmark> <size>
     
     <benchmark> options: alexnet, dbn, lstm, mlp, resnet, rnn, vgg
     <size> options: large, medium, small
 
 
 ## Configs, Dataset, and Pre-trained Weights
-Executing a Nebula benchmark requires three inputs, i) network configs, ii) dataset (i.e., input data), and iii) optionally pre-trained weights. The network configs specify detailed structure of the neural network benchmark, and the config files can be found in the nebula/benchmarks directory. Each sub-directory is named after a network type and size such as alexnet_S for small-sized AlexNet.
+Executing a Nebula benchmark requires three inputs, i) network configs, ii) input dataset, and optionally iii) pre-trained weights. The network configs specify detailed structure of the neural network, and the config files should be found in the nebula/benchmarks/ directory after cloning from the github repository. Each sub-directory inside the nebula/benchmarks/ is named after a network type and size such as alexnet_small for small-sized benchmark of AlexNet.
 
-A dataset is a group of input data consumed by the neural network benchmark. Nebula uses ImageNet for convolutional networks (i.e., AlexNet, ResNet, VGG), NIST for fully-connected networks (i.e., DBN, MLP), and PTB for recurrent networks (i.e., LSTM, RNN). These well-known datasets have been reformulated to fit for variable-sized Nebula benchmarks. Due to a limited github space to accommodate sizable datasets, Nebula maintains them in a remote Google Drive. To obtain a copy of a particular dataset, execute the dataset.sh script in the following format.
+A dataset is a group of input data consumed by the neural network. Nebula uses ImageNet for convolutional networks (i.e., AlexNet, ResNet, VGG), NIST for fully-connected networks (i.e., DBN, MLP), and PTB for recurrent networks (i.e., LSTM, RNN). These well-known datasets have been reformulated to fit for variable-sized Nebula benchmarks. Due to a limited space in the github repository to accommodate sizable datasets, Nebula maintains them in a remote Google Drive. To obtain a copy of a particular dataset, execute a script named dataset.sh in the following format.
 
     $ ./dataset.sh <dataset> <size>
 
-For instance, a small-sized ImageNet can be obtained using the script as follows. Executing the dataset.sh script creates a directory named nebula/data (if not already created), and it places the downloaded dataset files in the directory. Possible options for the <dataset> and <size> fields are listed after the example. 
+For instance, a small-sized ImageNet can be obtained using the script as follows. Executing the script creates a directory named nebula/dataset/ (if it does not exist), and it places downloaded dataset files in the directory. Possible options for the <dataset> and <size> fields are listed after the example. 
 
     $ ./dataset.sh imagenet small
     
-The following lists possible <dataset> and <size> options to put in the script run command shown above.
+The following shows possible <dataset> and <size> options to put in the script run command shown above.
 
-    Dataset command: dataset.sh <dataset> <size>
+    Dataset command: ./dataset.sh <dataset> <size>
     
     <dataset> options: imagenet, nist, ptb
     <size> options: large, medium, small
 
-Nebula provides a set of pre-trained weights for user convenience. The weights can be used for inference of neural network benchmarks or optionally as initial states of training. Similar to the process of obtaining a dataset, weight files can be downloaded using the weight.sh script file as follows.
+Nebula provides a set of pre-trained weights for user convenience. The weights can be used for inference of neural network benchmarks or optionally as initial states of training. Similar to the process of obtaining a dataset, weights can be downloaded using the weight.sh script file as follows.
   
     $ ./weight.sh <network> <size>
 
@@ -90,52 +90,27 @@ The following lists possible <network> and <size> options to put in the script r
 
 
 ## Run
-After the Nebula benchmark is built and dataset and weight files are download, it becomes ready to execute either for inference or training.
+After a Nebula benchmark is built and dataset and weight files are downloaded, the benchmark becomes ready to execute either for inference or training. The nebula.sh script facilitates the execution of Nebula benchmark. A run command to execute the benchmark follows the format shown below. The <run type> field in the command specifies an execution type, i.e., test or train. The <benchmark> field indicates a target benchmark to run, such as alexnet_small for small-sized AlexNet.
+
+    $ ./nebula.sh <run type> <benchmark>
+
+For example, the following command runs the inference of small-sized benchmark of AlexNet.
+
+    $ ./nebula.sh test alexnet_small
+
+Similarly, training a medium-sized ResNet can be done using the following command.
+
+    $ ./nebula.sh train resnet_medium
 
 
-# Running Nebula benchmarks
-Running Nebula requires the neural network with network configuration file (i.e., <em>network.cfg</em>), dataset. Optionally, you can obtain weight file.
+## Reference and Contact
+Our paper introducing the Nebula benchmark suite and its methodology is currently under review. To reference our work, please use our ModSim'20 presentation.
 
-## Preparing dataset
-You can download the dataset using the shell script <em>get_data.sh</em>. Nebula includes ImageNet for convolutional networks, NIST for fully connected networks, and PTB for recurrent networks. And each dataset supports variable-sized options from large to small. Following instructs the command to download the small size of ImageNet.
-
-    $ ./get_data.sh
-    Which dataset? [ImageNet[I] / NIST[N] / MNIST[M]] I
-    Which size? [Large[L] / Medium[M] / Small[S]] S
-    Get data ID of ImageNet_S
-
-    ...
-
-    Saving to: ImageNet_S.tar
-    ImageNet_S.tar      [           <=>         ] 2.82G  5.15MB/s
-
-After typing the command, data/ folder is created in the nebula directory. Now you should list file to the benchmark directory using following commands.
-
-    $ cd nebula/
-    $ cp data/ImageNet_S/.lst benchmarks/vgg_S
-
-<!--
-## Preparing Weight (Optional)
-You can download weight file using the shell script <em>get_weight.sh</em>. The weight file is downloaded at each benchmark directory with the name <em>input.wgh</em>. Following shows the commands to get weight and example. Convolutional and fully connected networks' weight files are available now. The weight files of recurrent networks will be updated soon.
-
-    $ ./get_weight.sh <benchmarks>
-    (example) $ ./get_weight.sh vgg_S
--->
-
-## Training
-With input files (i.e., config file and dataset), you can run variable-sized neural networks. After training the networks, an instantaneous loss, and a cumulative loss, and runtime are printed out at the end of every iteration. And after training, <em>output.wgh</em> file is created which is a trained weight file. Following describes the command for training Nebula benchmarks.
-
-    $ cd nebula/
-    $ ./nebula.sh train <benchmarks>
-    (example) $ ./nebula.sh train vgg_S
-
-
-## Inference
-With trained weight file, you can validate the efficacy of neural networks. At the end of inference, instantaneous accuracy, cumulative accuracy, and execution time are printed out.
-
-    $ cd nebula/
-    $ ./nebula.sh test <benchmarks>
-    (example) $ ./nebula.sh test vgg_S
-
-# Contact
-In case you notice a bug or you have a question regarding the use of Nebula benchmarks, please feel free to contact me via email, bogilkim@yonsei.ac.kr.
+    @inproceedings{kim_modsim2020,
+      author    = {B. Kim and S. Lee and W. Song},
+      title     = {{Nebula: Lightweight Neural Network Benchmarks}},
+      booktitle = {Workshop on Modeling and Simulation of Systems and Applications},
+      month     = {Aug.},
+      year      = {2020},
+    }
+    
