@@ -10,7 +10,7 @@ Lightweight benchmarks aim at modeling the proxy behaviors of full-fledged neura
 
 
 ## Prerequisites
-Nebula uses g++ and nvcc to compile C++ codes to execute on CPUs and NVIDIA GPUs, and it has dependency on OpenCV and OpenBLAS libraries to accelerate neural network algorithms. Nebula benchmarks have been validated in 18.04 (Bionic Beaver) with any later versions of g++-5.4, nvcc-9.0, OpenCV-3.2, and OpenBLAS-0.2 (as of July 2020).
+Nebula uses g++ and nvcc to compile C++ codes to execute on CPUs and NVIDIA GPUs. It has dependency on OpenCV and OpenBLAS libraries to accelerate neural network algorithms. The Nebula benchmarks have been validated in 18.04 (Bionic Beaver) with g++-5.4, nvcc-9.0, OpenCV-3.2, and OpenBLAS-0.2 or any later versions of them (as of July 2020).
 
     * g++-5.4 or later
     * nvcc-9.0 or later
@@ -18,11 +18,11 @@ Nebula uses g++ and nvcc to compile C++ codes to execute on CPUs and NVIDIA GPUs
     * OpenBLAS-0.2 or later: optional for CPU acceleration
     * cuBLAS and cuDNN (of package nvidia-384 or later): optional for GPU acceleration
 
-For instance in Ubuntu 18.04, use the following command to install the required libraries except for the NVIDIA driver package.
+In Ubuntu 18.04, use the following command to install the required libraries except for the NVIDIA driver package.
 
     $ sudo apt-get install build-essential g++ nvcc libopenblas-dev libopencv-dev
 
-To install an NVIDIA driver packages for cuBLAS and cuDNN libraries, refer to the following link: https://developer.nvidia.com/cuda-toolkit-archive. For example, installing an nvidia-384 package can be done by typing the following run command with sudo privilege.
+To install an NVIDIA driver package for cuBLAS and cuDNN libraries, refer to the following link: https://developer.nvidia.com/cuda-toolkit-archive. For example, installing an nvidia-384 package can be done by executing the following run command with sudo privilege.
 
     $ sudo ./cuda_9.0.176_384.81_linux-run
 
@@ -32,13 +32,13 @@ The latest release of Nebula benchmark suite is v1.0 (as of July, 2020). To obat
 
     $ git clone --branch v1.0 https://github.com/yonsei-icsl/nebula
 
-Or, if you wish to use the latest development version, simply clone the git respository as follows.
+Or, if you wish to use the latest development version, simply clone the git respository as is.
 
     $ git clone https://github.com/yonsei-icsl/nebula
 
 
 ## Build
-Nebula provides a script file named nebula.sh to facilitate the build and run processes of benchmark suite. To build the entire models of Nebula suite, execute the script file as follows in the main Nebula directory.
+Nebula provides a script file named nebula.sh to facilitate the build and run processes of benchmark suite. To build the entire models of Nebula suite, execute the script file as follows in the main directory of Nebula.
 
     $ cd nebula/
     $ ./nebula.sh build all
@@ -47,27 +47,51 @@ Alternatively, you may specify a benchmark of a particular size to build it by t
 
     $ ./nebula.sh build <benchmark> <size>
 
-For instance, a small benchmark of AlexNet can be built as follows. Possible options for the <benchmark> field is listed below the example.
+For instance, a small benchmark of AlexNet can be built as follows. Possible options for the <benchmark> and <size> fields are listed after the example.
 
     $ ./nebula.sh build alexnet small
 
+Nebula v1.0 includes seven different types of neural networks, and each network has three different size options, i) large (L), medium (M), and small (S). The large benchmark of a given network type represents the full-fledged neural network, and the medium and small benchmarks are down-sized representations. Small benchmarks on average about 10-15x faster to run than full-fldged counterparts, while exhibiting similar hardware performance and characteristics. Medium benchmarks in general reduce the runtime by 3-5x with more similar emulation of full-fledged networks. The benchmarks have been rigorously validated across a variety of platforms including CPUs, GPUs, FPGAs, and NPUs. The following lists possible <benchmark> and <size> options to put in the script run command shown above.
+ 
+    Build command: nebula.sh build <benchmark> <size>
+    
+    <benchmark> options: alexnet, dbn, lstm, mlp, resnet, rnn, vgg
+    <size> options: large, medium, small
 
+
+## Configs, Dataset, and Pre-trained Weights
+Executing a Nebula benchmark requires three inputs, i) network configs, ii) dataset (i.e., input data), and iii) optionally pre-trained weights. The network configs specify detailed structure of the neural network benchmark, and the config files can be found in the nebula/benchmarks directory. Each sub-directory is named after a network type and size such as alexnet_S for small-sized AlexNet.
+
+A dataset is a group of input data consumed by the neural network benchmark. Nebula uses ImageNet for convolutional networks (i.e., AlexNet, ResNet, VGG), NIST for fully-connected networks (i.e., DBN, MLP), and PTB for recurrent networks (i.e., LSTM, RNN). These well-known datasets have been reformulated to fit for variable-sized Nebula benchmarks. Due to a limited github space to accommodate sizable datasets, Nebula maintains them in a remote Google Drive. To obtain a copy of a particular dataset, execute the dataset.sh script in the following format.
+
+    $ ./dataset.sh <dataset> <size>
+
+For instance, a small-sized ImageNet can be obtained using the script as follows. Executing the dataset.sh script creates a directory named nebula/data (if not already created), and it places the downloaded dataset files in the directory. Possible options for the <dataset> and <size> fields are listed after the example. 
+
+    $ ./dataset.sh imagenet small
+    
+The following lists possible <dataset> and <size> options to put in the script run command shown above.
+
+    Dataset command: dataset.sh <dataset> <size>
+    
+    <dataset> options: imagenet, nist, ptb
+    <size> options: large, medium, small
+
+Nebula provides a set of pre-trained weights for user convenience. The weights can be used for inference of neural network benchmarks or optionally as initial states of training. Similar to the process of obtaining a dataset, weight files can be downloaded using the weight.sh script file as follows.
   
+    $ ./weight.sh <network> <size>
 
-If you want to build a specific Nebula benchmark, using following commands.
-The benchmarks supported at Nebula v1.0 is listed in following table.
-We use Small size of VGG as an exemplary network.
+The following lists possible <network> and <size> options to put in the script run command shown above.
 
-    $ ./nebula.sh build lib
-    $ ./nebula.sh build <benchmarks>
-    (example) $ ./nebula.sh build vgg_S
+    Weight command: weight.sh <network> <size>
+    
+    <benchmark> options: alexnet, dbn, lstm, mlp, resnet, rnn, vgg
+    <size> options: large, medium, small
 
-Network type | Size  | command | Network type | Size  | command
----          | ---   | ---     | ---          | ---   | ---
-AlexNet      | Large <br> Medium <br> Small | alexnet_L <br> alexnet_M <br> alexnet_S | VGG          | Large <br> Medium <br> Small | vgg_L <br> vgg_M <br> vgg_S
-ResNet       | Large <br> Medium <br> Small | resnet_L <br> resnet_M <br> resnet_S | MLP          | Large <br> Medium <br> Small | mlp_L <br> mlp_M <br> mlp_S
-DBN          | Large <br> Medium <br> Small | dbn_L <br> dbn_M <br> dbn_S | RNN          | Large <br> Medium <br> Small | rnn_L <br> rnn_M <br> rnn_S
-LSTM         | Large <br> Medium <br> Small | lstm_L <br> lstm_M <br> lstm_S
+
+## Run
+After the Nebula benchmark is built and dataset and weight files are download, it becomes ready to execute either for inference or training.
+
 
 # Running Nebula benchmarks
 Running Nebula requires the neural network with network configuration file (i.e., <em>network.cfg</em>), dataset. Optionally, you can obtain weight file.
