@@ -1,5 +1,7 @@
 # Nebula: Lightweight Neural Network Benchmarks
-
+Developed by Bogil Kim, Sungjae Lee, Chanho Park, Hyeonjin Kim, and William J. Song\
+Intelligent Computing Systems Lab, Yonsei University\
+Current release: v1.0 (July, 2020)
 
 ## Introduction
 The evolution of computing systems and explosive data production propel the advance of machine learning. As neural networks become increasingly important applications, developing neural network benchmarks has emerged as an imminent engineering challenge to tackle. Recent neural networks tend to form deeper networks to enhance accuracy and applicability, but such approaches impose great challenges on the modeling, simulation, and analysis of computing systems since they require unbearably long execution time to process a large amount of operations and sizable data. Neural networks are mostly comprised of matrix and vector calculations that repeat numerous times on multi-dimensional data across channels, layers, batches, etc. This observation becomes a motive to develop a lightweight neural network benchmark suite named Nebula.
