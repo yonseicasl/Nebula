@@ -113,4 +113,6 @@ Our paper introducing the Nebula benchmark suite and its methodology is currentl
       month     = {Aug.},
       year      = {2020},
     }
-    
+
+For troubleshooting, bug reports, or any questions regarding the use of Nebula benchmark suite, please contact Bogil Kim via email: bogilkim {\at} yonsei {\dot} ac {\dot} kr. Or, visit our lab webpage: https://icsl.yonsei.ac.kr
+
