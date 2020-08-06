@@ -1,30 +1,58 @@
 # Nebula
-Nebula is a lightweight benchmark suite for neural networks. Recent neural networks become increasingly deeper and larger. This trend puts great challenges on the modeling and analysis of computer systems in that it takes longer execution time to process a large number of operations and sizable data. Nebula tackles this challenge by taking the opposite direction based on an observation that the computations of neural networks are mainly comprised of matrix and vector operations. Nebula benchmarks drastically reduce the number of operations for an expectation that the lightened networks will still have similar architectural behaviors as the full-fledged neural networks, and thus it is not always necessary to run the complete networks with sizable data if the purpose is to characterize micro-architectural behaviors in computer systems. Results based on hardware measurements prove that Nebula benchmarks indeed meet the similarity and affordability goal.
 
-# Requirements
-Nebula requires g++ compiler to build on CPU, nvcc on GPU, and OpenCV for image processing.
-It utilizes several acceleration libraries encompassing OpenBLAS for CPU and CUDA libraries to speed up the computations of neural networks, but the implementations are not limited to external libraries.
 
-    * g++
-    * nvcc
-    * OpenCV
-    * OpenBLAS for CPU (optional)
-    * cuBLAS for GPU (optional)
-    * cuDNN for GPU (optional)
+## Introduction
+The evolution of computing systems and explosive data production propel the advance of machine learning. As neural networks become increasingly important applications, developing neural network benchmarks has emerged as an imminent engineering challenge to tackle. Recent neural networks tend to form deeper networks to enhance accuracy and applicability, but such approaches impose great challenges on the modeling, simulation, and analysis of computing systems since they require unbearably long execution time to process a large amount of operations and sizable data. Neural networks are primarily composed of matrix and vector calculations that repeat numerous times on multi-dimensional data across channels, layers, batches, etc. This observation becomes a motive to develop lightweight neural network benchmark suite named Nebula.
 
-## For Ubuntu (>=18.04)
-    $ sudo apt-get install build-essential
-    $ sudo apt-get install g++ g++-multilib
-    $ sudo apt-get install libopenblas-dev
-    $ sudo apt-get install libopencv-dev
+The Nebula suite built on a C++ framework currently consists of seven representative neural networks including, ResNet, VGG, AlexNet, MLP, DBN, LSTM, and RNN. More models will be added to the pool in future releases, including MobileNet, YOLO, FCN, and GAN. Inspired by popular benchmark suites such as PARSEC and SPLASH-3 that allow users to choose a different input size per benchmark, Nebula offers multiple size options from large to small datasets for various types of neural networks. The large ones represent full-fledged neural networks that implement complete structures of neural networks and execute on massive datadasts, and the medium and small benchmarks are downsized representation of full-fledged networks. The benchmarks are implemented by formulating variable-sized datasets and compacting neural networks to support the datasets of different sizes.
 
-# Download and Install Nebula
-The latest version of Nebula is v1.0 (as of July, 2020). It has been validated in Ubuntu 16.04 and 18.04. To obtain a Nebula v1.0, use the following git command in terminal.
-Then, enter the nebula directory and build the Nebula benchmarks using ./nebula.sh command.
+Lightweight benchmarks aim at modeling the proxy behaviors of full-fledged neural networks to alleviate the modeling and simulation challenges imposed by hefty neural network workloads. Nebula benchmarks as “proxy apps” intend to reduce the computational costs of full-fledged networks but still capture end-to-end neural network behaviors. We hope the multi-size options of Nebula benchmarks broaden the usability and affordability in diverse experiment environments from real hardware to microarchitecture simulations in which users can selectively use appropriate size of benchmarks.
+
+
+## Prerequisites
+Nebula uses g++ and nvcc to compile C++ codes to execute on CPUs and NVIDIA GPUs, and it has dependency on OpenCV and OpenBLAS libraries to accelerate neural network algorithms. Nebula benchmarks have been validated in 18.04 (Bionic Beaver) with any later versions of g++-5.4, nvcc-9.0, OpenCV-3.2, and OpenBLAS-0.2 (as of July 2020).
+
+    * g++-5.4 or later
+    * nvcc-9.0 or later
+    * OpenCV-3.2 or later
+    * OpenBLAS-0.2 or later: optional for CPU acceleration
+    * cuBLAS and cuDNN (of package nvidia-384 or later): optional for GPU acceleration
+
+For instance in Ubuntu 18.04, use the following command to install the required libraries except for the NVIDIA driver package.
+
+    $ sudo apt-get install build-essential g++ nvcc libopenblas-dev libopencv-dev
+
+To install an NVIDIA driver packages for cuBLAS and cuDNN libraries, refer to the following link: https://developer.nvidia.com/cuda-toolkit-archive. For example, installing an nvidia-384 package can be done by typing the following run command with sudo privilege.
+
+    $ sudo ./cuda_9.0.176_384.81_linux-run
+
+
+## Download
+The latest release of Nebula benchmark suite is v1.0 (as of July, 2020). To obatin a copy of Nebula v1.0, use the following git command in a terminal.
 
     $ git clone --branch v1.0 https://github.com/yonsei-icsl/nebula
+
+Or, if you wish to use the latest development version, simply clone the git respository as follows.
+
+    $ git clone https://github.com/yonsei-icsl/nebula
+
+
+## Build
+Nebula provides a script file named nebula.sh to facilitate the build and run processes of benchmark suite. To build the entire models of Nebula suite, execute the script file as follows in the main Nebula directory.
+
     $ cd nebula/
     $ ./nebula.sh build all
+
+Alternatively, you may specify a benchmark of a particular size to build it by typing a command in the following format.
+
+    $ ./nebula.sh build <benchmark> <size>
+
+For instance, a small benchmark of AlexNet can be built as follows. Possible options for the <benchmark> field is listed below the example.
+
+    $ ./nebula.sh build alexnet small
+
+
+  
 
 If you want to build a specific Nebula benchmark, using following commands.
 The benchmarks supported at Nebula v1.0 is listed in following table.
