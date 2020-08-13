@@ -1,31 +1,18 @@
 PAPER = Nebula
 TEX = $(wildcard *.tex)
-FIGS = $(wildcard figures/*.pdf)
+FIG = $(wildcard figures/*.pdf)
 SRC = $(wildcard *.cls *.sty)
 
-.PHONY: all clean
+.PHONY: dist clean
 
-$(PAPER).pdf: $(TEX) $(BIB) $(FIGS) $(SRC)
-	rm -rf *.glsdefs
-	pdflatex $(PAPER)
-	pdflatex $(PAPER)
-
-tar:
-	make; make clean
-	mkdir $(PAPER)
-	cp -rf $(TEX) $(SRC) *.pdf figures Makefile $(PAPER)/
-	zip -r $(PAPER).zip $(PAPER)
-	rm -rf $(PAPER)
-
-zip:
-	make tar
+$(PAPER).pdf: $(TEX) $(FIG) $(SRC)
+	@rm -rf *.glsdefs
+	@pdflatex $(PAPER) > /dev/null
+	@pdflatex $(PAPER) > /dev/null
 
 dist:
-	rm -rf *.glsdefs *.aux *.bbl *.blg *.log *.out $(PAPER) $(PAPER).zip
+	rm -rf *.glsdefs *.aux *.bbl *.blg *.log *.out
 
 clean:
 	make dist; rm -f $(PAPER).pdf
-
-distclean:
-	make clean
 
