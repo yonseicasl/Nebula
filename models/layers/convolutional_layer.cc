@@ -52,6 +52,12 @@ convolutional_layer_t::convolutional_layer_t(network_t *m_network, layer_t *m_pr
     variance_delta_dev =NULL;
     x_dev = NULL;
     normalize_x_dev = NULL;
+#ifdef CUDNN_ENABLED
+    input_descriptor = NULL;
+    output_descriptor = NULL;
+    weight_descriptor = NULL;
+    convolution_descriptor = NULL;
+#endif
 #endif
 }
 
@@ -96,6 +102,13 @@ convolutional_layer_t::~convolutional_layer_t() {
         cudaFree(x_dev);
         cudaFree(normalize_x_dev);
     }
+#ifdef CUDNN_ENABLED
+    cudnnDestroyTensorDescriptor(input_descriptor);
+    cudnnDestroyTensorDescriptor(output_descriptor);
+    cudnnDestroyFilterDescriptor(weight_descriptor);
+    cudnnDestroyConvolutionDescriptor(convolution_descriptor);
+#endif
+
 #endif
 }
 
@@ -205,6 +218,28 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
         cudaMemset(x_dev, 0.0, output_size * network->batch_size * sizeof(float));
         cudaMemset(normalize_x_dev, 0.0, output_size * network->batch_size * sizeof(float));
     }
+#ifdef CUDNN_ENABLED
+    // Create generic Tensor descriptor objects.
+    cudnnCreateTensorDescriptor(&input_descriptor);
+    cudnnCreateTensorDescriptor(&output_descriptor);
+    cudnnCreateFilterDescriptor(&weight_descriptor);
+    cudnnCreateConvolutionDescriptor(&convolution_descriptor);
+
+    // Initialize previously created generic tensor descriptor objects.
+    cudnnSetTensor4dDescriptor(input_descriptor, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT,
+                               network->batch_size, input_channel, input_height, input_width);
+    cudnnSetTensor4dDescriptor(output_descriptor, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, 
+                               network->batch_size, output_channel, output_height, output_width);
+    cudnnSetFilter4dDescriptor(weight_descriptor, CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW,
+                               output_channel, input_channel/group, filter_size, filter_size);
+    cudnnSetConvolution2dDescriptor(convolution_descriptor, padding, padding, stride, stride, 1, 1,
+                                    CUDNN_CROSS_CORRELATION, CUDNN_DATA_FLOAT);
+    size_t workspace_limit = 8 * 1024 * 1024;
+
+    cudnnGetConvolutionForwardAlgorithm(network->cudnn_handle, input_descriptor, weight_descriptor, convolution_descriptor, output_descriptor, 
+                                        CUDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT, workspace_limit, &forward_algorithm);
+
+#endif
 #endif
 }
 

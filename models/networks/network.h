@@ -5,6 +5,9 @@
 #ifdef GPU_ENABLED
 #include <curand.h>
 #include <cublas_v2.h>
+#ifdef CUDNN_ENABLED
+    #include <cudnn.h>
+#endif
 #endif
 #include "def.h"
 #include "stopwatch.h"
@@ -55,6 +58,9 @@ public:
     curandGenerator_t generator;
     float *input_data_dev;                  // Input data in device
     float *input_label_dev;                 // Input label in device
+#ifdef CUDNN_ENABLED
+    cudnnHandle_t cudnn_handle;             // cudnn handle
+#endif
 #endif
 
 protected:

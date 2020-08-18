@@ -80,6 +80,21 @@ void pooling_layer_t::init(section_config_t m_section_config) {
         cudaMalloc((void**)&index_dev, output_size * network->batch_size * sizeof(unsigned));
         cudaMemset(index_dev, 0, output_size * network->batch_size * sizeof(unsigned));
     }
+#ifdef CUDNN_ENABLED
+    cudnnCreateTensorDescriptor(&input_descriptor);
+    cudnnCreateTensorDescriptor(&output_descriptor);
+    cudnnCreatePoolingDescriptor(&pooling_descriptor);
+
+    pooling_mode = (layer_type == MAXPOOL_LAYER) ? 
+                    CUDNN_POOLING_MAX : CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
+
+    cudnnSetTensor4dDescriptor(input_descriptor, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT,
+                               network->batch_size, input_channel, input_height, input_width);
+    cudnnSetTensor4dDescriptor(output_descriptor, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT,
+                               network->batch_size, output_channel, output_height, output_width);
+    cudnnSetPooling2dDescriptor(pooling_descriptor, pooling_mode, CUDNN_NOT_PROPAGATE_NAN,
+                                filter_size, filter_size, padding, padding, stride, stride);
+#endif
 #endif
 }
 

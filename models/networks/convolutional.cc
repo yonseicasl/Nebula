@@ -40,6 +40,11 @@ convolutional_t::~convolutional_t() {
     cublasDestroy(cublas_handle);
     cudaFree(input_data_dev);
     cudaFree(input_label_dev);
+
+#ifdef CUDNN_ENABLED
+    cudnnDestroy(cudnn_handle);
+#endif
+
 #endif
 }
 

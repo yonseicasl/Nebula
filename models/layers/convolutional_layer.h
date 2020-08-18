@@ -90,6 +90,23 @@ private:
     float *normalize_x_dev;
 
     float *workspace_dev;           // Workspace
+
+#ifdef CUDNN_ENABLED
+    cudnnTensorDescriptor_t             input_descriptor;               // Descriptor for input data.
+    cudnnTensorDescriptor_t             input_delta_descriptor;         // Descriptor for input delta.
+
+    cudnnTensorDescriptor_t             output_descriptor;              // Descriptor for output data.
+    cudnnTensorDescriptor_t             output_delta_descriptor;        // Descriptor for output delta.
+
+    cudnnFilterDescriptor_t             weight_descriptor;              // Descriptor for weight data.
+    cudnnFilterDescriptor_t             weight_delta_descriptor;        // Descriptor for weight delta.
+
+    cudnnConvolutionDescriptor_t        convolution_descriptor;         // Descriptor for the order of convolution.
+
+    cudnnConvolutionFwdAlgo_t           forward_algorithm;              // Descriptor for forward convolution.
+    cudnnConvolutionBwdDataAlgo_t       backward_data_algorithm;        // Descriptor for backward convolution (data).
+    cudnnConvolutionBwdFilterAlgo_t     backward_weight_algorithm;      // Descriptor for backward convolution (weight).
+#endif
 #endif
 };
 

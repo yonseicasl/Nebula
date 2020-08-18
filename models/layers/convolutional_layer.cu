@@ -13,12 +13,40 @@ extern "C++" void convolutional_layer_t::_forward_() {
     cudaMemset(delta_dev, 0, output_size*network->batch_size*sizeof(float));
     
     const float alpha = 1.0;
-    const float beta  = 1.0;
-    unsigned patch_size = filter_size * filter_size * input_channel / group;
     unsigned num_patches = output_width * output_height;
     float *input_data_dev = prev_layer ? prev_layer->output_data_dev : network->input_data_dev;
-	
+
+#ifdef CUDNN_ENABLED
+    size_t workspace_size = 0; 
+    cudnnSetConvolutionMathType(convolution_descriptor, CUDNN_TENSOR_OP_MATH_ALLOW_CONVERSION);
+    cudnnGetConvolutionForwardWorkspaceSize(network->cudnn_handle, 
+                                            input_descriptor,
+                                            weight_descriptor, 
+                                            convolution_descriptor,
+                                            output_descriptor, 
+                                            forward_algorithm,
+                                            &workspace_size);
+
+
+    for(unsigned i = 0; i < group; i++) {
+        cudnnConvolutionForward(network->cudnn_handle, 
+                                &alpha,
+                                input_descriptor, 
+                                &input_data_dev[(input_size * network->batch_size * i / group)],
+                                weight_descriptor, 
+                                &weight_dev[(weight_size * i / group)],
+                                convolution_descriptor, 
+                                forward_algorithm,
+                                workspace_dev, 
+                                workspace_size, 
+                                &alpha,
+                                output_descriptor, 
+                                &output_data_dev[(output_size * network->batch_size * i / group)]);
+    }
+#else // Using cuBLAS.
     // Convolution
+    const float beta  = 1.0;
+    unsigned patch_size = filter_size * filter_size * input_channel / group;
 	for(unsigned i = 0; i < network->batch_size; i++){
 		for(unsigned j=0; j<group; j++){
 			_im2col_(&input_data_dev[(i * group + j) * input_channel / group * input_height * input_width],
@@ -43,6 +71,7 @@ extern "C++" void convolutional_layer_t::_forward_() {
 		}
 	}
 
+#endif
     // Forward bias
     if(batch_normalize) {
         _forward_batchnorm_();
