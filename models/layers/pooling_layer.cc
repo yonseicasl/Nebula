@@ -64,7 +64,7 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     output_channel = input_channel;
     output_size = output_height * output_width * output_channel;
     
-    std::cout << input_height << " * " << input_width << " * " << input_channel << std::endl;
+    //std::cout << input_height << " * " << input_width << " * " << input_channel << std::endl;
     // Allocate memory for pooling layer.
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
