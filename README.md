@@ -18,7 +18,7 @@ Nebula uses g++ and nvcc to compile C++ codes to execute on CPUs and NVIDIA GPUs
     * nvcc-9.0 or later
     * OpenCV-3.2 or later
     * OpenBLAS-0.2 or later: optional for CPU acceleration
-    * cuBLAS and cuDNN (of package nvidia-384 or later): optional for GPU acceleration
+    * cuBLAS (of package nvidia-384 or later) and cuDNN (version 7.0.4 to 7.6.5): optional for GPU acceleration
 
 In Ubuntu 18.04, use the following command to install the required libraries except for the NVIDIA driver package.
 
@@ -28,6 +28,13 @@ To install an NVIDIA driver package for cuBLAS and cuDNN libraries, refer to the
 
     $ sudo ./cuda_9.0.176_384.81_linux-run
 
+To install cuDNN libraries, refer to the following link:
+https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html. For example, installing cudnn-v7.6.5 can be done by executing the following commands with sudo privilege.
+
+    $ tar xf cudnn-10.2-linux-x64-v7.6.5.32.tgz
+    $ sudo cp cuda/include/cudnn*.h /usr/local/cuda/include
+    $ sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64
+    $ sudo chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn*
 
 ## Download
 The latest release of Nebula benchmark suite is v1.1 (as of Aug., 2020). To obatin a copy of Nebula v1.1, use the following git command in a terminal.
@@ -37,7 +44,6 @@ The latest release of Nebula benchmark suite is v1.1 (as of Aug., 2020). To obat
 Or, if you wish to use the latest development version, simply clone the git respository as is.
 
     $ git clone https://github.com/yonsei-icsl/nebula
-
 
 ## Build
 Nebula provides a script file named nebula.sh to facilitate the build and run processes of benchmark suite. To build the entire models of Nebula suite, execute the script file as follows in the main directory of Nebula.
