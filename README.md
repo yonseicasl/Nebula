@@ -37,7 +37,7 @@ https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html. For example
     $ sudo chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn*
 
 ## Download
-The latest release of Nebula benchmark suite is v1.2 (as of Aug., 2020). To obatin a copy of Nebula v1.2, use the following git command in a terminal.
+The latest release of Nebula benchmark suite is v1.2 (as of Aug., 2020). To obatin a copy of Nebula v1.1, use the following git command in a terminal.
 
     $ git clone --branch v1.2 https://github.com/yonsei-icsl/nebula
 
