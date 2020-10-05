@@ -114,7 +114,7 @@ Similarly, training a medium-sized ResNet can be done using the following comman
 ## Reference and Contact
 To reference our work, please use our TC paper.
 
-    @inproceedings{kim_modsim2020,
+    @inproceedings{kim_tc2020,
       author    = {B. Kim and S. Lee and C. Park and H. Kim and W. Song},
       title     = {{The Nebula Benchmark Suite: Implications of Lightweight Neural Networks}},
       booktitle = {IEEE Transactions on Computers},
