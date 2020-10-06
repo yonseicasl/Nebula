@@ -99,7 +99,7 @@ use_debug=0
 # Use GPU.
 gpu_enabled=1
 # Use cuDNN for GPU
-cudnn_enabled=1
+cudnn_enabled=0
 # Use custom blas.
 custom_blas=0
 # Do not load weight for training by default.

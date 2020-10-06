@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <iostream>
-#include "convolutional.h"
+#include "detection.h"
 
 
 int main(int argc, char **argv) {
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     }
 
     // Create network.
-    nebula::network_t *network = new nebula::convolutional_t();
+    nebula::network_t *network = new nebula::detection_t();
     // Initialize network.
     network->init(run_type, network_config, data_config, input_weight);
     // Run network and save optional output weight.
