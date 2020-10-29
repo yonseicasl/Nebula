@@ -151,6 +151,13 @@ extern "C++" void pooling_layer_t::_forward_() {
     float *input_data_dev = prev_layer ? prev_layer->output_data_dev : network->input_data_dev;
     cudaMemset(output_data_dev, 0.0, output_size * network->batch_size * sizeof(float));
     cudaMemset(delta_dev, 0.0, output_size * network->batch_size * sizeof(float));                            
+#ifdef CUDNN_ENABLED
+    const float alpha = 1.0;
+    const float beta = 0.0;
+    cudnnPoolingForward(network->cudnn_handle, pooling_descriptor, &alpha, 
+                        input_descriptor, input_data_dev, 
+                        &beta, output_descriptor, output_data_dev);
+#else
     dim3 cuda_griddim = {(output_size * network->batch_size - 1) / BLOCK_SIZE + 1, 1, 1};
     
     if(layer_type == MAXPOOL_LAYER) {
@@ -164,7 +171,7 @@ extern "C++" void pooling_layer_t::_forward_() {
         std::cerr << "unknown pooling layer type" << std::endl;
         exit(1);
     }
-
+#endif
 }
 extern "C++" void pooling_layer_t::_backward_() {
     float *prev_delta_dev = prev_layer ? prev_layer->delta_dev : NULL;

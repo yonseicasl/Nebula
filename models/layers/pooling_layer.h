@@ -38,6 +38,13 @@ private:
     unsigned *index;
 #ifdef GPU_ENABLED
     unsigned *index_dev;
+#ifdef CUDNN_ENABLED
+    cudnnTensorDescriptor_t   input_descriptor;       // Descriptor for input data.
+    cudnnTensorDescriptor_t   output_descriptor;      // Descriptor for output data.
+    cudnnPoolingDescriptor_t  pooling_descriptor;     // Descriptor for pooling operation.
+    cudnnPoolingMode_t        pooling_mode;           // Pooling mode whether max or average.
+
+#endif
 #endif
 
 };

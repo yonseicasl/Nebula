@@ -28,6 +28,9 @@ network_t::network_t() :
     cublas_handle(0),
     input_data_dev(NULL),
     input_label_dev(NULL),
+#ifdef CUDNN_ENABLED
+    cudnn_handle(0),
+#endif
 #endif
     input_layer(NULL),
     output_layer(NULL),
@@ -42,6 +45,9 @@ network_t::network_t() :
     // TODO: Nebula currently supports only single-device acceleration.
     cudaSetDevice(0);
     cublasCreate(&cublas_handle);
+#ifdef CUDNN_ENABLED
+    cudnnCreate(&cudnn_handle);
+#endif
 #endif
 }
 
