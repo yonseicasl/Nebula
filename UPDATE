@@ -4,7 +4,7 @@
 # Developed by                                        #
 # Intelligent Computing Systems Lab (ICSL)            #
 # School of Electrical Engineering, Yonsei University #
-# Version: 1.0                                        #
+# Version: 1.4                                        #
 #######################################################
 
 Update history:
@@ -22,4 +22,9 @@ Update history:
 
 * Version 1.3 (Oct. 2020)
     - Add benchmarks directory.
+
+* Version 1.4 (Oct. 2020)
+    - Add cuDNN libraries for faster inference of nebula benchmarks (Fixing error).
+    - Beta version of cuDNN.
+    - Does not supported on version 8.0.0 or later
 

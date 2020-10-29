@@ -1,7 +1,7 @@
 # Nebula: Lightweight Neural Network Benchmarks
 Developed by Bogil Kim, Sungjae Lee, Chanho Park, Hyeonjin Kim, and William J. Song\
 Intelligent Computing Systems Lab, Yonsei University\
-Current release: v1.2 (Aug., 2020)
+Current release: v1.4 (Oct., 2020)
 
 ## Introduction
 The evolution of computing systems and explosive data production propel the advance of machine learning. As neural networks become increasingly important applications, developing neural network benchmarks has emerged as an imminent engineering challenge to tackle. Recent neural networks tend to form deeper networks to enhance accuracy and applicability, but such approaches impose great challenges on the modeling, simulation, and analysis of computing systems since they require unbearably long execution time to process a large amount of operations and sizable data. Neural networks are mostly comprised of matrix and vector calculations that repeat numerous times on multi-dimensional data across channels, layers, batches, etc. This observation becomes a motive to develop a lightweight neural network benchmark suite named Nebula.
@@ -37,9 +37,9 @@ https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html. For example
     $ sudo chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn*
 
 ## Download
-The latest release of Nebula benchmark suite is v1.2 (as of Aug., 2020). To obatin a copy of Nebula v1.1, use the following git command in a terminal.
+The latest release of Nebula benchmark suite is v1.4 (as of Oct., 2020). To obatin a copy of Nebula v1.4, use the following git command in a terminal.
 
-    $ git clone --branch v1.2 https://github.com/yonsei-icsl/nebula
+    $ git clone --branch v1.4 https://github.com/yonsei-icsl/nebula
 
 Or, if you wish to use the latest development version, simply clone the git respository as is.
 
@@ -59,7 +59,7 @@ For instance, a small benchmark of AlexNet can be built as follows. Possible opt
 
     $ ./nebula.sh build alexnet small
 
-Nebula v1.0 includes seven different types of neural networks, and each network has three different size options, i) large (L), medium (M), and small (S). The large benchmark of a given network type represents the full-fledged neural network, and the medium and small benchmarks are down-sized representations. Small benchmarks on average about 10-15x faster to run than full-fldged counterparts, while exhibiting similar hardware performance and characteristics. Medium benchmarks in general reduce the runtime by 3-5x with more similar emulation of full-fledged networks. The benchmarks have been rigorously validated across a variety of platforms including CPUs, GPUs, FPGAs, and NPUs. The following lists possible <network> and <size> options to put in the script run command shown above.
+Nebula v1.4 includes seven different types of neural networks, and each network has three different size options, i) large (L), medium (M), and small (S). The large benchmark of a given network type represents the full-fledged neural network, and the medium and small benchmarks are down-sized representations. Small benchmarks on average about 10-15x faster to run than full-fldged counterparts, while exhibiting similar hardware performance and characteristics. Medium benchmarks in general reduce the runtime by 3-5x with more similar emulation of full-fledged networks. The benchmarks have been rigorously validated across a variety of platforms including CPUs, GPUs, FPGAs, and NPUs. The following lists possible <network> and <size> options to put in the script run command shown above.
 
     Build command: ./nebula.sh build <network> <size>
 
