@@ -1,5 +1,5 @@
+#include <cstring>
 #include "upsample_layer.h"
-
 
 namespace nebula {
 

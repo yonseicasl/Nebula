@@ -21,10 +21,13 @@
 #include "convolutional_layer.h"
 #include "connected_layer.h"
 #include "dropout_layer.h"
+#include "inception_layer.h"
 #include "softmax_layer.h"
 #include "cost_layer.h"
 #include "shortcut_layer.h"
 #include "pooling_layer.h"
+#include "upsample_layer.h"
+
 
 namespace nebula {
 
@@ -87,6 +90,9 @@ void convolutional_t::init_network(const std::string m_network_config) {
             else if(section_config.name == "dropout") {
                 layer = new dropout_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, DROPOUT_LAYER);
             }
+            else if(section_config.name == "inception") {
+                layer = new inception_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, INCEPTION_LAYER);
+            }
             else if(section_config.name == "maxpool") {
                 layer = new pooling_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, MAXPOOL_LAYER);
             }
@@ -100,6 +106,9 @@ void convolutional_t::init_network(const std::string m_network_config) {
                 layer = new softmax_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, SOFTMAX_LAYER);
                 // Softmax is output layer.
                 output_layer = layer;
+            }
+            else if(section_config.name == "upsample") {
+                layer = new upsample_layer_t(this, layers.size() ? layers[layers.size()-1] : NULL, UPSAMPLE_LAYER);
             }
             else if(section_config.name == "cost") {
                 layer = new cost_layer_t(this, layers.size() ? layers[layers.size()-1] : NULL, COST_LAYER);
