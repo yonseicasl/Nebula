@@ -4,7 +4,7 @@
 # Developed by                                        #
 # Intelligent Computing Systems Lab (ICSL)            #
 # School of Electrical Engineering, Yonsei University #
-# Version: 1.4                                        #
+# Version: 1.4.1                                      #
 #######################################################
 
 Update history:
@@ -28,3 +28,5 @@ Update history:
     - Beta version of cuDNN.
     - Does not supported on version 8.0.0 or later
 
+* Version 1.4.1(Nov. 2020)
+    - Fix error on dataset.sh
