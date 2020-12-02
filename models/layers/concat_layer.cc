@@ -55,7 +55,7 @@ void concat_layer_t::init(section_config_t m_section_config) {
     delta = new float[output_size * network->batch_size]();
 
 #ifdef GPU_ENABLED
-    cudaMalloc((void**)&output_data_Dev, output_size * network->batch_size * sizeof(float));
+    cudaMalloc((void**)&output_data_dev, output_size * network->batch_size * sizeof(float));
     cudaMalloc((void**)&delta_dev, output_size * network->batch_size * sizeof(float));
 
     cudaMemset(output_data_dev, 0.0, output_size * network->batch_size * sizeof(float));
