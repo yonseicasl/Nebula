@@ -117,7 +117,7 @@ fi
 # Use gdb for debug.
 use_debug=0
 # Use GPU.
-gpu_enabled=1
+gpu_enabled=0
 # Use cuDNN
 cudnn_enabled=0
 # Use custom blas.
