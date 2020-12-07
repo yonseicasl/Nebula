@@ -28,8 +28,7 @@ public:
     // Network update
     void update();
     // Initialize network.
-    void init(const std::string m_run_type, const std::string m_network_config,
-              const std::string m_data_config, const std::string m_input_weight = "");
+    void init(const std::string m_network_config, const std::string m_data_config, const std::string m_input_weight = "");
     // Run network.
     virtual void run(const std::string m_output_weight = "") = 0;
 
@@ -49,6 +48,7 @@ public:
     unsigned batch_size;                    // Batch size
 
     unsigned time_step;                     // Time steps used for recurrent networks
+    unsigned num_layers;                    // Number of layers
 
     float *input_data;                      // Input data
     float *input_label;                     // Input label
@@ -84,7 +84,6 @@ protected:
     layer_t *input_layer;                   // Input layer
     layer_t *output_layer;                  // Output layer
 
-    unsigned num_layers;                    // Number of layers
     unsigned num_classes;                   // Number of output classes
     unsigned num_iterations;                // Number of iterations to run
     unsigned iteration;                     // Number of processed batches
