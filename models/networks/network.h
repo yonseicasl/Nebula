@@ -28,7 +28,7 @@ public:
     // Network update
     void update();
     // Initialize network.
-    void init(const std::string m_network_config, const std::string m_data_config, const std::string m_input_weight = "");
+    void init(const std::string m_network_config, const std::string m_input_weight = "");
     // Run network.
     virtual void run(const std::string m_output_weight = "") = 0;
 
@@ -53,6 +53,7 @@ public:
     float *input_data;                      // Input data
     float *input_label;                     // Input label
     
+    std::vector<layer_t*> layers;           // Network layers
 #ifdef GPU_ENABLED
     cublasHandle_t cublas_handle;           // cublas handle
     curandGenerator_t generator;
@@ -63,7 +64,6 @@ public:
     #endif
 #endif
 
-protected:
     // Initialize network.
     virtual void init_network(const std::string m_network_config) = 0;
     // Load batch data.
@@ -78,7 +78,6 @@ protected:
     void store_weight(const std::string m_output_weight);
 
     std::vector<std::string> labels;        // List of labels
-    std::vector<layer_t*> layers;           // Network layers
     stopwatch_t stopwatch;                  // Stopwatch to measure runtime
 
     layer_t *input_layer;                   // Input layer

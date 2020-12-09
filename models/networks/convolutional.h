@@ -13,7 +13,6 @@ public:
     // Run network.
     void run(const std::string m_output_weight = "");
 
-private:
     // Initialize network.
     void init_network(const std::string m_network_config);
     //Initialize input data.

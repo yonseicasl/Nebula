@@ -22,6 +22,7 @@ network_t::network_t() :
     input_size(0),
     batch_size(1),
     time_step(1),
+    num_layers(0),
     input_data(NULL),
     input_label(NULL),
 #ifdef GPU_ENABLED
@@ -34,7 +35,6 @@ network_t::network_t() :
 #endif
     input_layer(NULL),
     output_layer(NULL),
-    num_layers(0),
     num_classes(0),
     num_iterations(0),
     iteration(0),
@@ -79,20 +79,17 @@ void network_t::update() {
 }
 
 // Initialize network.
-void network_t::init(const std::string m_run_type,    const std::string m_network_config,
-                     const std::string m_data_config, const std::string m_input_weight) {
+void network_t::init(const std::string m_network_config, const std::string m_input_weight) {
     std::cout << "Initializing network ..." << std::endl;
-    // Set network run type.
-    run_type = (run_type_t)get_type(run_type_str, m_run_type); 
 
     // Initialize network.
     init_network(m_network_config);
 
     // Initialize input data.
-    init_data(m_data_config);
+    //init_data(m_network_config);
 
     // Initialize weight.
-    init_weight(m_input_weight);
+    //init_weight(m_network_config);
 }
 
 // Initialize weight.
