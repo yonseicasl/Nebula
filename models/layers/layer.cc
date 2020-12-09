@@ -30,10 +30,6 @@ layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_lay
 	group(1),
     prev_layer(m_prev_layer),
     next_layer(NULL),
-#ifdef GPU_ENABLED
-    output_data_dev(NULL),
-    delta_dev(NULL),
-#endif
     num_threads(1),
     network(m_network) {
     num_threads = network->num_threads;

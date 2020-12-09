@@ -3,9 +3,6 @@
 #include <cstring>
 #include <thread>
 
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "pooling_layer.h"
 
 namespace nebula {
@@ -13,9 +10,6 @@ namespace nebula {
 pooling_layer_t::pooling_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
     index(NULL) {
-#ifdef GPU_ENABLED
-    index_dev = NULL;
-#endif
 }
 
 pooling_layer_t::~pooling_layer_t() {
@@ -26,15 +20,6 @@ pooling_layer_t::~pooling_layer_t() {
         delete [] index;
     }
 
-#ifdef GPU_ENABLED
-    cudaFree(output_data_dev);
-    cudaFree(delta_dev);
-
-    if(layer_type == MAXPOOL_LAYER) {
-        cudaFree(index_dev);
-    }
-
-#endif
 }
 
 void pooling_layer_t::init(section_config_t m_section_config) {
@@ -72,32 +57,6 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     if(layer_type == MAXPOOL_LAYER) {
         index = new unsigned[output_size * network->batch_size]();
     }
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&output_data_dev, output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&delta_dev, output_size * network->batch_size * sizeof(float));
-    cudaMemset(output_data_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    cudaMemset(delta_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    
-    if(layer_type == MAXPOOL_LAYER) {
-        cudaMalloc((void**)&index_dev, output_size * network->batch_size * sizeof(unsigned));
-        cudaMemset(index_dev, 0, output_size * network->batch_size * sizeof(unsigned));
-    }
-#ifdef CUDNN_ENABLED
-    cudnnCreateTensorDescriptor(&input_descriptor);
-    cudnnCreateTensorDescriptor(&output_descriptor);
-    cudnnCreatePoolingDescriptor(&pooling_descriptor);
-
-    pooling_mode = (layer_type == MAXPOOL_LAYER) ? 
-                    CUDNN_POOLING_MAX : CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
-
-    cudnnSetTensor4dDescriptor(input_descriptor, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT,
-                               network->batch_size, input_channel, input_height, input_width);
-    cudnnSetTensor4dDescriptor(output_descriptor, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT,
-                               network->batch_size, output_channel, output_height, output_width);
-    cudnnSetPooling2dDescriptor(pooling_descriptor, pooling_mode, CUDNN_NOT_PROPAGATE_NAN,
-                                filter_size, filter_size, padding, padding, stride, stride);
-#endif
-#endif
 }
 
 void pooling_layer_t::init_weight(std::fstream &m_weight_file) {

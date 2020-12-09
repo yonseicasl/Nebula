@@ -4,9 +4,6 @@
 #include <cfloat>
 #include <cmath>
 #include <cstring>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "softmax_layer.h"
 
 namespace nebula {
@@ -18,11 +15,6 @@ softmax_layer_t::softmax_layer_t(network_t *m_network, layer_t *m_prev_layer, la
 softmax_layer_t::~softmax_layer_t() {
     delete [] output_data;
     delete [] delta;
-
-#ifdef GPU_ENABLED
-    cudaFree(output_data_dev);
-    cudaFree(delta_dev);
-#endif
 }
 
 // Initialize layer.
@@ -33,14 +25,6 @@ void softmax_layer_t::init(section_config_t m_section_config) {
     
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&output_data_dev, output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&delta_dev, output_size * network->batch_size * sizeof(float));
-    cudaMemset(output_data_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    cudaMemset(delta_dev, 0.0, output_size * network->batch_size * sizeof(float));
-
-    cudaMemcpy(output_data_dev, output_data, output_size * network->batch_size * sizeof(float), cudaMemcpyHostToDevice);
-#endif
 }
 
 // Initialize weight from file.

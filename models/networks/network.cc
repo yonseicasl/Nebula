@@ -1,7 +1,4 @@
 #include <fstream>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "config.h"
 #include "layer.h"
 #include "network.h"
@@ -25,14 +22,6 @@ network_t::network_t() :
     num_layers(0),
     input_data(NULL),
     input_label(NULL),
-#ifdef GPU_ENABLED
-    cublas_handle(0),
-    input_data_dev(NULL),
-    input_label_dev(NULL),
-#ifdef CUDNN_ENABLED
-    cudnn_handle(0),
-#endif
-#endif
     input_layer(NULL),
     output_layer(NULL),
     num_classes(0),
@@ -41,41 +30,21 @@ network_t::network_t() :
     top_k(1),
 	pipe_index(0),
     cumulative_cost(0.0) {
-#ifdef GPU_ENABLED
-    // TODO: Nebula currently supports only single-device acceleration.
-    cudaSetDevice(0);
-    cublasCreate(&cublas_handle);
-#ifdef CUDNN_ENABLED
-    cudnnCreate(&cudnn_handle);
-#endif
-#endif
 }
 
 network_t::~network_t() {
 }
 
 void network_t::forward() {
-#ifdef GPU_ENABLED
-    for(unsigned i = 0; i < num_layers; i++) { layers[i]->_forward_(); }
-#else
     for(unsigned i = 0; i < num_layers; i++) { layers[i]->forward(); }
-#endif
 }
 
 void network_t::backward() {
-#ifdef GPU_ENABLED
-    for(unsigned i = num_layers; i > 0; i--) { layers[i-1]->_backward_(); }
-#else
     for(unsigned i = num_layers; i > 0; i--) { layers[i-1]->backward(); }
-#endif
 }
 
 void network_t::update() {
-#ifdef GPU_ENABLED 
-    for(unsigned i = 0; i < num_layers; i++) { layers[i]->_update_(); }
-#else 
     for(unsigned i = 0; i < num_layers; i++) { layers[i]->update(); }
-#endif
 }
 
 // Initialize network.

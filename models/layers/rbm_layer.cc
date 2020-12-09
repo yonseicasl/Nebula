@@ -7,9 +7,6 @@
 #include <cstring>
 #include <random>
 #include <thread>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "rbm_layer.h"
 #include "gemm.h"
 #include "activations.h"
@@ -22,10 +19,6 @@ rbm_layer_t::rbm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type
     weight_update(NULL),
     weight_size(0),
     k_step(1) {
-#ifdef GPU_ENABLED
-    weight_dev = NULL;
-    weight_update_dev = NULL;
-#endif
 }
 
 rbm_layer_t::~rbm_layer_t() {
@@ -45,24 +38,6 @@ rbm_layer_t::~rbm_layer_t() {
     delete [] hidden_bias;
     delete [] visible_bias_update;
     delete [] hidden_bias_update;
-#ifdef GPU_ENABLED
-    cudaFree(output_data_dev);
-    cudaFree(delta_dev);
-    cudaFree(weight_dev);
-    cudaFree(weight_update_dev);
-    
-    cudaFree(hidden_units_dev);
-    cudaFree(hidden_mean_zero_step_dev);
-    cudaFree(hidden_mean_k_step_dev);
-    cudaFree(visible_units_zero_step_dev);
-    cudaFree(visible_units_k_step_dev);
-    cudaFree(visible_mean_dev);     
-
-    cudaFree(visible_bias_dev);
-    cudaFree(hidden_bias_dev);
-    cudaFree(visible_bias_update_dev);
-    cudaFree(hidden_bias_update_dev);
-#endif
 }
 
 void rbm_layer_t::init(section_config_t m_section_config) {
@@ -108,52 +83,12 @@ void rbm_layer_t::init(section_config_t m_section_config) {
     visible_bias_update = new float[input_size]();
     hidden_bias_update = new float[output_size]();
 
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&output_data_dev, output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&delta_dev, input_size * output_size * sizeof(float));
-    cudaMemset(output_data_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    cudaMemset(delta_dev, 0.0, input_size * output_size * sizeof(float));
-    
-    cudaMalloc((void**)&weight_dev, input_size * output_size * sizeof(float));
-    cudaMalloc((void**)&weight_update_dev, input_size * output_size * sizeof(float));
-    cudaMemset(weight_dev, 0.0, input_size * output_size * sizeof(float));
-    cudaMemset(weight_update_dev, 0.0, input_size * output_size * sizeof(float));
-    
-    cudaMalloc((void**)&hidden_units_dev, output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&hidden_mean_zero_step_dev, output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&hidden_mean_k_step_dev, output_size * network->batch_size * sizeof(float));
-    cudaMemset(hidden_units_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    cudaMemset(hidden_mean_zero_step_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    cudaMemset(hidden_mean_k_step_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    
-    cudaMalloc((void**)&visible_units_zero_step_dev, input_size* network->batch_size * sizeof(float));
-    cudaMalloc((void**)&visible_units_k_step_dev, input_size* network->batch_size * sizeof(float));
-    cudaMalloc((void**)&visible_mean_dev, input_size* network->batch_size * sizeof(float));
-    cudaMemset(visible_units_zero_step_dev, 0.0, input_size * network->batch_size * sizeof(float));
-    cudaMemset(visible_units_k_step_dev, 0.0, input_size * network->batch_size * sizeof(float));
-    cudaMemset(visible_mean_dev, 0.0, input_size * network->batch_size * sizeof(float));
-   
-    cudaMalloc((void**)&visible_bias_dev, input_size * sizeof(float));
-    cudaMalloc((void**)&hidden_bias_dev, output_size * sizeof(float));
-    cudaMalloc((void**)&visible_bias_update_dev, input_size * sizeof(float));
-    cudaMalloc((void**)&hidden_bias_update_dev, output_size * sizeof(float));
-   
-    cudaMemset(visible_bias_dev, 0.0, input_size * sizeof(float));
-    cudaMemset(hidden_bias_dev, 0.0, output_size * sizeof(float));
-    cudaMemset(visible_bias_update_dev, 0.0, input_size * sizeof(float));
-    cudaMemset(hidden_bias_update_dev, 0.0, output_size * sizeof(float));
-    
-#endif
 }
 
 // Initialize weight from weight file.
 void rbm_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)hidden_bias, output_size * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
-#ifdef GPU_ENABLED
-    cudaMemcpy(hidden_bias_dev, hidden_bias, output_size * sizeof(float), cudaMemcpyHostToDevice); 
-    cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);
-#endif
 }
 
 // Initialize weight from scratch.
@@ -165,17 +100,10 @@ void rbm_layer_t::init_weight() {
     for(unsigned i = 0; i < weight_size; i++) {
         weight[i] = sqrt(2.0 / input_size) * dist(rng);
     }
-#ifdef GPU_ENABLED 
-    cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);    
-#endif
 }
 
 // Save weight to the weight file.
 void rbm_layer_t::store_weight(std::fstream &m_output_weight) {
-#ifdef GPU_ENABLED
-    cudaMemcpy(hidden_bias, hidden_bias_dev, output_size * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy(weight, weight_dev, weight_size * sizeof(float), cudaMemcpyDeviceToHost);
-#endif
     m_output_weight.write((char*)hidden_bias, output_size * sizeof(float));
     m_output_weight.write((char*)weight, weight_size * sizeof(float));
 }

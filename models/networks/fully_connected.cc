@@ -11,9 +11,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "fully_connected.h"
 #include "config.h"
 #include "layer.h"
@@ -34,21 +31,11 @@ fully_connected_t::~fully_connected_t() {
     delete [] input_data;
     delete [] input_label;
     delete [] reference_label;
-#ifdef GPU_ENABLED
-    cublasDestroy(cublas_handle);
-    cudaFree(input_data_dev);
-    cudaFree(input_label_dev);
-    curandDestroyGenerator(generator);
-#endif
 }
 
 // Initialize network.
 void fully_connected_t::init_network(const std::string m_network_config) {
    
-#ifdef GPU_ENABLED
-    curandCreateGenerator(&generator, CURAND_RNG_PSEUDO_DEFAULT);
-#endif
-    
     // Parse the configuration file.
     config_t config;
     config.parse(m_network_config);
@@ -161,23 +148,9 @@ void fully_connected_t::init_data(const std::string m_data_config){
     input_data = new float[input_size*batch_size];
     input_label = new float[num_classes * batch_size]();
     reference_label = new unsigned[batch_size]();
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&input_data_dev, input_size * batch_size * sizeof(float));
-    cudaMalloc((void**)&input_label_dev, num_classes * batch_size * sizeof(float));
-#endif
 
 }
 void fully_connected_t::pretrain(unsigned m_layer_index) {
-#ifdef GPU_ENABLED
-    for(unsigned j = 0; j < m_layer_index; j++) {
-        if(layers[j]->layer_type == RBM_LAYER) {
-            ((rbm_layer_t*)layers[j])->_forward_(); 
-        }
-    }
-    if(layers[m_layer_index]->layer_type == RBM_LAYER) {
-        ((rbm_layer_t*)layers[m_layer_index])->_pretrain_(); 
-    }
-#else
     for(unsigned j = 0; j < m_layer_index; j++) {
         if(layers[j]->layer_type == RBM_LAYER) {
             ((rbm_layer_t*)layers[j])->forward(); 
@@ -186,7 +159,6 @@ void fully_connected_t::pretrain(unsigned m_layer_index) {
     if(layers[m_layer_index]->layer_type == RBM_LAYER) {
         ((rbm_layer_t*)layers[m_layer_index])->pretrain(); 
     }
-#endif
 }
 
 // Run network.
@@ -313,12 +285,6 @@ void fully_connected_t::load_data(const unsigned m_batch_index) {
         }
     }
 
-#ifdef GPU_ENABLED
-    // Copy input_label to device.
-    cudaMemcpy(input_label_dev, input_label,
-               batch_size * num_classes * sizeof(float), cudaMemcpyHostToDevice);
-#endif
-
     // Set opencv flag.
     // flag -1: IMREAD_UNCHANGED
     // flag  0: IMREAD_GRAYSCALE
@@ -383,11 +349,6 @@ void fully_connected_t::load_data(const unsigned m_batch_index) {
     for(unsigned i = 0; i < input_size * batch_size;  i++) {
         input_data[i] = 1.0 - input_data[i];
     }
-#ifdef GPU_ENABLED
-    // Copy input data into device.
-    cudaMemcpy(input_data_dev, input_data,
-               input_size * batch_size * sizeof(float), cudaMemcpyHostToDevice);
-#endif
 }
 
 // Print results.

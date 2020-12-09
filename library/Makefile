@@ -12,13 +12,6 @@ CCSRC+=$(wildcard $(DIR)/models/networks/*.cc)
 CCSRC+=$(wildcard $(DIR)/models/layers/*.cc)
 CCOBJ=$(CCSRC:.cc=.o)
 
-ifeq ($(GPU_ENABLED), 1)
-CUSRC=$(wildcard $(DIR)/common/*.cu)
-CUSRC+=$(wildcard $(DIR)/models/networks/*.cu)
-CUSRC+=$(wildcard $(DIR)/models/layers/*.cu)
-CUOBJ=$(CUSRC:.cu=.ko)
-endif
-
 default: $(LIB)
 
 $(LIB): $(CCOBJ) $(CUOBJ)
@@ -26,9 +19,6 @@ $(LIB): $(CCOBJ) $(CUOBJ)
 
 %.o: %.cc $(HDR)
 	$(CC) $(CCFLAG) $(STD) -o $@ -c $<
-
-%.ko: %.cu $(HDR)
-	$(CU) $(CUARCH) --compiler-options "$(CCFLAG)" $(STD) -o $@ -c $<
 
 clean:
 	rm -f $(CCOBJ) $(CUOBJ) $(LIB)

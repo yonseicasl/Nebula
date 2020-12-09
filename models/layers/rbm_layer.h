@@ -3,10 +3,6 @@
 
 #include "layer.h"
 
-#ifdef GPU_ENABLED
-#include <curand.h>
-#endif
-
 namespace nebula {
 
 class rbm_layer_t : public layer_t {
@@ -36,22 +32,6 @@ public:
     void store_weight(std::fstream &m_weight_file);
 
 
-#ifdef GPU_ENABLED
-    // Forward propagation.
-    void _forward_();
-    // Backward propagation.
-    void _backward_();
-    // update layer's parameters.
-    void _update_();
-
-    // Sample hidden units using visible units value
-    void _sample_hidden_units_(unsigned m_step);
-    // Sample visible units using hidden units value
-    void _sample_visible_units_();
-    // Reconstruct the visible units and pretrain weight.
-    void _pretrain_();
-#endif
-
 private:
     float *bias;                    // Bias.
     float * weight;                 // Weight
@@ -72,24 +52,6 @@ private:
     float * hidden_bias_update;     // Bias update of hidden units
 
     unsigned k_step;                // k value for k-step contrastive divergence learning
-
-#ifdef GPU_ENABLED
-    float * weight_dev;
-    float * weight_update_dev;
-    
-    float *hidden_units_dev;
-    float *hidden_mean_zero_step_dev;
-    float *hidden_mean_k_step_dev;
-    
-    float *visible_units_zero_step_dev;
-    float *visible_units_k_step_dev;
-    float *visible_mean_dev;
-
-    float * visible_bias_dev;
-    float * hidden_bias_dev;
-    float * visible_bias_update_dev;
-    float * hidden_bias_update_dev;
-#endif
 
 };
 

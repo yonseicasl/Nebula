@@ -24,14 +24,6 @@ public:
     // Store weight.
     void store_weight(std::fstream &m_weight_file);
 
-#ifdef GPU_ENABLED
-    // Forward propagation
-    void _forward_();
-    // Backward propagation
-    void _backward_();
-    void _update_();
-#endif
-
 private:
     layer_t *connection;        // Shortcut connection between layers.
     unsigned hops;

@@ -1,9 +1,6 @@
 #ifndef __DROPOUT_LAYER_H__
 #define __DROPOUT_LAYER_H__
 
-#ifdef GPU_ENABLED
-	#include <curand.h>
-#endif
 #include "layer.h"
 
 namespace nebula {
@@ -28,22 +25,9 @@ public:
     // Store weight.
     void store_weight(std::fstream &m_weight_file);
 
-#ifdef GPU_ENABLED
-    // Forward propagation
-    void _forward_();
-    // Backward propagation
-    void _backward_();
-    // Network update
-    void _update_(); 
-#endif
-
 private:
     float probability;
     float *rand;
-#ifdef GPU_ENABLED
-    curandGenerator_t generator;
-    float *rand_dev;
-#endif
 };
 
 }

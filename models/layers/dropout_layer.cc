@@ -2,9 +2,6 @@
 #include <functional>
 #include <random>
 #include <thread>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "dropout_layer.h"
 
 namespace nebula {
@@ -13,17 +10,10 @@ dropout_layer_t::dropout_layer_t(network_t *m_network, layer_t *m_prev_layer, la
     layer_t(m_network, m_prev_layer, m_layer_type), 
     probability(0.0),
     rand(NULL) {
-#ifdef GPU_ENABLED
-    rand_dev = NULL;
-#endif
 }
 
 dropout_layer_t::~dropout_layer_t() {
     delete [] rand;
-#ifdef GPU_ENABLED
-    cudaFree(rand_dev);
-    curandDestroyGenerator(generator);
-#endif
 
 }
 
@@ -38,16 +28,6 @@ void dropout_layer_t::init(section_config_t m_section_config) {
     delta = prev_layer->delta;
 
     rand = new float[input_size * network->batch_size]();
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&rand_dev, input_size * network->batch_size * sizeof(float));
-    cudaMemset(rand_dev, 0, input_size * network->batch_size * sizeof(float));
-
-    output_data_dev = prev_layer->output_data_dev;
-    delta_dev   = prev_layer->delta_dev;
-
-    curandCreateGenerator(&generator, CURAND_RNG_PSEUDO_DEFAULT);
-    curandGenerateUniform(generator, rand_dev, input_size * network->batch_size);
-#endif
 }
 
 // Initialize weight from file.

@@ -2,9 +2,6 @@
     #include <cblas.h>
 #endif
 #include <cstring>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "cost_layer.h"
 
 namespace nebula {
@@ -17,10 +14,6 @@ cost_layer_t::cost_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_ty
 cost_layer_t::~cost_layer_t() {
     delete [] output_data;
     delete [] delta;
-#ifdef GPU_ENABLED
-    cudaFree(output_data_dev);
-    cudaFree(delta_dev);
-#endif
 }
 
 // Initialize layer.
@@ -37,12 +30,6 @@ void cost_layer_t::init(section_config_t m_section_config) {
 	
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&output_data_dev, output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&delta_dev, output_size * network->batch_size * sizeof(float));
-    cudaMemset(output_data_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    cudaMemset(delta_dev, 0.0, output_size * network->batch_size * sizeof(float));
-#endif
 }
 
 // Initialize weight from file.

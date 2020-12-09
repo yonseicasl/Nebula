@@ -11,9 +11,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
-#ifdef GPU_ENABLED
-    #include <cuda_runtime.h>
-#endif
 #include "config.h"
 #include "layer.h"
 #include "recurrent.h"
@@ -32,11 +29,6 @@ recurrent_t::~recurrent_t() {
     for(unsigned i = 0; i < layers.size(); i++) {delete layers[i];}
     delete [] input_data;
     delete [] input_label;
-#ifdef GPU_ENABLED
-    cublasDestroy(cublas_handle);
-    cudaFree(input_data_dev);
-    cudaFree(input_label_dev);
-#endif
 }
 
 
@@ -225,12 +217,6 @@ void recurrent_t::load_data(const unsigned m_batch_index) {
             }
         }
     }
-#ifdef GPU_ENABLED
-    cudaMemcpy(input_data_dev, input_data, 
-               input_size * batch_size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(input_label_dev, input_label, 
-               input_size * batch_size * sizeof(float), cudaMemcpyHostToDevice);
-#endif
 }
 
 // Print results.
@@ -353,13 +339,6 @@ void recurrent_t::init_data(const std::string m_data_config){
     
     input_data  = new float[input_size * batch_size]();
     input_label = new float[input_size * batch_size]();
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&input_data_dev, input_size * batch_size * sizeof(float));
-    cudaMalloc((void**)&input_label_dev, input_size * batch_size * sizeof(float));
-    cudaMemset(input_data_dev, 0.0, input_size * batch_size * sizeof(float));
-    cudaMemset(input_label_dev, 0.0, input_size * batch_size * sizeof(float));
-#endif
-
 }
 
 }

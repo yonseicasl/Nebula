@@ -7,9 +7,6 @@
 #include <cstring>
 #include <random>
 #include <thread>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "connected_layer.h"
 #include "utils.h"
 #include "batchnorm.h"
@@ -35,22 +32,6 @@ connected_layer_t::connected_layer_t(network_t *m_network, layer_t *m_prev_layer
     variance_delta(NULL),
     x(NULL),
     normalize_x(NULL) {
-#ifdef GPU_ENABLED
-    bias_dev = NULL;
-    bias_update_dev = NULL;
-    weight_dev = NULL;
-    weight_update_dev = NULL;
-    scale_dev = NULL;
-    scale_update_dev = NULL;
-    normalize_mean_dev = NULL;
-    rolling_mean_dev = NULL;
-    mean_delta_dev = NULL;
-    normalize_variance_dev = NULL;
-    rolling_variance_dev = NULL;
-    variance_delta_dev =NULL;
-    x_dev = NULL;
-    normalize_x_dev = NULL;
-#endif
 }
 
 connected_layer_t::~connected_layer_t() {
@@ -72,27 +53,6 @@ connected_layer_t::~connected_layer_t() {
         delete [] x;
         delete [] normalize_x;
     }
-#ifdef GPU_ENABLED
-    cudaFree(bias_dev);
-    cudaFree(bias_update_dev);
-    cudaFree(weight_dev);
-    cudaFree(weight_update_dev);
-    cudaFree(output_data_dev);
-    cudaFree(delta_dev);
-    if(batch_normalize) {
-        cudaFree(scale_dev);
-        cudaFree(scale_update_dev);
-        cudaFree(normalize_mean_dev);
-        cudaFree(rolling_mean_dev);
-        cudaFree(mean_delta_dev);
-        cudaFree(normalize_variance_dev);
-        cudaFree(rolling_variance_dev);
-        cudaFree(variance_delta_dev);
-        cudaFree(x_dev);
-        cudaFree(normalize_x_dev);
-    }
-
-#endif
 }
 
 void connected_layer_t::init(section_config_t m_section_config) {
@@ -137,49 +97,6 @@ void connected_layer_t::init(section_config_t m_section_config) {
         normalize_x = new float[output_size * network->batch_size]();
     }
 
-#ifdef GPU_ENABLED
-    // Initialize layer parameters. (GPU)
-    cudaMalloc((void**)&bias_dev, output_size * sizeof(float));
-    cudaMalloc((void**)&bias_update_dev, output_size * sizeof(float));
-    cudaMemset(bias_dev, 0.0, output_size * sizeof(float));
-    cudaMemset(bias_update_dev, 0.0, output_size * sizeof(float));
-
-    cudaMalloc((void**)&weight_dev, weight_size * sizeof(float));
-    cudaMalloc((void**)&weight_update_dev, weight_size * sizeof(float));
-    cudaMemset(weight_dev, 0.0, weight_size * sizeof(float));
-    cudaMemset(weight_update_dev, 0.0, weight_size * sizeof(float));
-
-    cudaMalloc((void**)&output_data_dev, output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&delta_dev, output_size * network->batch_size * sizeof(float));
-    cudaMemset(output_data_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    cudaMemset(delta_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    
-    if(batch_normalize) {
-        cudaMalloc((void**)&scale_dev, output_size * sizeof(float));
-        cudaMalloc((void**)&scale_update_dev, output_size * sizeof(float));
-        cudaMemcpy(scale_dev, scale,  output_size * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemset(scale_update_dev, 0.0, output_size * sizeof(float));
-        
-        cudaMalloc((void**)&normalize_mean_dev, output_size * sizeof(float));
-        cudaMalloc((void**)&rolling_mean_dev, output_size * sizeof(float));
-        cudaMalloc((void**)&mean_delta_dev, output_size * sizeof(float));
-        cudaMemset(normalize_mean_dev, 0.0, output_size * sizeof(float));
-        cudaMemset(rolling_mean_dev, 0.0, output_size * sizeof(float));
-        cudaMemset(mean_delta_dev, 0.0, output_size * sizeof(float));
-
-        cudaMalloc((void**)&normalize_variance_dev, output_size * sizeof(float));
-        cudaMalloc((void**)&rolling_variance_dev, output_size * sizeof(float));
-        cudaMalloc((void**)&variance_delta_dev, output_size * sizeof(float));
-        cudaMemset(normalize_variance_dev, 0.0, output_size * sizeof(float));
-        cudaMemset(rolling_variance_dev, 0.0, output_size * sizeof(float));
-        cudaMemset(variance_delta_dev, 0.0, output_size * sizeof(float));
-
-        cudaMalloc((void**)&x_dev, output_size * network->batch_size * sizeof(float));
-        cudaMalloc((void**)&normalize_x_dev, output_size * network->batch_size * sizeof(float));
-        cudaMemset(x_dev, 0.0, output_size * network->batch_size * sizeof(float));
-        cudaMemset(normalize_x_dev, 0.0, output_size * network->batch_size * sizeof(float));
-    }
-#endif
 }
 
 // Initialize weight from weight file.
@@ -192,18 +109,6 @@ void connected_layer_t::init_weight(std::fstream &m_input_weight) {
         m_input_weight.read((char*)rolling_mean, output_size * sizeof(float));
         m_input_weight.read((char*)rolling_variance, output_size * sizeof(float));
     }
-#ifdef GPU_ENABLED
-    cudaMemcpy(bias_dev, bias, output_size * sizeof(float), cudaMemcpyHostToDevice); 
-    cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);
-    if(batch_normalize) {
-        cudaMemcpy(scale_dev, scale,
-                   output_size * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemcpy(rolling_mean_dev, rolling_mean,
-                   output_size * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemcpy(rolling_variance_dev, rolling_variance,
-                   output_size * sizeof(float), cudaMemcpyHostToDevice);
-    }
-#endif
 }
 
 // Initialized weight from scratch.
@@ -215,24 +120,9 @@ void connected_layer_t::init_weight() {
     for(unsigned i = 0; i < weight_size; i++) {
         weight[i] = sqrt(2.0 / input_size) * dist(rng);
     }
-#ifdef GPU_ENABLED 
-    cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);    
-#endif
 }
 
 void connected_layer_t::store_weight(std::fstream &m_output_weight) {
-#ifdef GPU_ENABLED
-    cudaMemcpy(bias, bias_dev, output_size * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy(weight, weight_dev, weight_size * sizeof(float), cudaMemcpyDeviceToHost);
-    if(batch_normalize) {
-        cudaMemcpy(scale, scale_dev,
-                   output_size * sizeof(float), cudaMemcpyDeviceToHost);
-        cudaMemcpy(rolling_mean, rolling_mean_dev,
-                   output_size * sizeof(float), cudaMemcpyDeviceToHost);
-        cudaMemcpy(rolling_variance, rolling_variance_dev,
-                   output_size * sizeof(float), cudaMemcpyDeviceToHost);
-    }
-#endif
     m_output_weight.write((char*)bias, output_size * sizeof(float));
     m_output_weight.write((char*)weight, weight_size * sizeof(float));
     if(batch_normalize) {

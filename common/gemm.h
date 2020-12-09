@@ -7,24 +7,6 @@
 
 namespace nebula {
 
-#ifdef GPU_ENABLED
-
-void _axpy_(unsigned m_size, 
-            const float alpha, 
-            float *X, unsigned incx,
-            float *Y, unsigned incy);
-
-void _scal_(unsigned m_size, 
-            const float alpha,
-            float *X, unsigned incx);
-
-void _gemm_(int TA, int TB, int M, int N, int K, float ALPHA,
-        float *A, int lda,
-        float *B, int ldb,
-        float BETA,
-        float *C, int ldc);
-#endif
-
 template <typename T>
 // Y = a * X 
 void axmy(unsigned m_size, const float alpha, T *X, unsigned incx, T *Y, unsigned incy) {

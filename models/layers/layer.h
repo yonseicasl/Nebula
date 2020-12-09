@@ -30,14 +30,6 @@ public:
     virtual void store_weight(std::fstream &m_weight_file) = 0;
 
 
-#ifdef GPU_ENABLED
-    // Forward propagation
-    virtual void _forward_() = 0;
-    // Backward propagation
-    virtual void _backward_() = 0;
-    // Network update
-    virtual void _update_() = 0;
-#endif
     layer_type_t layer_type;            // Layer type
     activation_type_t activation_type;  // Activation type
 
@@ -64,21 +56,12 @@ public:
    
     layer_t     *prev_layer;            // Pointer to previous layer
     layer_t     *next_layer;            // Pointer to next layer
-#ifdef GPU_ENABLED
-    float *output_data_dev;             // Output data in device
-    float *delta_dev;                   // Delta to update layers in device
-#endif
 
 protected:
     // Activation function
     void activate();
     // Gradient function
     void gradient();
-
-#ifdef GPU_ENABLED
-    void _activate_();
-    void _gradient_();
-#endif
 
     unsigned    num_threads;            // Number of threads
     network_t   *network;               // Pointer to main network

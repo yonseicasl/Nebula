@@ -33,37 +33,6 @@ void relu_gradient(float *m_delta, float *m_output, unsigned m_size);
 void stair_gradient(float *m_delta, float *m_output, unsigned m_size);
 void tanh_gradient(float *m_delta, float *m_output, unsigned m_size);
 
-#ifdef GPU_ENABLED
-
-void _elu_activation_(float *m_output_dev, unsigned m_size);
-void _hardtan_activation_(float *m_output_dev, unsigned m_size);
-void _leaky_activation_(float *m_output_dev, unsigned m_size);
-void _lhtan_activation_(float *m_output_dev, unsigned m_size);
-void _linear_activation_(float *m_output_dev, unsigned m_size);
-void _loggy_activation_(float *m_output_dev, unsigned m_size);
-void _logistic_activation_(float *m_output_dev, unsigned m_size);
-void _plse_activation_(float *m_output_dev, unsigned m_size);
-void _ramp_activation_(float *m_output_dev, unsigned m_size);
-void _relie_activation_(float *m_output_dev, unsigned m_size);
-void _relu_activation_(float *m_output_dev, unsigned m_size);
-void _stair_activation_(float *m_output_dev, unsigned m_size);
-void _tanh_activation_(float *m_output_dev, unsigned m_size);
-
-void _elu_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _hardtan_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _leaky_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _lhtan_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _linear_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _loggy_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _logistic_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _plse_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _ramp_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _relie_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _relu_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _stair_gradient_(float *m_output, float *m_delta, unsigned m_size);
-void _tanh_gradient_(float *m_output, float *m_delta, unsigned m_size);
-#endif
-
 }
 // End of namespace nebula.
 

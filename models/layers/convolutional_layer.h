@@ -29,19 +29,6 @@ public:
     // Backward batch normalization.
     void backward_batchnorm();
 
-#ifdef GPU_ENABLED
-    // Forward propagation
-    void _forward_();
-    // Backward propagation
-    void _backward_();
-    // Network update
-    void _update_(); 
-    // forward batch_normalization.
-    void _forward_batchnorm_();
-    // Backward batch normalization.
-    void _backward_batchnorm_();
-#endif
-
 private:
     float *workspace;               // Workspace
     size_t workspace_size;          // workspace size
@@ -68,46 +55,6 @@ private:
     float *x;                       // Renaming
     float *normalize_x;             // Renaming
 
-#ifdef GPU_ENABLED
-    float *bias_dev;                // Bias.
-    float *bias_update_dev;         // Bias update.
-
-    float *weight_dev;              // Weight 
-    float *weight_update_dev;       // Weight update
-
-    float *scale_dev;
-    float *scale_update_dev;
-
-    float *normalize_mean_dev;
-    float *rolling_mean_dev;
-    float *mean_delta_dev;
-
-    float *normalize_variance_dev;
-    float *rolling_variance_dev;
-    float *variance_delta_dev;
-
-    float *x_dev;
-    float *normalize_x_dev;
-
-    float *workspace_dev;           // Workspace
-
-#ifdef CUDNN_ENABLED
-    cudnnTensorDescriptor_t             input_descriptor;               // Descriptor for input data.
-    cudnnTensorDescriptor_t             input_delta_descriptor;         // Descriptor for input delta.
-
-    cudnnTensorDescriptor_t             output_descriptor;              // Descriptor for output data.
-    cudnnTensorDescriptor_t             output_delta_descriptor;        // Descriptor for output delta.
-
-    cudnnFilterDescriptor_t             weight_descriptor;              // Descriptor for weight data.
-    cudnnFilterDescriptor_t             weight_delta_descriptor;        // Descriptor for weight delta.
-
-    cudnnConvolutionDescriptor_t        convolution_descriptor;         // Descriptor for the order of convolution.
-
-    cudnnConvolutionFwdAlgo_t           forward_algorithm;              // Descriptor for forward convolution.
-    cudnnConvolutionBwdDataAlgo_t       backward_data_algorithm;        // Descriptor for backward convolution (data).
-    cudnnConvolutionBwdFilterAlgo_t     backward_weight_algorithm;      // Descriptor for backward convolution (weight).
-#endif
-#endif
 };
 
 }

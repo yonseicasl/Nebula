@@ -4,9 +4,6 @@
 #ifndef CUSTOM_BLAS
     #include <cblas.h>
 #endif
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "gemm.h"
 #include "lstm_layer.h"
 #include "activations.h"
@@ -25,18 +22,6 @@ lstm_layer_t::lstm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_ty
     cell_gate(NULL),
     output_gate(NULL),
     batch_normalize(false){
-#ifdef GPU_ENABLED
-    cell_state_dev = NULL;
-    current_cell_state_dev = NULL;
-    cell_delta_dev = NULL;
-
-    hidden_state_dev = NULL;
-    
-    input_gate_dev = NULL;
-    forget_gate_dev = NULL;
-    cell_gate_dev = NULL;
-    output_gate_dev = NULL;
-#endif
 }
 
 lstm_layer_t::~lstm_layer_t() {
@@ -63,22 +48,6 @@ lstm_layer_t::~lstm_layer_t() {
     delete forget_gate_U;
     delete cell_gate_U;
     delete output_gate_U;
-#ifdef GPU_ENABLED
-    cudaFree(output_data_dev);
-    cudaFree(delta_dev);
-
-    cudaFree(cell_state_dev);
-    cudaFree(current_cell_state_dev);
-    cudaFree(cell_delta_dev);
-
-    cudaFree(hidden_state_dev);
-
-    cudaFree(input_gate_dev);
-    cudaFree(forget_gate_dev);
-    cudaFree(cell_gate_dev);
-    cudaFree(output_gate_dev);
-#endif
-
 }
 
 void lstm_layer_t::init(section_config_t m_section_config) {
@@ -140,55 +109,6 @@ void lstm_layer_t::init(section_config_t m_section_config) {
     next_forget_gate   = new float[output_size * network->batch_size / network->time_step]();
     cell_gate          = new float[output_size * network->batch_size / network->time_step]();
     output_gate        = new float[output_size * network->batch_size / network->time_step]();
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&output_data_dev, 
-        output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&delta_dev, 
-        output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&cell_state_dev, 
-        output_size * network->batch_size * sizeof(float));
-    cudaMalloc((void**)&current_cell_state_dev,
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMalloc((void**)&cell_delta_dev,
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-
-    cudaMalloc((void**)&hidden_state_dev, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMalloc((void**)&input_gate_dev, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMalloc((void**)&forget_gate_dev, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMalloc((void**)&next_forget_gate_dev,
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMalloc((void**)&cell_gate_dev, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMalloc((void**)&output_gate_dev, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-
-    cudaMemset(output_data_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float));
-    cudaMemset(delta_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float));
-    cudaMemset(cell_state_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float));
-    cudaMemset(current_cell_state_dev, 0.0,
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMemset(cell_delta_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-
-    cudaMemset(hidden_state_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMemset(input_gate_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMemset(forget_gate_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMemset(next_forget_gate_dev, 0.0,
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMemset(cell_gate_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMemset(output_gate_dev, 0.0, 
-        output_size * network->batch_size * sizeof(float) / network->time_step);
-#endif
 }
 
 void lstm_layer_t::init_weight(std::fstream &m_input_weight) {

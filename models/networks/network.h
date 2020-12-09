@@ -2,13 +2,6 @@
 #define __NETWORK_H__
 
 #include <vector>
-#ifdef GPU_ENABLED
-    #include <curand.h>
-    #include <cublas_v2.h>
-    #ifdef CUDNN_ENABLED
-        #include <cudnn.h>
-    #endif
-#endif
 #include "def.h"
 #include "stopwatch.h"
 
@@ -54,15 +47,6 @@ public:
     float *input_label;                     // Input label
     
     std::vector<layer_t*> layers;           // Network layers
-#ifdef GPU_ENABLED
-    cublasHandle_t cublas_handle;           // cublas handle
-    curandGenerator_t generator;
-    float *input_data_dev;                  // Input data in device
-    float *input_label_dev;                 // Input label in device
-    #ifdef CUDNN_ENABLED
-        cudnnHandle_t cudnn_handle;         // cudnn handle
-    #endif
-#endif
 
     // Initialize network.
     virtual void init_network(const std::string m_network_config) = 0;

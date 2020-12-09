@@ -116,10 +116,6 @@ fi
 ##### Optional arguments #####
 # Use gdb for debug.
 use_debug=0
-# Use GPU.
-gpu_enabled=0
-# Use cuDNN
-cudnn_enabled=0
 # Use custom blas.
 custom_blas=0
 # Do not load weight for training by default.
@@ -141,21 +137,6 @@ done
 # Append Makefile options when debug.
 if [[ $debug_enabled -eq 1 ]]; then
 	ccopt+=" -g"
-fi
-
-# Append Makefile options when GPU is enabled.
-if [[ $gpu_enabled -eq 1 ]]; then
-	lc=$cu
-	ccopt+=" -DGPU_ENABLED"
-    cuarch="CUARCH=\"-gencode arch=$ptx,code=[$cubin,$ptx]\""
-    libopt+=" -lcuda -lcudart -lcurand -lcublas"
-    mopt+=" CUSRC=\"$cusrc\" CUOBJ=\"$cuobj\" GPU_ENABLED=\"$gpu_enabled\""
-    if [[ $cudnn_enabled -eq 1 ]]; then
-        ccopt+=" -DCUDNN_ENABLED"
-        libopt+=" -L/usr/local/cuda/lib64/ -lcudnn"
-        #libopt+=" -lcudnn"
-    fi
-
 fi
 
 # Append Makefile options when select custom blas.

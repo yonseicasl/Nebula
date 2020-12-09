@@ -9,9 +9,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #ifndef CUSTOM_BLAS
 #include <cblas.h>
 #endif
@@ -36,16 +33,6 @@ convolutional_t::~convolutional_t() {
     delete [] input_data;
     delete [] input_label;
     delete [] reference_label;
-#ifdef GPU_ENABLED
-    cublasDestroy(cublas_handle);
-    cudaFree(input_data_dev);
-    cudaFree(input_label_dev);
-
-#ifdef CUDNN_ENABLED
-    cudnnDestroy(cudnn_handle);
-#endif
-
-#endif
 }
 
 // Initialize network.
@@ -171,10 +158,6 @@ void convolutional_t::init_data(const std::string m_data_config) {
     input_data = new float[input_size*batch_size];
     input_label = new float[num_classes * batch_size]();
     reference_label = new unsigned[batch_size]();
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&input_data_dev, input_size * batch_size * sizeof(float));
-    cudaMalloc((void**)&input_label_dev, num_classes * batch_size * sizeof(float));
-#endif
 }
 
 // Run network.
@@ -293,12 +276,6 @@ void convolutional_t::load_data(const unsigned m_batch_index) {
         }
     }
 
-#ifdef GPU_ENABLED
-    // Copy input_label to device.
-    cudaMemcpy(input_label_dev, input_label,
-               batch_size * num_classes * sizeof(float), cudaMemcpyHostToDevice);
-#endif
-
     // Set opencv flag.
     // flag -1: IMREAD_UNCHANGED
     // flag  0: IMREAD_GRAYSCALE
@@ -415,11 +392,6 @@ void convolutional_t::load_data(const unsigned m_batch_index) {
         } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
     }
 
-#ifdef GPU_ENABLED
-    // Copy input data into device.
-    cudaMemcpy(input_data_dev, input_data,
-               input_size * batch_size * sizeof(float), cudaMemcpyHostToDevice);
-#endif
 }
 
 // Print results.

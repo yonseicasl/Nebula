@@ -26,19 +26,7 @@ public:
     // update layer's parameters.
     void update();
 
-#ifdef GPU_ENABLED
-    // Forward propagation.
-    void _forward_();
-    // Backward propagation.
-    void _backward_();
-    // update layer's parameters.
-    void _update_();
-#endif
 private:
-#ifdef GPU_ENABLED
-    float *state_dev;
-    float *prev_state_dev;
-#endif
     float *state;
     float *prev_state;
     bool batch_normalize; 

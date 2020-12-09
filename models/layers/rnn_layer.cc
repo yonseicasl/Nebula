@@ -3,9 +3,6 @@
 #ifndef CUSTOM_BLAS
     #include <cblas.h>
 #endif
-#ifdef GPU_ENABLED
-#include <cuda_runtime.h>
-#endif
 #include "rnn_layer.h"
 #include "gemm.h"
 
@@ -13,10 +10,6 @@ namespace nebula {
 
 rnn_layer_t::rnn_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
-#ifdef GPU_ENABLED
-    state_dev(NULL),
-    prev_state_dev(NULL),
-#endif
     state(NULL),
     prev_state(NULL),
     batch_normalize(false) {
@@ -25,10 +18,6 @@ rnn_layer_t::rnn_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type
 rnn_layer_t::~rnn_layer_t() {
     delete [] state;
     delete [] prev_state;
-#ifdef GPU_ENABLED
-    cudaFree(state_dev);
-    cudaFree(prev_state_dev);
-#endif
 }
 
 void rnn_layer_t::init(section_config_t m_section_config) {
@@ -56,17 +45,6 @@ void rnn_layer_t::init(section_config_t m_section_config) {
 
     output_data = output_gate->output_data;
     delta = output_gate->delta;
-
-#ifdef GPU_ENABLED
-    cudaMalloc((void**)&state_dev, output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMalloc((void**)&prev_state_dev, output_size * network->batch_size * sizeof(float) / network->time_step);
-
-    cudaMemset(state_dev, 0.0, output_size * network->batch_size * sizeof(float) / network->time_step);
-    cudaMemset(prev_state_dev, 0.0, output_size * network->batch_size * sizeof(float) / network->time_step);
-
-    output_data_dev = output_gate->output_data_dev;
-    delta_dev = output_gate->delta_dev;
-#endif
 
 }
 
