@@ -21,7 +21,7 @@ private:
     // Initialize network.
     void init_network(const std::string m_network_config);
     // Initialize input data.
-    void init_data(const std::string m_data_config);
+    void init_data(section_config_t m_data_config);
     // Pretrain the network.
     void pretrain(unsigned m_layer_index);
     // Load batch data.

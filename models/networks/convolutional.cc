@@ -62,6 +62,9 @@ void convolutional_t::init_network(const std::string m_network_config) {
             section_config.get_setting("num_iterations", &num_iterations);
             input_size = input_height * input_width * input_channel;
         }
+		else if(section_config.name == "data") {
+			init_data(section_config);
+		}
         // Layer configuration
         else {
             layer_t *layer = NULL;
@@ -108,23 +111,13 @@ void convolutional_t::init_network(const std::string m_network_config) {
 #endif
 }
 
-void convolutional_t::init_data(const std::string m_data_config) {
-    // Parse input data config.
-    config_t config;
-    config.parse(m_data_config);
-    section_config_t section_config = config.sections[0];
-
-    if((config.sections.size() != 1) || (config.sections[0].name != "data")) {
-        std::cerr << "Error: input config format error in " << m_data_config << std::endl;
-        exit(1);
-    }
+void convolutional_t::init_data(section_config_t m_data_config) {
 
     // Input configuration
     std::string input_list, label_list;
-    if(run_type == TEST_RUN) { section_config.get_setting("test", &input_list); }
-    else { section_config.get_setting("train", &input_list); }
-    section_config.get_setting("labels", &label_list);
-    section_config.get_setting("top", &top_k);
+    m_data_config.get_setting("test", &input_list); 
+    m_data_config.get_setting("labels", &label_list);
+    m_data_config.get_setting("top", &top_k);
    
     // Read input list.
     std::fstream input_list_file;
@@ -248,23 +241,11 @@ void convolutional_t::load_data(const unsigned m_batch_index) {
     std::vector<std::string> batch_inputs;
     batch_inputs.reserve(batch_size);
 
-    // Inference
-    if(run_type == TEST_RUN) {
-        // Sequentially load batch data.
-        for(unsigned i = 0; i < batch_size; i++) {
-            batch_inputs.push_back(inputs[m_batch_index*batch_size + i]);
-        }
-    }
-    // Training
-    else {
-        // Randomly load batch data.
-        std::minstd_rand rng(std::random_device{}());
-        std::uniform_int_distribution<unsigned> uid(0,inputs.size()-1);
-        for(unsigned i = 0; i < batch_size; i++) {
-            batch_inputs.push_back(inputs[uid(rng)]);
-        }
-    }
-
+	// Inference
+	// Sequentially load batch data.
+	for(unsigned i = 0; i < batch_size; i++) {
+		batch_inputs.push_back(inputs[m_batch_index*batch_size + i]);
+	}
     // Mark matching labels in the batch.
     memset(input_label, 0, batch_size * num_classes * sizeof(float)); 
     for(unsigned i = 0; i < batch_size; i++) {
@@ -287,111 +268,54 @@ void convolutional_t::load_data(const unsigned m_batch_index) {
         std::cerr << "Error: unsupported image channel " << input_channel << std::endl;
         exit(1);
     }
-    // If the batch size is equal to 1.
-    if(batch_size == 1) {
-        // Load data in parallel.
-        std::vector<std::thread> threads;
-        threads.reserve(num_threads);
-        for(unsigned i = 0; i < batch_size; i++) {
-            cv::Mat src, dst;
-            // Check input data format.
-            if(batch_inputs[i].find("png") != std::string::npos) { src = cv::imread(batch_inputs[i], -1); }
-            else { src = cv::imread(batch_inputs[i], opencv_flag); }
-            if(src.empty()) {
-                std::cerr << "Error: failed to load input " << inputs[i] << std::endl;
-                exit(1);
-            }
+   // Load data in parallel.
+   std::vector<std::thread> threads;
+   threads.reserve(num_threads);
+   for(unsigned tid = 0; tid < num_threads; tid++) {
+       threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                          const unsigned tid) {
+           for(unsigned i = begin; i < end; i++) {
+               cv::Mat src, dst;
+               // Check input data format.
+               if(batch_inputs[i].find("png") != std::string::npos) { src = cv::imread(batch_inputs[i], -1); }
+               else { src = cv::imread(batch_inputs[i], opencv_flag); }
+               if(src.empty()) {
+                   std::cerr << "Error: failed to load input " << inputs[i] << std::endl;
+                   exit(1);
+               }
 
-            // Resize data.
-            if((input_height != (unsigned)src.size().height) ||
-                    (input_width  != (unsigned)src.size().width)) {
-                cv::resize(src, dst, cv::Size(input_width, input_height), 0, 0, cv::INTER_LINEAR);
-            }
-            else { dst = src; }
+               // Resize data.
+               if((input_height != (unsigned)src.size().height) ||
+                  (input_width  != (unsigned)src.size().width)) {
+                   cv::resize(src, dst, cv::Size(input_width, input_height), 0, 0, cv::INTER_LINEAR);
+               }
+               else { dst = src; }
 
-            // Flatten data into 1-D array.
-            unsigned height  = dst.size().height;
-            unsigned width   = dst.size().width;
-            unsigned channel = dst.channels();
-            float *data = new float[height * width * channel]();
+               // Flatten data into 1-D array.
+               unsigned height  = dst.size().height;
+               unsigned width   = dst.size().width;
+               unsigned channel = dst.channels();
+               float *data = new float[height * width * channel]();
 
-            std::vector<std::thread> threads;
-            threads.reserve(num_threads);
-            for(unsigned tid = 0; tid < num_threads; tid++) {
-                threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
-                                                   const unsigned tid) {
-                    for(unsigned h = begin; h < end; h++) {
-                        for(unsigned c = 0; c < channel; c++) {
-                            for(unsigned w = 0; w < width; w++) {
-                                data[c * width * height + h * width + w] =
-                                dst.data[h * dst.step + w * channel + c]/255.0;
-                            }
-                        }
-                    }
-                }, tid * height / num_threads, (tid + 1) * height / num_threads, tid));
-            } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
+               for(unsigned h = 0; h < height; h++) {
+                   for(unsigned c = 0; c < channel; c++) {
+                       for(unsigned w = 0; w < width; w++) {
+                           data[c * width * height + h * width + w] =
+                           dst.data[h * dst.step + w * channel + c]/255.0;
+                       }
+                   }
+               }
 
-            for(unsigned i = 0; i < height * width; i++) {
-                cv::swap(data[i], data[i + 2 * width * height]);
-            }
+               for(unsigned i = 0; i < height * width; i++) {
+                   cv::swap(data[i], data[i + 2 * width * height]);
+               }
 
-            memcpy(input_data + i * input_size, data,
-                   input_height * input_width * input_channel * sizeof(float));
-            delete [] data;
-        }
-    }
-    // If the batch size is bigger than 1.
-    else {
-        // Load data in parallel.
-        std::vector<std::thread> threads;
-        threads.reserve(num_threads);
-        for(unsigned tid = 0; tid < num_threads; tid++) {
-            threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
-                                               const unsigned tid) {
-                for(unsigned i = begin; i < end; i++) {
-                    cv::Mat src, dst;
-                    // Check input data format.
-                    if(batch_inputs[i].find("png") != std::string::npos) { src = cv::imread(batch_inputs[i], -1); }
-                    else { src = cv::imread(batch_inputs[i], opencv_flag); }
-                    if(src.empty()) {
-                        std::cerr << "Error: failed to load input " << inputs[i] << std::endl;
-                        exit(1);
-                    }
-
-                    // Resize data.
-                    if((input_height != (unsigned)src.size().height) ||
-                       (input_width  != (unsigned)src.size().width)) {
-                        cv::resize(src, dst, cv::Size(input_width, input_height), 0, 0, cv::INTER_LINEAR);
-                    }
-                    else { dst = src; }
-
-                    // Flatten data into 1-D array.
-                    unsigned height  = dst.size().height;
-                    unsigned width   = dst.size().width;
-                    unsigned channel = dst.channels();
-                    float *data = new float[height * width * channel]();
-
-                    for(unsigned h = 0; h < height; h++) {
-                        for(unsigned c = 0; c < channel; c++) {
-                            for(unsigned w = 0; w < width; w++) {
-                                data[c * width * height + h * width + w] =
-                                dst.data[h * dst.step + w * channel + c]/255.0;
-                            }
-                        }
-                    }
-
-                    for(unsigned i = 0; i < height * width; i++) {
-                        cv::swap(data[i], data[i + 2 * width * height]);
-                    }
-
-                    memcpy(input_data + i * input_size, data,
-                           input_height * input_width * input_channel * sizeof(float));
-                    delete [] data;
-                }
-            }, tid * batch_size / num_threads, (tid + 1) * batch_size / num_threads, tid));
-        } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
-    }
-
+               memcpy(input_data + i * input_size, data,
+                      input_height * input_width * input_channel * sizeof(float));
+               delete [] data;
+           }
+       }, tid * batch_size / num_threads, (tid + 1) * batch_size / num_threads, tid));
+   } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
 }
 
 // Print results.

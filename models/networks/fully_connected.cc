@@ -97,24 +97,14 @@ void fully_connected_t::init_network(const std::string m_network_config) {
 }
 
 // Initialize input data.
-void fully_connected_t::init_data(const std::string m_data_config){
+void fully_connected_t::init_data(section_config_t m_data_config){
     
-    // Parse input data config.
-    config_t config;
-    config.parse(m_data_config);
-    section_config_t section_config = config.sections[0];
-
-    if((config.sections.size() != 1) || (config.sections[0].name != "data")) {
-        std::cerr << "Error: input config format error in " << m_data_config << std::endl;
-        exit(1);
-    }
-
     // Input configuration
     std::string input_list, label_list;
-    if(run_type == TEST_RUN) { section_config.get_setting("test", &input_list); }
-    else { section_config.get_setting("train", &input_list); }
-    section_config.get_setting("labels", &label_list);
-    section_config.get_setting("top", &top_k);
+    if(run_type == TEST_RUN) { m_data_config.get_setting("test", &input_list); }
+    else { m_data_config.get_setting("train", &input_list); }
+    m_data_config.get_setting("labels", &label_list);
+    m_data_config.get_setting("top", &top_k);
    
     // Read input list.
     std::fstream input_list_file;

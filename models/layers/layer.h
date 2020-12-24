@@ -57,6 +57,7 @@ public:
     layer_t     *prev_layer;            // Pointer to previous layer
     layer_t     *next_layer;            // Pointer to next layer
 
+    network_t   *network;               // Pointer to main network
 protected:
     // Activation function
     void activate();
@@ -64,7 +65,6 @@ protected:
     void gradient();
 
     unsigned    num_threads;            // Number of threads
-    network_t   *network;               // Pointer to main network
 };
 
 }

@@ -4,6 +4,7 @@
 #include <vector>
 #include "def.h"
 #include "stopwatch.h"
+#include "config.h"
 
 namespace nebula {
 
@@ -55,7 +56,8 @@ public:
     // Print reulsts.
     virtual void print_results() = 0;
     // Initialize input data.
-    virtual void init_data(const std::string m_data_config) = 0;
+	virtual void init_data(section_config_t m_data_config) = 0;
+    //virtual void init_data(const std::string m_data_config) = 0;
     // Initialize weight.
     void init_weight(const std::string m_input_weight);
     // Store weight.
