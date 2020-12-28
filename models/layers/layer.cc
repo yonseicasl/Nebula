@@ -30,8 +30,8 @@ layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_lay
 	group(1),
     prev_layer(m_prev_layer),
     next_layer(NULL),
-    num_threads(1),
-    network(m_network) {
+    network(m_network),
+    num_threads(1) {
     num_threads = network->num_threads;
     if(m_prev_layer) { m_prev_layer->next_layer = this; }
 }
