@@ -43,7 +43,8 @@ void convolutional_t::init_network(const std::string m_network_config) {
 
     // Number of layers is equivalent to the size of sections.
     // -1 counts for generic network setting section.
-    num_layers = config.sections.size() - 1;
+	// -1 counts for data setting section.
+    num_layers = config.sections.size() - 2;
     layers.reserve(num_layers);
 
     for(size_t i = 0; i < config.sections.size(); i++) {
@@ -89,7 +90,7 @@ void convolutional_t::init_network(const std::string m_network_config) {
             else if(section_config.name == "softmax") {
                 layer = new softmax_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, SOFTMAX_LAYER);
                 // Softmax is output layer.
-                output_layer = layer;
+                //output_layer = layer;
             }
             else if(section_config.name == "cost") {
                 layer = new cost_layer_t(this, layers.size() ? layers[layers.size()-1] : NULL, COST_LAYER);
