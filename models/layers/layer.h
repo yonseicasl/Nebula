@@ -43,6 +43,8 @@ public:
     unsigned output_channel;            // Output channel
     unsigned output_size;               // Output data size
 
+    float *input_data;                  // Input data.
+    float *weight;                  // Weight 
     float *output_data;                 // Output data
     float *delta;                       // Delta to update layers
 

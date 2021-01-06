@@ -20,7 +20,6 @@ convolutional_layer_t::convolutional_layer_t(network_t *m_network, layer_t *m_pr
     workspace_size(0),
     bias(NULL),
     bias_update(NULL),
-    weight(NULL),
     weight_update(NULL),
     weight_size(0),
     batch_normalize(false),
@@ -153,7 +152,7 @@ void convolutional_layer_t::forward() {
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0, output_size * network->batch_size * sizeof(float));
     
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     unsigned patch_size = filter_size * filter_size * input_channel/ group;
     unsigned num_patches = output_width * output_height;
 
@@ -209,7 +208,7 @@ void convolutional_layer_t::backward() {
         backward_batchnorm();
     }
 
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     float *prev_delta = prev_layer ? prev_layer->delta : NULL;
 
     for(unsigned i = 0; i < network->batch_size; ++i) {

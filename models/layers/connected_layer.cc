@@ -18,7 +18,6 @@ connected_layer_t::connected_layer_t(network_t *m_network, layer_t *m_prev_layer
     layer_t(m_network, m_prev_layer, m_layer_type),
     bias(NULL),
     bias_update(NULL),
-    weight(NULL),
     weight_update(NULL),
     weight_size(0),
     batch_normalize(false),
@@ -135,7 +134,7 @@ void connected_layer_t::store_weight(std::fstream &m_output_weight) {
 void connected_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
    
 // Matrix multiplication
 #ifdef CUSTOM_BLAS
@@ -170,7 +169,7 @@ void connected_layer_t::forward(float *m_input_data) {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
    
-    float *input_data = m_input_data ? m_input_data :   
+    input_data = m_input_data ? m_input_data :   
                         prev_layer ? prev_layer->output_data : network->input_data;
 // Matrix multiplication
 #ifdef CUSTOM_BLAS
@@ -212,7 +211,7 @@ void connected_layer_t::backward() {
         backward_batchnorm();
     } 
     
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     float *prev_delta = prev_layer ? prev_layer->delta : NULL;
 
 #ifdef CUSTOM_BLAS
@@ -260,7 +259,7 @@ void connected_layer_t::backward() {
 
 void connected_layer_t::backward(float *m_input_data, float *m_delta){
 
-    float *input_data = m_input_data ? m_input_data :
+    input_data = m_input_data ? m_input_data :
                         prev_layer ? prev_layer->output_data : network->input_data;
     float *prev_delta = m_delta ? m_delta :
                         prev_layer ? prev_layer->delta : 0;

@@ -46,7 +46,7 @@ void cost_layer_t::init_weight() {
 void cost_layer_t::forward() {
     memset(delta, 0.0, output_size * network->batch_size * sizeof(float));
 
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
 
     switch(cost_type) {
         case SMOOTH_COST:

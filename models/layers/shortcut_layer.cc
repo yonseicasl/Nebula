@@ -55,7 +55,7 @@ void shortcut_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
 
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     
     memcpy(output_data, input_data, output_size * network->batch_size * sizeof(float));
     shortcut(num_threads, input_width, input_height, input_channel, connection->output_data, 

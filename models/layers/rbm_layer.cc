@@ -181,7 +181,7 @@ void rbm_layer_t::pretrain() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
 
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     
     memcpy(visible_units_zero_step, input_data, input_size * network->batch_size * sizeof(float));
 
@@ -273,7 +273,7 @@ void rbm_layer_t::pretrain() {
 void rbm_layer_t::forward() {
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0, output_size * network->batch_size * sizeof(float));
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
    
     // Matrix multiplication
 #ifdef CUSTOM_BLAS
@@ -307,7 +307,7 @@ void rbm_layer_t::backward() {
     
     backward_bias(num_threads, hidden_bias_update, delta, 1, output_width * output_height, network->batch_size);
     
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     float *prev_delta = prev_layer ? prev_layer->delta : NULL;
 
     // Matrix multiplication for weight update.

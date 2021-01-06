@@ -36,7 +36,6 @@ private:
     float *bias;
     float *bias_update;
 
-    float *weight;                  // Weight 
     float *weight_update;           // Weight update
     unsigned weight_size;           // Weight size
 

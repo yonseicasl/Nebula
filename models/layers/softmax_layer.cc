@@ -67,7 +67,7 @@ void softmax_layer_t::store_weight(std::fstream &m_weight_file) {/*Nothing to do
 
 // Softmax function.
 void softmax_layer_t::softmax() {
-    float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
  
     for(unsigned i = 0; i < network->batch_size; i++) {
         float sum = 0.0;

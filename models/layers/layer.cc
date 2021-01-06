@@ -21,6 +21,8 @@ layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_lay
     output_width(1),
     output_channel(1),
     output_size(0),
+    input_data(NULL),
+    weight(NULL),
     output_data(NULL),
     delta(NULL),
     padding(0),
