@@ -42,6 +42,7 @@ convolutional_layer_t::~convolutional_layer_t() {
     delete [] weight;
     delete [] weight_update;
     delete [] output_data;
+    //delete [] input_data;
     delete [] delta;
     if(batch_normalize) {
         delete [] scale;
@@ -90,6 +91,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     weight = new float[weight_size]();
     weight_update = new float[weight_size]();
 
+    //input_data = new float[input_size * network->batch_size]();
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
     workspace = new float[workspace_size]();
