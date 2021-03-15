@@ -19,7 +19,6 @@ connected_layer_t::connected_layer_t(network_t *m_network, layer_t *m_prev_layer
     bias(NULL),
     bias_update(NULL),
     weight_update(NULL),
-    weight_size(0),
     batch_normalize(false),
     scale(NULL),
     scale_update(NULL),

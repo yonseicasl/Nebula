@@ -47,6 +47,8 @@ void convolutional_t::init_network(const std::string m_network_config) {
     num_layers = config.sections.size() - 2;
     layers.reserve(num_layers);
 
+    std::string weight;
+
     for(size_t i = 0; i < config.sections.size(); i++) {
         section_config_t section_config = config.sections[i];
         // Network configuration
@@ -65,6 +67,7 @@ void convolutional_t::init_network(const std::string m_network_config) {
         }
 		else if(section_config.name == "data") {
 			init_data(section_config);
+            section_config.get_setting("weight", &weight);
 		}
         // Layer configuration
         else {
@@ -106,6 +109,7 @@ void convolutional_t::init_network(const std::string m_network_config) {
             layers.push_back(layer); 
         }
     }
+    init_weight(weight);
 #ifndef CUSTOM_BLAS
     // Multi-thread openblas
     openblas_set_num_threads(num_threads);

@@ -48,7 +48,7 @@ void network_t::update() {
 }
 
 // Initialize network.
-void network_t::init(const std::string m_network_config, const std::string m_input_weight) {
+void network_t::init(const std::string m_network_config) {
     std::cout << "Initializing network ..." << std::endl;
 
     // Initialize network.

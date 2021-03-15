@@ -38,6 +38,8 @@ public:
     unsigned input_channel;             // Input channel
     unsigned input_size;                // Input data size
 
+    unsigned weight_size;
+
     unsigned output_height;             // Output height
     unsigned output_width;              // Output width
     unsigned output_channel;            // Output channel

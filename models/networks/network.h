@@ -22,7 +22,7 @@ public:
     // Network update
     void update();
     // Initialize network.
-    void init(const std::string m_network_config, const std::string m_input_weight = "");
+    void init(const std::string m_network_config);
     // Run network.
     virtual void run(const std::string m_output_weight = "") = 0;
 

@@ -17,6 +17,7 @@ layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_lay
     input_width(1),
     input_channel(1),
     input_size(1),
+    weight_size(0),
     output_height(1),
     output_width(1),
     output_channel(1),

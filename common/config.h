@@ -27,7 +27,6 @@ public:
         std::stringstream ss; ss.str(it->second);
         ss >> *m_var; return true;
     }
-
     // Section name
     std::string name;
 
