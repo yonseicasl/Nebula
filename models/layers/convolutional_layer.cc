@@ -40,8 +40,8 @@ convolutional_layer_t::~convolutional_layer_t() {
     delete [] bias_update;
     delete [] weight;
     delete [] weight_update;
-    delete [] output_data;
     //delete [] input_data;
+    delete [] output_data;
     delete [] delta;
     if(batch_normalize) {
         delete [] scale;
