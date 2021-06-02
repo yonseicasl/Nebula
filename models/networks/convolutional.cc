@@ -173,7 +173,7 @@ void convolutional_t::run(const std::string m_output_weight) {
             // Loda batch data.
             load_data(iteration);
             // Forward propagation
-            //forward();
+            forward();
             // Print batch processing results.
             //print_results();
         }
