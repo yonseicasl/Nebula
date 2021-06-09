@@ -65,6 +65,7 @@ void connected_layer_t::init(section_config_t m_section_config) {
 
     // Initialize layer parameters.
     input_size = prev_layer ? prev_layer->output_size : network->input_size;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     weight_size = input_size * output_size;
 
     bias        = new float[output_size]();
@@ -133,7 +134,6 @@ void connected_layer_t::store_weight(std::fstream &m_output_weight) {
 void connected_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
-    input_data = prev_layer ? prev_layer->output_data : network->input_data;
    
 // Matrix multiplication
 #ifdef CUSTOM_BLAS

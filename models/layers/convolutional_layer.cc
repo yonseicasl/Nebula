@@ -90,7 +90,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     weight = new float[weight_size]();
     weight_update = new float[weight_size]();
 
-    //input_data = new float[input_size * network->batch_size]();
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
     workspace = new float[workspace_size]();
@@ -153,7 +153,6 @@ void convolutional_layer_t::forward() {
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0, output_size * network->batch_size * sizeof(float));
     
-    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     unsigned patch_size = filter_size * filter_size * input_channel/ group;
     unsigned num_patches = output_width * output_height;
 

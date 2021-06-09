@@ -43,8 +43,11 @@ void npu_mmu::init(size_t m_capacity) {
 void npu_mmu::npu_malloc(uint64_t m_ptr, size_t m_size) {
     for(std::set<npu_segment>::iterator it = free_list.begin(); it != free_list.end(); ++it) {
         if(m_size <= it->size) {
+            // Add the memory block to used list.
             used_list.emplace(m_size, it->addr, m_ptr);
+            // Divide the memory block at free list.
             free_list.emplace(it->size - m_size, it->addr + m_size);
+            // Remove the memory block from free list.
             free_list.erase(it);
         }
     }
@@ -52,3 +55,27 @@ void npu_mmu::npu_malloc(uint64_t m_ptr, size_t m_size) {
 }
 
 
+void npu_mmu::npu_free(uint64_t m_ptr) {
+    for(std::set<npu_segment>::iterator it = used_list.begin(); it != used_list.end(); ++it) {
+        if(m_ptr == it->ptr) {
+            // Add the memory block to free list.
+            std::set<npu_segment>::iterator free_it = free_list.emplace(it->size, it->addr).first;
+            // Remove the memory block from used list.
+            used_list.erase(it);
+
+            // Coalescing adjacent memory blocks.
+            if(free_it != free_list.begin()) {
+                //uint64_t addr = 
+            }
+        }
+    }
+}
+
+uint64_t npu_mmu::v2p(uint64_t m_ptr) {
+    for(std::set<npu_segment>::iterator it =used_list.begin(); it != used_list.end(); ++it) {
+        if((m_ptr >= it->ptr) && (m_ptr < it->ptr+it->size)) {
+            return (uint64_t)(it->addr + m_ptr - it->ptr);
+        }
+    }
+    return 0;
+}

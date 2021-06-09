@@ -27,6 +27,7 @@ public:
 
     static void init(size_t m_capacity);
     static void npu_malloc(uint64_t m_ptr, size_t m_size);
+    static void npu_free(uint64_t m_ptr);
 
     // Virtual to physical address translation.
     static uint64_t v2p(uint64_t m_ptr);            

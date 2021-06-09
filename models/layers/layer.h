@@ -5,6 +5,7 @@
 #include "config.h"
 #include "def.h"
 #include "network.h"
+#include "memory.h"
 
 namespace nebula {
 
