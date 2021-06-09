@@ -77,6 +77,8 @@ public:
 	unsigned pipe_index;					// Index of the layer.
     float cumulative_cost;                  // Cumulative cost
     std::vector<float> cost_history;        // Latest cost history
+
+    uint8_t *cornerstone;
 };
 
 }

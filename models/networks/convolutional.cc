@@ -33,10 +33,15 @@ convolutional_t::~convolutional_t() {
     delete [] input_data;
     delete [] input_label;
     delete [] reference_label;
+
+    delete [] cornerstone;
 }
 
 // Initialize network.
 void convolutional_t::init_network(const std::string m_network_config) {
+
+    cornerstone = new uint8_t[1]; 
+
     // Parse the configuration file.
     config_t config;
     config.parse(m_network_config);
