@@ -81,6 +81,13 @@ extern "C++" void convolutional_layer_t::_forward_() {
     // Activate function
     _activate_();
     
+    //cudaMemcpy(output_data, output_data_dev, output_size * network->batch_size * sizeof(float), cudaMemcpyDeviceToHost);
+    //for(unsigned i = 0; i < output_size * network->batch_size; i++) {
+    //    if(output_data[i] < network->input_thres) {
+    //        output_data[i] = 0.0;
+    //    }
+    //}
+    //cudaMemcpy(output_data_dev, output_data, output_size * network->batch_size * sizeof(float), cudaMemcpyHostToDevice);
 }
 
 // Backward propagation
@@ -174,6 +181,14 @@ extern "C++" void convolutional_layer_t::_update_() {
                 &learning_rate, bias_update_dev, 1, bias_dev, 1);
     cublasSscal(network->cublas_handle, num_filters, &momentum, bias_update_dev, 1);
 #endif
+    //cudaMemcpy(weight, weight_dev, weight_size*sizeof(float), cudaMemcpyDeviceToHost);
+
+    //for(unsigned i = 0; i < weight_size; i++) {
+    //    if(weight[i] < network->threshold && weight[i] > -network->threshold) {
+    //        weight[i] = 0.0;
+    //    }
+    //}
+    //cudaMemcpy(weight_dev, weight, weight_size*sizeof(float), cudaMemcpyHostToDevice);
 }
 
 

@@ -40,6 +40,8 @@ public:
     float momentum;                         // Momentum
     float decay;                            // Decay
     float cost;                             // Cost in an iteration
+    float threshold;
+    float input_thres;
 
     unsigned *reference_label;              // Correct labels
     unsigned input_height;                  // Input data height

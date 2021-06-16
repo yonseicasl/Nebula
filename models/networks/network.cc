@@ -15,6 +15,8 @@ network_t::network_t() :
     momentum(0.9),
     decay(0.0001),
     cost(0.0),
+    threshold(0.0),
+    input_thres(0.0),
     reference_label(NULL),
     input_height(1),
     input_width(1),

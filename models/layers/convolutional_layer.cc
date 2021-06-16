@@ -150,6 +150,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     workspace = new float[workspace_size]();
 
     // Print out structure of the network.
+    std::cout << num_filters << " " << network->batch_size << " " << output_height << " " << output_width << " " << input_channel << " " << filter_size << " " << filter_size << std::endl;
     //std::cout << input_height << " " << input_width << " " << input_channel << " " << filter_size << " " << filter_size << " " << num_filters << std::endl;
 
     // Initialize parameters for batch normalization.
@@ -246,6 +247,12 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
 void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, num_filters * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
+
+    //for(unsigned i = 0; i < weight_size; i++) {
+    //    if(weight[i] < network->threshold && weight[i] > -(network->threshold)) {
+    //        weight[i] = 0.0;
+    //    }
+    //}
    
     if(batch_normalize) {
         m_input_weight.read((char*)scale, num_filters * sizeof(float));

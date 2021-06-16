@@ -8,7 +8,7 @@ HDR=$(wildcard *.h)
 CCSRC=$(wildcard *.cc)
 CCOBJ=$(CCSRC:.cc=.o)
 
-ifeq ($(GPU_ENABLED), 0)
+ifeq ($(GPU_ENABLED), 1)
 CUSRC=$(wildcard *.cu)
 CUOBJ=$(CUSRC:.cu=.ko)
 endif
