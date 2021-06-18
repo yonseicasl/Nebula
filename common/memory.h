@@ -9,14 +9,12 @@ class npu_segment {
 
 public:
     //npu_segment(uint64_t m_ptr, uint64_t m_addr, size_t m_size);
-    npu_segment(size_t m_size, uint64_t m_addr, uint64_t m_ptr = 0);
+    npu_segment();
     ~npu_segment();
 
-    bool operator < (const npu_segment &s) const;
-
-    size_t size;
     uint64_t addr;
     uint64_t ptr;
+    bool valid;
 };
 
 class npu_mmu {
@@ -26,7 +24,7 @@ public:
     ~npu_mmu();
 
     static void init(size_t m_capacity);
-    static void npu_malloc(uint64_t m_ptr, size_t m_size);
+    static void npu_malloc(uint64_t m_ptr);
     static void npu_free(uint64_t m_ptr);
 
     // Virtual to physical address translation.
@@ -34,9 +32,8 @@ public:
 
 private:
 
-    static std::set<npu_segment> free_list;         // Free segment list
-    static std::set<npu_segment> used_list;         // Used segment list
-
+    static npu_mmu *address;
+    static npu_segment base_addr;
 };
 
 #endif
