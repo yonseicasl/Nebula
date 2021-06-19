@@ -6,6 +6,7 @@
 #define CAPACITY 0x200000000
 
 npu_mmu *npu_mmu::memory=0;
+npu_segment npu_mmu::base_addr;
 
 npu_segment::npu_segment() :
     addr(BASE_ADDR),
