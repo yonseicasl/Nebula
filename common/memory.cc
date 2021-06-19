@@ -5,8 +5,7 @@
 #define BASE_ADDR 0X80000000
 #define CAPACITY 0x200000000
 
-npu_mmu *npu_mmu::address=0;
-npu_segment base_addr;
+npu_mmu *npu_mmu::memory=0;
 
 npu_segment::npu_segment() :
     addr(BASE_ADDR),
@@ -20,15 +19,16 @@ npu_segment::~npu_segment() {
 }
 
 npu_mmu::npu_mmu() {
-    init(CAPACITY);
 }
 
 npu_mmu::~npu_mmu() {
-    //free_list.clear();
-    //used_list.clear();
+    delete memory;
 }
 
-void npu_mmu::init(size_t m_capacity) {
+void npu_mmu::init() {
+    if(!memory) {
+        memory = new npu_mmu();
+    }
     //free_list.emplace(m_capacity - NPU_MEM_OFFSET, NPU_MEM_OFFSET);
 }
 
@@ -65,8 +65,5 @@ uint64_t npu_mmu::v2p(uint64_t m_ptr) {
     else if(base_addr.addr + offset > CAPACITY) {
         std::cout << "Physical address : 0x" << std::hex << base_addr.addr+offset << " is bigger than the capacity 0x" << CAPACITY << std::endl;
     }
-    return 0;
-    
-
     return 0;
 }

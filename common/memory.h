@@ -23,7 +23,7 @@ public:
     npu_mmu();
     ~npu_mmu();
 
-    static void init(size_t m_capacity);
+    static void init();
     static void npu_malloc(uint64_t m_ptr);
     static void npu_free(uint64_t m_ptr);
 
@@ -32,7 +32,7 @@ public:
 
 private:
 
-    static npu_mmu *address;
+    static npu_mmu *memory;
     static npu_segment base_addr;
 };
 

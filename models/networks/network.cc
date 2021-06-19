@@ -59,6 +59,7 @@ void network_t::update() {
 void network_t::init(const std::string m_network_config) {
     std::cout << "Initializing network ..." << std::endl;
 
+    npu_mmu::init();
     // Initialize network.
     init_network(m_network_config);
 

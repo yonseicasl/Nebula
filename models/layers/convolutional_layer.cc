@@ -88,10 +88,12 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     bias_update = new float[num_filters]();
 
     weight = new float[weight_size]();
+    npu_mmu::npu_malloc((uint64_t)weight);
     weight_update = new float[weight_size]();
 
     input_data = prev_layer ? prev_layer->output_data : network->input_data;
     output_data = new float[output_size * network->batch_size]();
+    npu_mmu::npu_malloc((uint64_t)output_data);
     delta = new float[output_size * network->batch_size]();
     workspace = new float[workspace_size]();
 

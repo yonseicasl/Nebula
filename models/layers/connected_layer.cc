@@ -72,9 +72,11 @@ void connected_layer_t::init(section_config_t m_section_config) {
     bias_update = new float[output_size]();
 
     weight        = new float[weight_size]();
+    npu_mmu::npu_malloc((uint64_t)weight);
     weight_update = new float[weight_size]();
 
     output_data = new float[output_size * network->batch_size]();
+    npu_mmu::npu_malloc((uint64_t)output_data);
     delta       = new float[output_size * network->batch_size]();
 
     if(batch_normalize) {

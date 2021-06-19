@@ -38,7 +38,7 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     input_width   = prev_layer ? prev_layer->output_width : network->input_width;
     input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
     input_size = prev_layer ? prev_layer->output_size : network->input_size;
-
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     
     // Set output paramemters.
 
@@ -52,6 +52,7 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     //std::cout << input_height << " * " << input_width << " * " << input_channel << std::endl;
     // Allocate memory for pooling layer.
     output_data = new float[output_size * network->batch_size]();
+    npu_mmu::npu_malloc((uint64_t)output_data);
     delta = new float[output_size * network->batch_size]();
     
     if(layer_type == MAXPOOL_LAYER) {

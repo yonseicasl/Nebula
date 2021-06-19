@@ -40,8 +40,6 @@ convolutional_t::~convolutional_t() {
 // Initialize network.
 void convolutional_t::init_network(const std::string m_network_config) {
 
-    cornerstone = new uint8_t[1]; 
-
     // Parse the configuration file.
     config_t config;
     config.parse(m_network_config);
@@ -159,6 +157,8 @@ void convolutional_t::init_data(section_config_t m_data_config) {
     // Reserve memory for input data and labels.
     input_size = input_height * input_width * input_channel;
     input_data = new float[input_size*batch_size];
+    npu_mmu::npu_malloc((uint64_t)input_data);
+    
     input_label = new float[num_classes * batch_size]();
     reference_label = new unsigned[batch_size]();
 }
