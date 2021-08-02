@@ -157,6 +157,7 @@ void convolutional_t::init_data(section_config_t m_data_config) {
     // Reserve memory for input data and labels.
     input_size = input_height * input_width * input_channel;
     input_data = new float[input_size*batch_size];
+    std::cout << "Network input" << std::endl;
     npu_mmu::npu_malloc((uint64_t)input_data);
     
     input_label = new float[num_classes * batch_size]();

@@ -30,7 +30,6 @@ void npu_mmu::init() {
     if(!memory) {
         memory = new npu_mmu();
     }
-    //free_list.emplace(m_capacity - NPU_MEM_OFFSET, NPU_MEM_OFFSET);
 }
 
 
@@ -43,6 +42,7 @@ void npu_mmu::npu_malloc(uint64_t m_ptr) {
     else {
         base_addr.ptr = m_ptr, base_addr.addr = BASE_ADDR, base_addr.valid = true;
     }
+    //std::cout << std::hex << m_ptr << " " << base_addr.ptr << " " << m_ptr - base_addr.ptr << std::endl;
 }
 
 
@@ -53,18 +53,23 @@ uint64_t npu_mmu::v2p(uint64_t m_ptr) {
     
     uint64_t offset;
 
-    offset = m_ptr - base_addr.ptr;
+    offset = (m_ptr - base_addr.ptr) % CAPACITY;
+    
 
     if(m_ptr >= base_addr.ptr && base_addr.addr + offset < CAPACITY) {
-        std::cout << "Virtual address : 0x" << std::hex << m_ptr << std::endl;
-        std::cout << "Physical address : 0x" << std::hex << base_addr.addr + offset << std::endl;
+        //std::cout << "Virtual address : 0x" << std::hex << m_ptr << std::endl;
+        //std::cout << "Physical address : 0x" << std::hex << base_addr.addr + offset << std::endl;
         return base_addr.addr + offset;
     }
     else if(m_ptr < base_addr.ptr) {
-        std::cout << "Virtual address : 0x" << std::hex << m_ptr << " is bigger than the baseline virtual address : 0x" << std::hex << base_addr.ptr << std::endl;
+        //std::cout << "Virtual address : 0x" << std::hex << m_ptr << " is bigger than the baseline virtual address : 0x" << std::hex << base_addr.ptr << std::endl;
+        std::cerr << "Virtual address : 0x" << std::hex << m_ptr << " is smaller than the baseline virtual address : 0x" << std::hex << base_addr.ptr << std::endl;
+        exit(1);
     }
-    else if(base_addr.addr + offset > CAPACITY) {
-        std::cout << "Physical address : 0x" << std::hex << base_addr.addr+offset << " is bigger than the capacity 0x" << CAPACITY << std::endl;
+    else if(offset > CAPACITY) {
+        //std::cout << "Physical address : 0x" << std::hex << base_addr.addr+offset << " is bigger than the capacity 0x" << CAPACITY << std::endl;
+        std::cerr << "Physical address : 0x" << std::hex << base_addr.addr + offset << " is bigger than the capacity 0x" << CAPACITY << std::endl;
+        exit(1);
     }
     return 0;
 }
