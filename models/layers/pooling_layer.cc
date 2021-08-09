@@ -57,10 +57,8 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     
     // Set output paramemters.
 
-    //output_height = (input_height + 2 * padding) / stride;
-    //output_width = (input_width + 2 * padding) / stride;
-    output_height = (input_height + 2 * padding - filter_size) / stride + 1;
-    output_width = (input_width + 2 * padding - filter_size) / stride + 1;
+    output_height = (input_height + 2 * padding) / stride;
+    output_width = (input_width + 2 * padding) / stride;
     output_channel = input_channel;
     output_size = output_height * output_width * output_channel;
     
