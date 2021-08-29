@@ -24,6 +24,10 @@ network_t::network_t() :
     input_label(NULL),
     input_layer(NULL),
     output_layer(NULL),
+#ifdef PRUNING
+    weight_threshold(0.0),
+    data_threshold(0.0),
+#endif
     num_classes(0),
     num_iterations(0),
     iteration(0),
@@ -38,11 +42,6 @@ network_t::~network_t() {
 void network_t::forward() {
     //for(unsigned i = 0; i < num_layers; i++) { layers[i]->forward(); }
     for(unsigned i = 0; i < num_layers; i++) { 
-        if(i == 2) {
-            for(unsigned j = 0; j < layers[i]->input_size; i++) {
-                std::cout << layers[i]->input_data[j] << std::endl;
-            }
-        }
         layers[i]->forward(); 
     }
 }

@@ -124,6 +124,14 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
 void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, num_filters * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
+
+#ifdef PRUNING
+    for(unsigned i = 0; i < weight_size; i++) {
+        if(weight[i] < network->weight_threshold && weight[i] > -network->weight_threshold) {
+            weight[i] = 0.0;
+        }
+    }
+#endif
    
     if(batch_normalize) {
         m_input_weight.read((char*)scale, num_filters * sizeof(float));
@@ -157,6 +165,21 @@ void convolutional_layer_t::forward() {
     
     unsigned patch_size = filter_size * filter_size * input_channel/ group;
     unsigned num_patches = output_width * output_height;
+
+#ifdef PRUNING
+    unsigned zero_input = 0;
+    for(unsigned i = 0; i < input_size; i++) {
+        if(input_data[i] == 0.0) { zero_input++;}
+    }
+    std::cout << (float)zero_input/(float)input_size << " ";
+
+    unsigned zero_weight = 0;
+    for(unsigned i = 0; i < weight_size; i++) {
+        if(weight[i] == 0.0) {zero_weight++;}
+    }
+    std::cout << (float)zero_weight/(float)weight_size << std::endl;
+
+#endif
 
 	// Convolution
 	for(unsigned i = 0; i < network->batch_size; i++){
@@ -194,6 +217,15 @@ void convolutional_layer_t::forward() {
 
     // Activate function
     activate();
+
+#ifdef PRUNING
+    for(unsigned i = 0; i < output_size; i++) {
+        if(output_data[i] < network->data_threshold && output_data[i] > -network->data_threshold) {
+            output_data[i] = 0.0;
+        }
+    }
+    //std::cout << zero_output << "/" << output_size << std::endl;
+#endif
 }
 
 void convolutional_layer_t::backward() {

@@ -120,6 +120,8 @@ use_debug=0
 custom_blas=0
 # Do not load weight for training by default.
 load_weight=0
+# Pruning
+PRUNING=1
 
 # Parse optional arguments for load weight when training.
 while [[ "$1" != '' ]]; do
@@ -135,13 +137,17 @@ while [[ "$1" != '' ]]; do
 done
 
 # Append Makefile options when debug.
-if [[ $debug_enabled -eq 1 ]]; then
+if [[ $use_debug -eq 1 ]]; then
 	ccopt+=" -g"
 fi
 
 # Append Makefile options when select custom blas.
 if [[ $custom_blas -eq 1 ]]; then
 	ccopt+=" -DCUSTOM_BLAS"
+fi
+
+if [[ $PRUNING -eq 1 ]]; then
+    ccopt+=" -DPRUNING"
 fi
 
 # Makefile MFLAG
