@@ -56,6 +56,7 @@ connected_layer_t::~connected_layer_t() {
 void connected_layer_t::init(section_config_t m_section_config) {
     // Get layer settings.
     m_section_config.get_setting("output", &output_size);
+    output_channel = output_size;
     m_section_config.get_setting("batch_normalize", &batch_normalize);  
     
     std::string activation_str;

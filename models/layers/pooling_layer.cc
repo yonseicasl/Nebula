@@ -41,7 +41,6 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     input_data = prev_layer ? prev_layer->output_data : network->input_data;
     
     // Set output paramemters.
-
     //output_height = (input_height + 2 * padding) / stride;
     //output_width = (input_width + 2 * padding) / stride;
     output_height = (input_height + 2 * padding - filter_size) / stride + 1;

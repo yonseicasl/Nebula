@@ -64,6 +64,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("batch_normalize", &batch_normalize);  
     m_section_config.get_setting("padding", &padding);
     m_section_config.get_setting("stride", &stride);
+    m_section_config.get_setting("group", &group);
 
     std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
@@ -75,6 +76,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     input_height = prev_layer ? prev_layer->output_height : network->input_height;
     input_width = prev_layer ? prev_layer->output_width : network->input_width;
     input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
+
     
     output_height = (input_height + 2 * padding - filter_size) / stride + 1;
     output_width = (input_width  + 2 * padding - filter_size) / stride + 1;
