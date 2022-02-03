@@ -55,7 +55,6 @@ void convolutional_t::init_network(const std::string m_network_config) {
         section_config_t section_config = config.sections[i];
         // Network configuration
         if(section_config.name == "net") {
-            std::cout << "net" << std::endl;
             section_config.get_setting("num_threads", &num_threads);
             section_config.get_setting("learning_rate", &learning_rate);
             section_config.get_setting("momentum", &momentum);
@@ -82,11 +81,9 @@ void convolutional_t::init_network(const std::string m_network_config) {
         else {
             layer_t *layer = NULL;
             if(section_config.name == "convolutional") {
-                std::cout << "convolutional" << std::endl;
                 layer = new convolutional_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, CONVOLUTIONAL_LAYER);
             }
             else if(section_config.name == "connected") {
-                std::cout << "connected" << std::endl;
                 layer = new connected_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, CONNECTED_LAYER);
             }
             else if(section_config.name == "dropout") {
@@ -99,7 +96,6 @@ void convolutional_t::init_network(const std::string m_network_config) {
                 layer = new pooling_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, MAXPOOL_LAYER);
             }
             else if(section_config.name == "avgpool") {
-                std::cout << "pooling" << std::endl;
                 layer = new pooling_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, AVGPOOL_LAYER);
             }
             else if(section_config.name == "shortcut") {

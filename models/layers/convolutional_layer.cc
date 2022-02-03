@@ -61,8 +61,14 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     // Get layer settings.
     m_section_config.get_setting("filters", &num_filters);
     m_section_config.get_setting("size", &filter_size);
+    filter_height = filter_size, filter_width = filter_size;
+    m_section_config.get_setting("filter_height", &filter_height);
+    m_section_config.get_setting("filter_width", &filter_width);
     m_section_config.get_setting("batch_normalize", &batch_normalize);  
     m_section_config.get_setting("padding", &padding);
+    padding_h = padding, padding_w = padding;
+    m_section_config.get_setting("padding_height", &padding_h);
+    m_section_config.get_setting("padding_width", &padding_w);
     m_section_config.get_setting("stride", &stride);
     m_section_config.get_setting("group", &group);
 
@@ -77,14 +83,18 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     input_width = prev_layer ? prev_layer->output_width : network->input_width;
     input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
 
-    
-    output_height = (input_height + 2 * padding - filter_size) / stride + 1;
-    output_width = (input_width  + 2 * padding - filter_size) / stride + 1;
+    //output_height = (input_height + 2 * padding - filter_size) / stride + 1;
+    //output_width = (input_width  + 2 * padding - filter_size) / stride + 1;
+
+    output_height = (input_height + 2*padding_h - filter_height) / stride + 1;
+    output_width = (input_width + 2*padding_w - filter_width) / stride + 1;
     output_channel = num_filters;
     output_size = output_height * output_width * output_channel;
     
-    workspace_size = output_height * output_width * filter_size * filter_size * input_channel;
-    weight_size = input_channel * num_filters * filter_size * filter_size / group;	   
+    //workspace_size = output_height * output_width * filter_size * filter_size * input_channel;
+    //weight_size = input_channel * num_filters * filter_size * filter_size / group;	   
+    workspace_size = output_height*output_width*filter_height*filter_width*input_channel;
+    weight_size = input_channel*num_filters*filter_height*filter_width/group;
     
     bias = new float[num_filters]();
     bias_update = new float[num_filters]();
@@ -147,7 +157,9 @@ void convolutional_layer_t::init_weight() {
     std::normal_distribution<float> dist(0.0, 1.0);
     
     for(unsigned i = 0; i < weight_size; i++) {
-        weight[i] = sqrt(2.0 / (filter_size * filter_size * input_channel / group)) * dist(rng);
+        //weight[i] = sqrt(2.0 / (filter_size * filter_size * input_channel / group)) * dist(rng);
+        weight[i] = sqrt(2.0 / (filter_height * filter_width * input_channel / group)) * dist(rng);
+
     }
 }
 
@@ -165,7 +177,8 @@ void convolutional_layer_t::forward() {
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0, output_size * network->batch_size * sizeof(float));
     
-    unsigned patch_size = filter_size * filter_size * input_channel/ group;
+    //unsigned patch_size = filter_size * filter_size * input_channel/ group;
+    unsigned patch_size = filter_height * filter_width * input_channel/ group;
     unsigned num_patches = output_width * output_height;
 
 #ifdef PRUNING
@@ -234,7 +247,7 @@ void convolutional_layer_t::backward() {
     // Gradient function
     gradient();
 
-    unsigned patch_size = filter_size*filter_size*input_channel
+    unsigned patch_size = filter_height*filter_width*input_channel
 						 / group;
     unsigned num_patches = output_width*output_height;
 

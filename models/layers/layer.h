@@ -52,9 +52,13 @@ public:
     float *delta;                       // Delta to update layers
 
     unsigned padding;                   // Padding size
+    unsigned padding_h;
+    unsigned padding_w;
 
     unsigned num_filters;               // Number of filters (channels)
     unsigned filter_size;               // Filter size
+    unsigned filter_height;
+    unsigned filter_width;
     unsigned stride;                    // Filter striding distance
 	
 	unsigned group;					    // Group Convolution

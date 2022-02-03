@@ -32,8 +32,6 @@ void excitation_layer_t::init(section_config_t m_section_config) {
     input_width = prev_layer ? prev_layer->output_width : network->input_width;
     input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
 
-    std::cout << input_height << "*" << input_width <<"*" << input_channel << std::endl;
-    
     m_section_config.get_setting("output_height", &output_height);
     m_section_config.get_setting("output_width", &output_width);
     m_section_config.get_setting("output_channel", &output_channel);
