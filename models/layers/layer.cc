@@ -34,6 +34,7 @@ layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_lay
     filter_height(1),
     filter_width(1),
     stride(1), 
+    hops(1),
 	group(1),
     prev_layer(m_prev_layer),
     next_layer(NULL),

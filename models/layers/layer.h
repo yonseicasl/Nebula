@@ -60,7 +60,7 @@ public:
     unsigned filter_height;
     unsigned filter_width;
     unsigned stride;                    // Filter striding distance
-	
+    unsigned hops;
 	unsigned group;					    // Group Convolution
    
     layer_t     *prev_layer;            // Pointer to previous layer

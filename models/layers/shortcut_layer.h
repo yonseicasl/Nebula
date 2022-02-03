@@ -26,7 +26,6 @@ public:
 
 private:
     layer_t *connection;        // Shortcut connection between layers.
-    unsigned hops;
 };
 
 }

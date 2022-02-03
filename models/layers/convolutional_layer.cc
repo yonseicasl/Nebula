@@ -70,6 +70,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("padding_height", &padding_h);
     m_section_config.get_setting("padding_width", &padding_w);
     m_section_config.get_setting("stride", &stride);
+    m_section_config.get_setting("hops", &hops);
     m_section_config.get_setting("group", &group);
 
     std::string activation_str;
@@ -77,11 +78,22 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
 
-    input_size = prev_layer ? prev_layer->output_size : network->input_size;
+    layer_t *connection = this;
+    if(hops > 1) {
+        for(unsigned i = 0; i < hops; i++) { connection = connection->prev_layer ? connection->prev_layer : NULL;}
+        input_size = connection ? connection->output_size : network->input_size;
+        input_height = connection ? connection->output_height : network->input_height;
+        input_width = connection ? connection->output_width : network->input_width;
+        input_channel = connection ? connection->output_channel : network->input_channel;
+    }
+    else {
 
-    input_height = prev_layer ? prev_layer->output_height : network->input_height;
-    input_width = prev_layer ? prev_layer->output_width : network->input_width;
-    input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
+        input_size = prev_layer ? prev_layer->output_size : network->input_size;
+
+        input_height = prev_layer ? prev_layer->output_height : network->input_height;
+        input_width = prev_layer ? prev_layer->output_width : network->input_width;
+        input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
+    }
 
     //output_height = (input_height + 2 * padding - filter_size) / stride + 1;
     //output_width = (input_width  + 2 * padding - filter_size) / stride + 1;
