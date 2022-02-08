@@ -115,11 +115,14 @@ Similarly, training a medium-sized ResNet can be done using the following comman
 To reference our work, please use our TC paper.
 
     @inproceedings{kim_tc2020,
-      author    = {B. Kim and S. Lee and C. Park and H. Kim and W. Song},
-      title     = {{The Nebula Benchmark Suite: Implications of Lightweight Neural Networks}},
-      booktitle = {IEEE Transactions on Computers},
-      month     = {Oct.},
-      year      = {2020},
+      author  = {B. Kim and S. Lee and C. Park and H. Kim and W. Song},
+      title   = {{The Nebula Benchmark Suite: Implications of Lightweight Neural Networks}},
+      journal = {IEEE Transactions on Computers},
+      volume  = {70},
+      number  = {11},
+      month   = {Nov.},
+      year    = {2021},
+      pages   = {1887-1900},
     }
 
 For troubleshooting, bug reports, or any questions regarding the use of Nebula benchmark suite, please contact Bogil Kim via email: bogilkim {\at} yonsei {\dot} ac {\dot} kr. Or, visit our lab webpage: https://icsl.yonsei.ac.kr
