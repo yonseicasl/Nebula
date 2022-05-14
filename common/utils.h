@@ -12,6 +12,11 @@ std::string& lowercase(std::string &m_str);
 // Convert string to uppercase.
 std::string& uppercase(std::string &m_str);
    
+void excitation(unsigned num_threads,
+                unsigned m_input_width, unsigned m_input_height, unsigned m_input_channel, float *m_input_data,
+                float *m_excitation_data,
+                unsigned m_output_width, unsigned m_output_height, unsigned m_output_channel, float *m_output_data, unsigned m_batch);
+
 void shortcut(unsigned num_threads, 
               unsigned m_input_width, unsigned m_input_height, unsigned m_input_channel, float *m_input_data,
               unsigned m_output_width, unsigned m_output_height, unsigned m_output_channel, float *m_output_data, unsigned m_batch);

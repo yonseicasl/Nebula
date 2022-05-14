@@ -22,6 +22,7 @@ convolutional_layer_t::convolutional_layer_t(network_t *m_network, layer_t *m_pr
     bias_update(NULL),
     weight_update(NULL),
     batch_normalize(false),
+    beta(NULL),
     scale(NULL),
     scale_update(NULL),
     normalize_mean(NULL),
@@ -44,6 +45,7 @@ convolutional_layer_t::~convolutional_layer_t() {
     delete [] output_data;
     delete [] delta;
     if(batch_normalize) {
+        delete [] beta;
         delete [] scale;
         delete [] scale_update;
         delete [] normalize_mean;
@@ -72,6 +74,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("stride", &stride);
     m_section_config.get_setting("hops", &hops);
     m_section_config.get_setting("group", &group);
+
 
     std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
@@ -126,9 +129,11 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
 
     // Initialize parameters for batch normalization.
     if(batch_normalize) {
+        beta         = new float[num_filters]();
         scale        = new float[num_filters]();
         scale_update = new float[num_filters]();
         for(unsigned i = 0; i < num_filters; i++) {
+            beta[i]  = 0.0;
             scale[i] = 1.0;
         }
 
@@ -158,6 +163,7 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
 #endif
    
     if(batch_normalize) {
+        m_input_weight.read((char*)beta, num_filters * sizeof(float));
         m_input_weight.read((char*)scale, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_variance, num_filters * sizeof(float));
@@ -239,7 +245,8 @@ void convolutional_layer_t::forward() {
     // Forward bias
     if(batch_normalize) {
         forward_batchnorm();
-    } 
+    }
+
     forward_bias(num_threads, output_data, bias, num_filters, num_patches, network->batch_size);
 
     // Activate function
@@ -349,7 +356,7 @@ void convolutional_layer_t::update() {
 void convolutional_layer_t::forward_batchnorm() {
     unsigned num_patches = output_height * output_width;
     memcpy(x, output_data, output_size * network->batch_size * sizeof(float));
-    if(network->run_type == TRAIN_RUN) {
+    if(network->run_type == TRAIN_RUN || network->run_type == TEST_RUN) {
     
         batchnorm_mean(num_threads, output_data, normalize_mean,
                        output_channel, num_patches, network->batch_size);
@@ -380,6 +387,8 @@ void convolutional_layer_t::forward_batchnorm() {
     }
     batchnorm_scale_down(num_threads, output_data, scale, 
                          output_channel, num_patches, network->batch_size);
+    batchnorm_add_beta(num_threads, output_data, beta,
+                       output_channel, num_patches, network->batch_size);
 }
 
 //Backward batch normalization.

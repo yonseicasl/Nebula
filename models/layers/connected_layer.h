@@ -40,6 +40,7 @@ private:
     float *weight_update;           // Weight update
 
     bool batch_normalize;           // Use batch normalize or not.
+    float *beta;                    // beta.
     float *scale;                   // scale.
     float *scale_update;
 

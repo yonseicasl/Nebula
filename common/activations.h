@@ -17,6 +17,9 @@ void relie_activation(float *m_output, unsigned m_size);
 void relu_activation(float *m_output, unsigned m_size);
 void stair_activation(float *m_output, unsigned m_size);
 void tanh_activation(float *m_output, unsigned m_size);
+void sigmoid_activation(float *m_output, unsigned m_size);
+void hsigmoid_activation(float *m_output, unsigned m_size);
+void hswish_activation(float *m_output, unsigned m_size);
 
 // Gradient function
 void elu_gradient(float *m_delta, float *m_output, unsigned m_size);

@@ -25,6 +25,37 @@ std::string& uppercase(std::string &m_str) {
     return m_str;
 }
 
+void excitation(unsigned num_threads,
+                unsigned m_input_width, unsigned m_input_height, unsigned m_input_channel, float *m_input_data,
+                float *m_excitation_data,
+                unsigned m_output_width, unsigned m_output_height, unsigned m_output_channel, float *m_output_data, unsigned m_batch){
+    unsigned stride = 1;
+    unsigned sample = 1;
+    unsigned width  = m_input_width;
+    unsigned height = m_input_height;
+    unsigned channel= m_input_channel;
+
+    std::vector<std::thread> threads;
+    threads.reserve(num_threads);
+    for(unsigned tid = 0; tid < num_threads; tid++) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
+            for(unsigned i = begin; i < end; i++) {
+                for(unsigned c = 0; c < channel; c++) {
+                    for(unsigned h = 0; h < height; h++) {
+                        for(unsigned w = 0; w < width; w++) {
+                            unsigned output_index = w * sample + m_output_width * ( h * sample + m_output_height * (c + m_output_channel * i));
+                            unsigned input_index = w * stride + m_input_width * ( h * stride + m_input_height * ( c + m_input_channel * i));
+                            m_output_data[output_index] =  m_input_data[input_index] * m_excitation_data[c];
+                        }
+                    }
+                }
+            }
+        }, tid * m_batch / num_threads,
+           (tid + 1) * m_batch / num_threads, tid));
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
+}
+
 void shortcut(unsigned num_threads, 
               unsigned m_input_width, unsigned m_input_height, unsigned m_input_channel, float *m_input_data,
               unsigned m_output_width, unsigned m_output_height, unsigned m_output_channel, float *m_output_data, unsigned m_batch){

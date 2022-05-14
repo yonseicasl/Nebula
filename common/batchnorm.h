@@ -11,6 +11,8 @@ void batchnorm_normalize(unsigned num_threads, float *m_output, float *m_mean, f
                          unsigned m_channel, unsigned m_size, unsigned m_batch);
 void batchnorm_scale_down(unsigned num_threads, float *m_output, float *m_scale, 
                           unsigned m_channel, unsigned m_size, unsigned m_batch);
+void batchnorm_add_beta(unsigned num_threads, float *m_output, float *m_beta,
+                        unsigned m_channel, unsigned m_size, unsigned m_batch);
 void batchnorm_mean_delta(unsigned num_threads,  float *m_delta, float *m_variance, float *m_mean_delta, 
                           unsigned m_channel, unsigned m_size, unsigned m_batch);
 void batchnorm_variance_delta(unsigned num_threads, float *m_x, float *m_delta, 

@@ -85,6 +85,36 @@ void tanh_activation(float *m_output, unsigned m_size){
     for(unsigned i = 0; i < m_size; i++) {
         m_output[i] = (exp(2.0 * m_output[i]) - 1.0) /
             (exp(2.0 * m_output[i]) + 1.0); 
+        // Protect NaN 
+        if(std::isnan(m_output[i]))
+            m_output[i] = 0;
+    }
+}
+void sigmoid_activation(float *m_output, unsigned m_size){
+    for(unsigned i = 0; i < m_size; i++) {
+        m_output[i] = (1.0) / (exp(-1 * m_output[i]) + 1.0); 
+        // Protect NaN 
+        if(std::isnan(m_output[i]))
+            m_output[i] = 0;
+    }
+}
+void hsigmoid_activation(float *m_output, unsigned m_size){
+    // relu6(x) = min(max(0,x),6)
+    // hsigmoid = relu6(x+3)/6
+    for(unsigned i = 0; i < m_size; i++) {
+        m_output[i] = m_output[i]+3 > 0.0 ? m_output[i]+3 : 0.0; // x = max(0, x+3)
+        m_output[i] = m_output[i] > 6.0 ? 6.0 : m_output[i]; // x = min(x, 6)
+        m_output[i] = m_output[i]/6; //x = x/6
+    }
+}
+void hswish_activation(float *m_output, unsigned m_size){
+    for(unsigned i = 0; i < m_size; i++) {
+        if(m_output[i] <= -3) m_output[i] = 0;
+        else if (m_output[i] >= 3) m_output[i] = m_output[i];
+        else m_output[i] = (m_output[i] * (m_output[i] +3)) / 6;
+        // Protect NaN 
+        if(std::isnan(m_output[i]))
+            m_output[i] = 0;
     }
 }
 

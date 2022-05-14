@@ -4,6 +4,7 @@
 #endif
 #include <fstream>
 #include <functional>
+#include <cmath>
 #include <cstring>
 #include <random>
 #include <thread>
@@ -20,6 +21,7 @@ connected_layer_t::connected_layer_t(network_t *m_network, layer_t *m_prev_layer
     bias_update(NULL),
     weight_update(NULL),
     batch_normalize(false),
+    beta(NULL),
     scale(NULL),
     scale_update(NULL),
     normalize_mean(NULL),
@@ -40,6 +42,7 @@ connected_layer_t::~connected_layer_t() {
     delete [] output_data;
     delete [] delta;
     if(batch_normalize) {
+        delete [] beta;
         delete [] scale;
         delete [] scale_update;
         delete [] normalize_mean;
@@ -81,9 +84,11 @@ void connected_layer_t::init(section_config_t m_section_config) {
     delta       = new float[output_size * network->batch_size]();
 
     if(batch_normalize) {
+        beta         = new float[output_size]();
         scale        = new float[output_size]();
         scale_update = new float[output_size]();
         for(unsigned i = 0; i < output_size; i++) {
+            beta[i]  = 0.0;
             scale[i] = 1.0;
         }
 
@@ -113,8 +118,8 @@ void connected_layer_t::init_weight(std::fstream &m_input_weight) {
         }
     }
 #endif
-    
     if(batch_normalize) {
+        m_input_weight.read((char*)beta, output_size * sizeof(float));
         m_input_weight.read((char*)scale, output_size * sizeof(float));
         m_input_weight.read((char*)rolling_mean, output_size * sizeof(float));
         m_input_weight.read((char*)rolling_variance, output_size * sizeof(float));
@@ -183,7 +188,7 @@ void connected_layer_t::forward() {
         forward_batchnorm();
     } 
     forward_bias(num_threads, output_data, bias, output_size, 1, network->batch_size);
-   
+
     // Activate function
     activate();
 
@@ -230,7 +235,6 @@ void connected_layer_t::forward(float *m_input_data) {
    
     // Activate function
     activate();
-
 }
 
 void connected_layer_t::backward() {

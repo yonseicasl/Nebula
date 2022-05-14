@@ -40,6 +40,7 @@ enum layer_type_t {
     RNN_LAYER,
     LSTM_LAYER,
     RBM_LAYER,
+    HOOK_LAYER,
     NUM_LAYER_TYPES,
 };
 
@@ -76,6 +77,9 @@ enum activation_type_t {
     RELU_ACTIVATION,
     STAIR_ACTIVATION,
     TANH_ACTIVATION,
+    SIGMOID_ACTIVATION,
+    HSIGMOID_ACTIVATION,
+    HSWISH_ACTIVATION,
     NUM_ACTIVATION_TYPES,
 };
 
@@ -94,6 +98,9 @@ static std::vector<std::string> activation_type_str __attribute__((unused)) = {
     "relu",
     "stair",
     "tanh",
+    "sigmoid",
+    "hsigmoid",
+    "hswish",
     "num_activation_types",
 };
 

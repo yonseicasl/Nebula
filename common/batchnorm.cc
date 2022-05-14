@@ -87,7 +87,31 @@ void batchnorm_scale_down(unsigned num_threads, float *m_output, float *m_scale,
             for(unsigned i = begin; i < end; i++) {
                 for(unsigned j = 0; j < m_channel; j++) {
                     for(unsigned k = 0; k <  m_size; k++) {
-                        m_output[(i *  m_channel + j) * m_size + k] *= m_scale[j];
+                        unsigned index = i * m_size * m_channel + j * m_size + k;
+                        m_output[index] *= m_scale[j];
+                        // m_output[(i *  m_channel + j) * m_size + k] *= m_scale[j];
+                    }
+                }
+            }
+        }, tid * m_batch / num_threads,
+           (tid + 1) * m_batch / num_threads, tid));
+    } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
+}
+
+void batchnorm_add_beta(unsigned num_threads, float *m_output, float *m_beta,
+                          unsigned m_channel, unsigned m_size, unsigned m_batch){
+
+    std::vector<std::thread> threads;
+    threads.reserve(num_threads);
+    for(unsigned tid = 0; tid < num_threads; tid++) {
+        threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end,
+                                           const unsigned tid) {
+            for(unsigned i = begin; i < end; i++) {
+                for(unsigned j = 0; j < m_channel; j++) {
+                    for(unsigned k = 0; k <  m_size; k++) {
+                        unsigned index = i * m_size * m_channel + j * m_size + k;
+                        m_output[index] += m_beta[j];
+                        // m_output[(i *  m_channel + j) * m_size + k] += m_beta[j];
                     }
                 }
             }

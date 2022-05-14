@@ -30,6 +30,8 @@ public:
     void backward_batchnorm();
 
 private:
+    layer_t *connection;        // Shortcut connection between layers.
+    float* excitation_data;
 
 };
 
