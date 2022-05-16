@@ -87,9 +87,7 @@ void batchnorm_scale_down(unsigned num_threads, float *m_output, float *m_scale,
             for(unsigned i = begin; i < end; i++) {
                 for(unsigned j = 0; j < m_channel; j++) {
                     for(unsigned k = 0; k <  m_size; k++) {
-                        unsigned index = i * m_size * m_channel + j * m_size + k;
-                        m_output[index] *= m_scale[j];
-                        // m_output[(i *  m_channel + j) * m_size + k] *= m_scale[j];
+                        m_output[(i *  m_channel + j) * m_size + k] *= m_scale[j];
                     }
                 }
             }
@@ -109,9 +107,7 @@ void batchnorm_add_beta(unsigned num_threads, float *m_output, float *m_beta,
             for(unsigned i = begin; i < end; i++) {
                 for(unsigned j = 0; j < m_channel; j++) {
                     for(unsigned k = 0; k <  m_size; k++) {
-                        unsigned index = i * m_size * m_channel + j * m_size + k;
-                        m_output[index] += m_beta[j];
-                        // m_output[(i *  m_channel + j) * m_size + k] += m_beta[j];
+                        m_output[(i *  m_channel + j) * m_size + k] += m_beta[j];
                     }
                 }
             }
