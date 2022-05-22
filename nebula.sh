@@ -121,7 +121,7 @@ custom_blas=0
 # Do not load weight for training by default.
 load_weight=0
 # Pruning
-PRUNING=1
+PRUNING=0
 
 # Parse optional arguments for load weight when training.
 while [[ "$1" != '' ]]; do

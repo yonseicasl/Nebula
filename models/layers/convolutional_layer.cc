@@ -88,14 +88,15 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
         input_height = connection ? connection->output_height : network->input_height;
         input_width = connection ? connection->output_width : network->input_width;
         input_channel = connection ? connection->output_channel : network->input_channel;
+        input_data = connection ? connection->output_data : network->input_data;
     }
     else {
 
         input_size = prev_layer ? prev_layer->output_size : network->input_size;
-
         input_height = prev_layer ? prev_layer->output_height : network->input_height;
         input_width = prev_layer ? prev_layer->output_width : network->input_width;
         input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
+        input_data = prev_layer ? prev_layer->output_data : network->input_data;
     }
 
     //output_height = (input_height + 2 * padding - filter_size) / stride + 1;
@@ -118,7 +119,6 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     npu_mmu::npu_malloc((uint64_t)weight);
     weight_update = new float[weight_size]();
 
-    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     output_data = new float[output_size * network->batch_size]();
     npu_mmu::npu_malloc((uint64_t)output_data);
     delta = new float[output_size * network->batch_size]();
@@ -192,6 +192,7 @@ void convolutional_layer_t::store_weight(std::fstream &m_output_weight) {
 }
 
 void convolutional_layer_t::forward() {
+    std::cout << input_height << "*" << input_width << "*" << input_channel << std::endl;
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0, output_size * network->batch_size * sizeof(float));
     

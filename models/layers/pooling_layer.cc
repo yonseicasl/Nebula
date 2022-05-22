@@ -32,17 +32,27 @@ void pooling_layer_t::init(section_config_t m_section_config) {
 
     padding = (filter_size - 1) / 2;
     m_section_config.get_setting("padding", &padding);
+    m_section_config.get_setting("hops", &hops);
 
     // Set input parameters.
-    input_height  = prev_layer ? prev_layer->output_height : network->input_height;
-    input_width   = prev_layer ? prev_layer->output_width : network->input_width;
-    input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
-    input_size = prev_layer ? prev_layer->output_size : network->input_size;
-    input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    layer_t *connection = this;
+    if(hops > 1) {
+        for(unsigned i = 0; i < hops; i++) { connection = connection->prev_layer ? connection->prev_layer : NULL; }
+        input_height = connection ? connection->output_height : network->input_height;
+        input_width = connection ? connection->output_width : network->input_width;
+        input_channel = connection ? connection->output_channel : network->input_channel;
+        input_size = connection ? connection->output_size : network->input_size;
+        input_data = connection ? connection->output_data : network->input_data;
+    }
+    else {
+        input_height  = prev_layer ? prev_layer->output_height : network->input_height;
+        input_width   = prev_layer ? prev_layer->output_width : network->input_width;
+        input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
+        input_size = prev_layer ? prev_layer->output_size : network->input_size;
+        input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    }
     
-    // Set output paramemters.
-    //output_height = (input_height + 2 * padding) / stride;
-    //output_width = (input_width + 2 * padding) / stride;
+    // Set output parameters.
     output_height = (input_height + 2 * padding - filter_size) / stride + 1;
     output_width = (input_width + 2 * padding - filter_size) / stride + 1;
     output_channel = input_channel;
@@ -71,6 +81,7 @@ void pooling_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0.0, output_size * network->batch_size * sizeof(float));
     
+    std::cout << input_height << "*" << input_width << "*" << input_channel << std::endl;
     input_data = prev_layer ? prev_layer->output_data : network->input_data;
     // Case 1: Max pooling
     // Select the biggest element in the filter.

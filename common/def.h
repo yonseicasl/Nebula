@@ -28,6 +28,7 @@ static std::vector<std::string> run_type_str __attribute__((unused)) = {
 // Layer types
 enum layer_type_t { 
     UNDEFINED_LAYER = 0,
+    CONCAT_LAYER,
     CONNECTED_LAYER,
     CONVOLUTIONAL_LAYER,
     COST_LAYER,
@@ -46,6 +47,7 @@ enum layer_type_t {
 
 static std::vector<std::string> layer_type_str __attribute__((unused)) = {
     "undefined_layer",
+    "concat_layer"
     "connected_layer",
     "convolutional_layer",
     "cost_layer",

@@ -42,7 +42,6 @@ void npu_mmu::npu_malloc(uint64_t m_ptr) {
     else {
         base_addr.ptr = m_ptr, base_addr.addr = BASE_ADDR, base_addr.valid = true;
     }
-    //std::cout << std::hex << m_ptr << " " << base_addr.ptr << " " << m_ptr - base_addr.ptr << std::endl;
 }
 
 
@@ -62,12 +61,11 @@ uint64_t npu_mmu::v2p(uint64_t m_ptr) {
         return base_addr.addr + offset;
     }
     else if(m_ptr < base_addr.ptr) {
-        //std::cout << "Virtual address : 0x" << std::hex << m_ptr << " is bigger than the baseline virtual address : 0x" << std::hex << base_addr.ptr << std::endl;
         std::cerr << "Virtual address : 0x" << std::hex << m_ptr << " is smaller than the baseline virtual address : 0x" << std::hex << base_addr.ptr << std::endl;
         exit(1);
     }
     else if(offset > CAPACITY) {
-        //std::cout << "Physical address : 0x" << std::hex << base_addr.addr+offset << " is bigger than the capacity 0x" << CAPACITY << std::endl;
+        std::cout << "Physical address : 0x" << std::hex << base_addr.addr+offset << " is bigger than the capacity 0x" << CAPACITY << std::endl;
         std::cerr << "Physical address : 0x" << std::hex << base_addr.addr + offset << " is bigger than the capacity 0x" << CAPACITY << std::endl;
         exit(1);
     }

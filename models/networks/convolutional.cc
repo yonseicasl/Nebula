@@ -15,6 +15,7 @@
 #include "convolutional.h"
 #include "config.h"
 #include "layer.h"
+#include "concat_layer.h"
 #include "convolutional_layer.h"
 #include "connected_layer.h"
 #include "dropout_layer.h"
@@ -80,7 +81,10 @@ void convolutional_t::init_network(const std::string m_network_config) {
         // Layer configuration
         else {
             layer_t *layer = NULL;
-            if(section_config.name == "convolutional") {
+            if(section_config.name == "concat") {
+                layer = new concat_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, CONCAT_LAYER);
+            }
+            else if(section_config.name == "convolutional") {
                 layer = new convolutional_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, CONVOLUTIONAL_LAYER);
             }
             else if(section_config.name == "connected") {
