@@ -36,7 +36,7 @@ public:
 
 private:
     std::vector<layer_t *> connections;
-    std::vector<unsigned> hops;
+    std::vector<unsigned> hop;
     unsigned num_concats;
 };
 

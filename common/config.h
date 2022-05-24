@@ -27,6 +27,21 @@ public:
         std::stringstream ss; ss.str(it->second);
         ss >> *m_var; return true;
     }
+    template <typename T>
+    bool get_vector_setting(std::string m_key, std::vector<T> *m_vector) {
+        std::map<std::string, std::string>::iterator it = settings.find(lowercase(m_key));
+        if(it == settings.end()) return false;
+        std::stringstream ss(it->second);
+        T temp_value;
+        for(unsigned i = 0; i < m_vector->size(); i++) {
+            ss >> temp_value;
+            m_vector->at(i) = temp_value;
+            if(ss.peek() == ',') {
+                ss.ignore();
+            }
+        }
+        return true;
+    }
     // Section name
     std::string name;
 

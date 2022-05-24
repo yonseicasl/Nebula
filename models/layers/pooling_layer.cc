@@ -81,7 +81,8 @@ void pooling_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0.0, output_size * network->batch_size * sizeof(float));
     
-    std::cout << input_height << "*" << input_width << "*" << input_channel << std::endl;
+    std::cout << "pooling layer" << std::endl;
+    std::cout << output_height << "*" << output_width << "*" << output_channel << std::endl;
     input_data = prev_layer ? prev_layer->output_data : network->input_data;
     // Case 1: Max pooling
     // Select the biggest element in the filter.

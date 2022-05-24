@@ -27,7 +27,8 @@ int main(int argc, char **argv) {
     // Create network.
     nebula::network_t *network = new nebula::convolutional_t();
     // Initialize network.
-    network->init(run_type, network_config, data_config, input_weight);
+    // network->init(run_type, network_config, data_config, input_weight);
+    network->init(network_config);
     // Run network and save optional output weight.
     network->run(output_weight);
     // Delete network.

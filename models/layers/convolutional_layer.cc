@@ -91,7 +91,6 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
         input_data = connection ? connection->output_data : network->input_data;
     }
     else {
-
         input_size = prev_layer ? prev_layer->output_size : network->input_size;
         input_height = prev_layer ? prev_layer->output_height : network->input_height;
         input_width = prev_layer ? prev_layer->output_width : network->input_width;
@@ -107,8 +106,6 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     output_channel = num_filters;
     output_size = output_height * output_width * output_channel;
     
-    //workspace_size = output_height * output_width * filter_size * filter_size * input_channel;
-    //weight_size = input_channel * num_filters * filter_size * filter_size / group;	   
     workspace_size = output_height*output_width*filter_height*filter_width*input_channel;
     weight_size = input_channel*num_filters*filter_height*filter_width/group;
     
@@ -123,9 +120,6 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     npu_mmu::npu_malloc((uint64_t)output_data);
     delta = new float[output_size * network->batch_size]();
     workspace = new float[workspace_size]();
-
-    // Print out structure of the network.
-    //std::cout << input_height << " " << input_width << " " << input_channel << " " << filter_size << " " << filter_size << " " << num_filters << std::endl;
 
     // Initialize parameters for batch normalization.
     if(batch_normalize) {
@@ -163,7 +157,7 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
 #endif
    
     if(batch_normalize) {
-        m_input_weight.read((char*)beta, num_filters * sizeof(float));
+        //m_input_weight.read((char*)beta, num_filters * sizeof(float));
         m_input_weight.read((char*)scale, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_variance, num_filters * sizeof(float));
@@ -192,7 +186,6 @@ void convolutional_layer_t::store_weight(std::fstream &m_output_weight) {
 }
 
 void convolutional_layer_t::forward() {
-    std::cout << input_height << "*" << input_width << "*" << input_channel << std::endl;
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0, output_size * network->batch_size * sizeof(float));
     
@@ -205,13 +198,13 @@ void convolutional_layer_t::forward() {
     for(unsigned i = 0; i < input_size; i++) {
         if(input_data[i] == 0.0) { zero_input++;}
     }
-    std::cout << (float)zero_input/(float)input_size << " ";
+    std::cout << "Input data : " << (float)zero_input/(float)input_size << " ";
 
     unsigned zero_weight = 0;
     for(unsigned i = 0; i < weight_size; i++) {
         if(weight[i] == 0.0) {zero_weight++;}
     }
-    std::cout << (float)zero_weight/(float)weight_size << std::endl;
+    std::cout << "Weight : " << (float)zero_weight/(float)weight_size << " ";
 
 #endif
 
@@ -254,12 +247,14 @@ void convolutional_layer_t::forward() {
     activate();
 
 #ifdef PRUNING
+    unsigned zero_output = 0;
     for(unsigned i = 0; i < output_size; i++) {
         if(output_data[i] < network->data_threshold && output_data[i] > -network->data_threshold) {
             output_data[i] = 0.0;
+            zero_output++;
         }
     }
-    //std::cout << zero_output << "/" << output_size << std::endl;
+    std::cout << "Output data : " << (float)zero_output/(float)output_size << std::endl;
 #endif
 }
 
@@ -357,7 +352,7 @@ void convolutional_layer_t::update() {
 void convolutional_layer_t::forward_batchnorm() {
     unsigned num_patches = output_height * output_width;
     memcpy(x, output_data, output_size * network->batch_size * sizeof(float));
-    if(network->run_type == TRAIN_RUN || network->run_type == TEST_RUN) {
+    if(network->run_type == TRAIN_RUN) {
     
         batchnorm_mean(num_threads, output_data, normalize_mean,
                        output_channel, num_patches, network->batch_size);
@@ -388,8 +383,8 @@ void convolutional_layer_t::forward_batchnorm() {
     }
     batchnorm_scale_down(num_threads, output_data, scale, 
                          output_channel, num_patches, network->batch_size);
-    batchnorm_add_beta(num_threads, output_data, beta,
-                       output_channel, num_patches, network->batch_size);
+    //batchnorm_add_beta(num_threads, output_data, beta,
+    //                   output_channel, num_patches, network->batch_size);
 }
 
 //Backward batch normalization.
