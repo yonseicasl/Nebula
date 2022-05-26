@@ -1,4 +1,7 @@
 #include <cstring>
+#ifndef CUSTOM_BLAS
+#include <cblas.h>
+#endif
 
 #include "concat_layer.h"
 
@@ -81,20 +84,22 @@ void concat_layer_t::forward() {
     std::cout << "concat layer" << std::endl;
     std::cout << output_height << "*" << output_width << "*" << output_channel << std::endl;
 
-    for(unsigned b = 0; b < network->batch_size; b++) {
-        for(unsigned i = 0; i < num_concats; i++) {
+    for(unsigned i = 0; i < num_concats; i++) {
+        for(unsigned b = 0; b < network->batch_size; b++) {
             memcpy(output_data, connections[i]->output_data, connections[i]->output_size * sizeof(float));
-            connections[i]->output_data += connections[i]->output_size;
             output_data += connections[i]->output_size;
         }
     }
 }
 
 void concat_layer_t::backward() {
-    for(unsigned b = 0; b < network->batch_size; b++) {
-        for(unsigned i = 0; i < num_concats; i++) {
-            memcpy(connections[i]->delta, delta, connections[i]->output_size * sizeof(float));
-            connections[i]->delta += connections[i]->output_size;
+    for(unsigned i = 0; i < num_concats; i++) {
+        for(unsigned b = 0; b < network->batch_size; b++) {
+#ifdef CUSTOM_BLAS
+            axpy(connections[i]->output_size*network->batch_size, 1, delta, 1, connections[i]->delta);
+#else
+            cblas_saxpy(connections[i]->output_size, 1, delta, 1, connections[i]->delta, 1);
+#endif
             delta += connections[i]->output_size;
         }
     }
