@@ -181,6 +181,7 @@ void convolutional_t::run(const std::string m_output_weight) {
     stopwatch.start();
 
     // Inference 
+    run_type = run_type_t::TEST_RUN;
     if(run_type == TEST_RUN) {
         // Set batch count as num_iterations or inputs.size()/batch_size, whichever is smaller.
         //unsigned batch_count = inputs.size()/batch_size;
@@ -192,7 +193,7 @@ void convolutional_t::run(const std::string m_output_weight) {
             // Forward propagation
             forward();
             // Print batch processing results.
-            //print_results();
+            print_results();
         }
 		//print_results();
     }
