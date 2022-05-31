@@ -108,7 +108,7 @@ void convolutional_t::init_network(const std::string m_network_config) {
             else if(section_config.name == "softmax") {
                 layer = new softmax_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, SOFTMAX_LAYER);
                 // Softmax is output layer.
-                //output_layer = layer;
+                output_layer = layer;
             }
             else if(section_config.name == "cost") {
                 layer = new cost_layer_t(this, layers.size() ? layers[layers.size()-1] : NULL, COST_LAYER);
