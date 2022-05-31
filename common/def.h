@@ -41,7 +41,6 @@ enum layer_type_t {
     RNN_LAYER,
     LSTM_LAYER,
     RBM_LAYER,
-    HOOK_LAYER,
     NUM_LAYER_TYPES,
 };
 

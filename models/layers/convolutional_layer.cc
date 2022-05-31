@@ -43,6 +43,7 @@ convolutional_layer_t::~convolutional_layer_t() {
     delete [] weight_update;
     //delete [] input_data;
     delete [] output_data;
+    delete [] non_activation_data;
     delete [] delta;
     if(batch_normalize) {
         delete [] beta;
@@ -81,7 +82,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
     }
 
-    layer_t *connection = this;
+    connection = this;
     if(hops > 1) {
         for(unsigned i = 0; i < hops; i++) { connection = connection->prev_layer ? connection->prev_layer : NULL;}
         input_size = connection ? connection->output_size : network->input_size;
@@ -96,10 +97,8 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
         input_width = prev_layer ? prev_layer->output_width : network->input_width;
         input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
         input_data = prev_layer ? prev_layer->output_data : network->input_data;
+        connection = prev_layer;
     }
-
-    //output_height = (input_height + 2 * padding - filter_size) / stride + 1;
-    //output_width = (input_width  + 2 * padding - filter_size) / stride + 1;
 
     output_height = (input_height + 2*padding_h - filter_height) / stride + 1;
     output_width = (input_width + 2*padding_w - filter_width) / stride + 1;
@@ -117,6 +116,7 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     weight_update = new float[weight_size]();
 
     output_data = new float[output_size * network->batch_size]();
+    non_activation_data = new float[output_size * network->batch_size]();
     npu_mmu::npu_malloc((uint64_t)output_data);
     delta = new float[output_size * network->batch_size]();
     workspace = new float[workspace_size]();
@@ -157,7 +157,7 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
 #endif
    
     if(batch_normalize) {
-        //m_input_weight.read((char*)beta, num_filters * sizeof(float));
+        // m_input_weight.read((char*)beta, num_filters * sizeof(float));
         m_input_weight.read((char*)scale, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_variance, num_filters * sizeof(float));
@@ -171,7 +171,6 @@ void convolutional_layer_t::init_weight() {
     for(unsigned i = 0; i < weight_size; i++) {
         //weight[i] = sqrt(2.0 / (filter_size * filter_size * input_channel / group)) * dist(rng);
         weight[i] = sqrt(2.0 / (filter_height * filter_width * input_channel / group)) * dist(rng);
-
     }
 }
 
@@ -189,7 +188,6 @@ void convolutional_layer_t::forward() {
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0, output_size * network->batch_size * sizeof(float));
     
-    //unsigned patch_size = filter_size * filter_size * input_channel/ group;
     unsigned patch_size = filter_height * filter_width * input_channel/ group;
     unsigned num_patches = output_width * output_height;
 
@@ -207,12 +205,11 @@ void convolutional_layer_t::forward() {
     std::cout << "Weight : " << (float)zero_weight/(float)weight_size << " ";
 
 #endif
-
 	// Convolution
 	for(unsigned i = 0; i < network->batch_size; i++){
 		for(unsigned j =0 ; j < group ; j++){
 			im2col(&input_data[(i * group + j) * input_channel / group * input_height * input_width], input_channel / group,
-					input_height, input_width, filter_size, stride, padding, workspace,
+					input_height, input_width, filter_height, filter_width, stride, padding_h, padding_w, workspace,
 					network->num_threads);
 #ifdef CUSTOM_BLAS
 			gemm(0, 0,
@@ -244,6 +241,8 @@ void convolutional_layer_t::forward() {
     forward_bias(num_threads, output_data, bias, num_filters, num_patches, network->batch_size);
 
     // Activate function
+    memset(non_activation_data, 0, sizeof(float) * output_size * network->batch_size);
+    memcpy(non_activation_data, output_data, sizeof(float) * output_size * network->batch_size);
     activate();
 
 #ifdef PRUNING
@@ -272,8 +271,7 @@ void convolutional_layer_t::backward() {
         backward_batchnorm();
     }
 
-    input_data = prev_layer ? prev_layer->output_data : network->input_data;
-    float *prev_delta = prev_layer ? prev_layer->delta : NULL;
+    float *prev_delta = connection ? connection->delta : NULL;
 
     for(unsigned i = 0; i < network->batch_size; ++i) {
 		for(unsigned j = 0; j < group; ++j){
@@ -336,7 +334,7 @@ void convolutional_layer_t::update() {
     axpy(weight_size, network->learning_rate / network->batch_size, weight_update, 1, weight, 1);
     scal(weight_size, network->momentum, weight_update, 1);
 #else
-
+    
     // Update bias.
     cblas_saxpy(num_filters, network->learning_rate / network->batch_size, bias_update, 1, bias, 1);
     cblas_sscal(num_filters, network->momentum, bias_update, 1);
@@ -345,6 +343,7 @@ void convolutional_layer_t::update() {
     cblas_saxpy(weight_size, (0.0 - network->decay) * network->batch_size, weight, 1, weight_update, 1);
     cblas_saxpy(weight_size, network->learning_rate / network->batch_size, weight_update, 1, weight, 1);
     cblas_sscal(weight_size, network->momentum, weight_update, 1);
+
 #endif
 }
 
@@ -383,7 +382,7 @@ void convolutional_layer_t::forward_batchnorm() {
     }
     batchnorm_scale_down(num_threads, output_data, scale, 
                          output_channel, num_patches, network->batch_size);
-    //batchnorm_add_beta(num_threads, output_data, beta,
+    // batchnorm_add_beta(num_threads, output_data, beta,
     //                   output_channel, num_patches, network->batch_size);
 }
 

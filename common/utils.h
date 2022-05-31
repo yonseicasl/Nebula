@@ -28,6 +28,10 @@ void sampling(float *m_sample, float *m_probability, unsigned m_size, unsigned n
 void im2col(float *m_im_data, unsigned m_channel, unsigned m_height, unsigned m_width,
             unsigned m_filter_size, unsigned m_stride, unsigned m_padding, float *m_col_data,
             unsigned m_num_threads);
+void im2col(float *m_im_data, unsigned m_channel, unsigned m_height, unsigned m_width,
+            unsigned m_filter_height, unsigned m_filter_width, unsigned m_stride, 
+            unsigned m_padding_h, unsigned m_padding_w, float *m_col_data,
+            unsigned m_num_threads);
 
 // Fold data.
 void col2im(float *m_col_data, unsigned m_channel, unsigned m_height, unsigned m_width,

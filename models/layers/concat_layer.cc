@@ -43,11 +43,11 @@ void concat_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_vector_setting("hops", &hop);
 
     for(unsigned i = 0; i < num_concats; i++) {
-        layer_t *connection = this;
+        layer_t *connection_ = this;
         for(unsigned j = 0; j < hop[i]; j++) {
-            connection = connection->prev_layer ? connection->prev_layer : NULL;
+            connection_ = connection_->prev_layer ? connection_->prev_layer : NULL;
         }
-        connections.push_back(connection);
+        connections.push_back(connection_);
     }
 
     output_height = connections[0]->output_height;
@@ -81,8 +81,9 @@ void concat_layer_t::init_weight() {
 void concat_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0.0, output_size * network->batch_size * sizeof(float));
-    std::cout << "concat layer" << std::endl;
-    std::cout << output_height << "*" << output_width << "*" << output_channel << std::endl;
+
+    // std::cout << "concat layer" << std::endl;
+    // std::cout << output_height << "*" << output_width << "*" << output_channel << std::endl;
 
     for(unsigned i = 0; i < num_concats; i++) {
         for(unsigned b = 0; b < network->batch_size; b++) {
@@ -103,6 +104,7 @@ void concat_layer_t::backward() {
             delta += connections[i]->output_size;
         }
     }
+    //distribute delta
 }
 
 void concat_layer_t::update() {

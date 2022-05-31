@@ -49,6 +49,7 @@ public:
     float *input_data;                  // Input data.
     float *weight;                      // Weight 
     float *output_data;                 // Output data
+    float *non_activation_data;         // Output data which are not passed activation function
     float *delta;                       // Delta to update layers
 
     unsigned padding;                   // Padding size
@@ -64,6 +65,7 @@ public:
 	unsigned group;					    // Group Convolution
    
     layer_t     *prev_layer;            // Pointer to previous layer
+    layer_t     *connection;
     layer_t     *next_layer;            // Pointer to next layer
 
     network_t   *network;               // Pointer to main network

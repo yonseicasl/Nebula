@@ -25,6 +25,7 @@ layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_lay
     input_data(NULL),
     weight(NULL),
     output_data(NULL),
+    non_activation_data(NULL),
     delta(NULL),
     padding(0),
     padding_h(0),
@@ -37,6 +38,7 @@ layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_lay
     hops(1),
 	group(1),
     prev_layer(m_prev_layer),
+    connection(NULL),
     next_layer(NULL),
     network(m_network),
     num_threads(1) {
@@ -102,18 +104,6 @@ void layer_t::activate() {
         }
         case TANH_ACTIVATION: { 
             tanh_activation(output_data, output_size * network->batch_size);
-            break;
-        }
-        case SIGMOID_ACTIVATION: { 
-            sigmoid_activation(output_data, output_size * network->batch_size);
-            break;
-        }
-        case HSIGMOID_ACTIVATION: { 
-            hsigmoid_activation(output_data, output_size * network->batch_size);
-            break;
-        }
-        case HSWISH_ACTIVATION: { 
-            hswish_activation(output_data, output_size * network->batch_size);
             break;
         }
         default : {

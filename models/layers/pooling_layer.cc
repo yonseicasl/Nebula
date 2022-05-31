@@ -35,7 +35,7 @@ void pooling_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("hops", &hops);
 
     // Set input parameters.
-    layer_t *connection = this;
+    connection = this;
     if(hops > 1) {
         for(unsigned i = 0; i < hops; i++) { connection = connection->prev_layer ? connection->prev_layer : NULL; }
         input_height = connection ? connection->output_height : network->input_height;
@@ -50,6 +50,7 @@ void pooling_layer_t::init(section_config_t m_section_config) {
         input_channel = prev_layer ? prev_layer->output_channel : network->input_channel;
         input_size = prev_layer ? prev_layer->output_size : network->input_size;
         input_data = prev_layer ? prev_layer->output_data : network->input_data;
+        connection = prev_layer;
     }
     
     // Set output parameters.
@@ -81,9 +82,7 @@ void pooling_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta, 0.0, output_size * network->batch_size * sizeof(float));
     
-    std::cout << "pooling layer" << std::endl;
-    std::cout << output_height << "*" << output_width << "*" << output_channel << std::endl;
-    input_data = prev_layer ? prev_layer->output_data : network->input_data;
+    // std::cout << input_height << "*" << input_width << "*" << input_channel << std::endl;
     // Case 1: Max pooling
     // Select the biggest element in the filter.
     if(layer_type == MAXPOOL_LAYER) {
@@ -141,6 +140,14 @@ void pooling_layer_t::forward() {
                                     }
                                 }
                                 output_data[output_index] = val / (filter_size * filter_size);
+                                // For cross-validation with pytorch
+                                // unsigned temp_filter_h = filter_size;
+                                // unsigned temp_filter_w = filter_size;
+                                // if(h==0 || h == output_height)
+                                //     temp_filter_h--;
+                                // if(w==0 || w == output_width)
+                                //     temp_filter_w--;
+                                // output_data[output_index] = val / (temp_filter_h * temp_filter_w);
                             }
                         }
                     }
@@ -155,13 +162,20 @@ void pooling_layer_t::forward() {
 }
 
 void pooling_layer_t::backward() {
+    // float *prev_delta = connection ? connection->delta : NULL;
     float *prev_delta = prev_layer ? prev_layer->delta : NULL;
+
     if(layer_type == MAXPOOL_LAYER) {
         std::vector<std::thread> threads;
         threads.reserve(num_threads);
         for(unsigned tid = 0; tid < num_threads; tid++) {
             threads.emplace_back(std::bind([&](const unsigned begin, const unsigned end, const unsigned tid) {
-                for(unsigned i = begin; i < end; i++) { prev_delta[index[i]] += delta[i];}
+                for(unsigned i = begin; i < end; i++) {
+                    for(unsigned j = 0; j < filter_size * filter_size; j++) {
+                        unsigned input_index = filter_size * filter_size * i + j;
+                        prev_delta[input_index] += delta[i];
+                    }
+                }
             }, tid * output_size * network->batch_size / num_threads, 
                (tid + 1) * output_size * network->batch_size / num_threads, tid));
         } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
