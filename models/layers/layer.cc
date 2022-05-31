@@ -106,6 +106,18 @@ void layer_t::activate() {
             tanh_activation(output_data, output_size * network->batch_size);
             break;
         }
+        case SIGMOID_ACTIVATION: { 
+            sigmoid_activation(output_data, output_size * network->batch_size);
+            break;
+        }
+        case HSIGMOID_ACTIVATION: { 
+            hsigmoid_activation(output_data, output_size * network->batch_size);
+            break;
+        }
+        case HSWISH_ACTIVATION: { 
+            hswish_activation(output_data, output_size * network->batch_size);
+            break;
+        }
         default : {
             std::cerr << "Error: undefined activation type "
                       << activation_type_str[activation_type] << std::endl;
