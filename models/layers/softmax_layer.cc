@@ -21,6 +21,7 @@ softmax_layer_t::~softmax_layer_t() {
 void softmax_layer_t::init(section_config_t m_section_config) {
     // Initialize layer parameters.
     input_size = prev_layer ? prev_layer->output_size : network->input_size;
+    input_data = prev_layer ? prev_layer->output_data : network->input_data;
     output_size = input_size;  
     
     output_data = new float[output_size * network->batch_size]();
@@ -67,7 +68,6 @@ void softmax_layer_t::store_weight(std::fstream &m_weight_file) {/*Nothing to do
 
 // Softmax function.
 void softmax_layer_t::softmax() {
-    input_data = prev_layer ? prev_layer->output_data : network->input_data;
  
     for(unsigned i = 0; i < network->batch_size; i++) {
         float sum = 0.0;

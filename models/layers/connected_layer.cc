@@ -156,12 +156,12 @@ void connected_layer_t::forward() {
     for(unsigned i = 0; i < input_size; i++) {
         if(input_data[i] == 0.0) {zero_input++;}
     }
-    std::cout << (float)zero_input/(float)input_size << " ";
+    std::cout << "Connected Input data : " << (float)zero_input/(float)input_size << " ";
     unsigned zero_weight = 0;
     for(unsigned i = 0; i < weight_size; i++) {
         if(weight[i] == 0.0) {zero_weight++;}
     }
-    std::cout << (float)zero_weight/(float)weight_size << std::endl;
+    std::cout << "Weight : " << (float)zero_weight/(float)weight_size << std::endl;
 #endif
    
 // Matrix multiplication

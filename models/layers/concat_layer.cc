@@ -56,6 +56,7 @@ void concat_layer_t::init(section_config_t m_section_config) {
     for(unsigned i = 0; i < connections.size(); i++) {
         output_channel += connections[i]->output_channel;
     }
+    std::cout << output_height << " " << output_width << " " << output_channel << std::endl;
 
     output_size = output_height * output_width * output_channel;
     output_data = new float[output_size * network->batch_size]();

@@ -23,6 +23,7 @@
 #include "softmax_layer.h"
 #include "cost_layer.h"
 #include "shortcut_layer.h"
+#include "upsample_layer.h"
 #include "pooling_layer.h"
 
 namespace nebula {
@@ -110,6 +111,9 @@ void convolutional_t::init_network(const std::string m_network_config) {
                 // Softmax is output layer.
                 output_layer = layer;
             }
+            else if(section_config.name == "upsample") {
+                layer = new upsample_layer_t(this, layers.size()?layers[layers.size()-1]:NULL, UPSAMPLE_LAYER);
+            }
             else if(section_config.name == "cost") {
                 layer = new cost_layer_t(this, layers.size() ? layers[layers.size()-1] : NULL, COST_LAYER);
             }
@@ -181,7 +185,7 @@ void convolutional_t::run(const std::string m_output_weight) {
     stopwatch.start();
 
     // Inference 
-    run_type = run_type_t::TEST_RUN;
+    run_type = TEST_RUN;
     if(run_type == TEST_RUN) {
         // Set batch count as num_iterations or inputs.size()/batch_size, whichever is smaller.
         //unsigned batch_count = inputs.size()/batch_size;
@@ -192,8 +196,10 @@ void convolutional_t::run(const std::string m_output_weight) {
             load_data(iteration);
             // Forward propagation
             forward();
+
+            std::cout << "done" << std::endl;
             // Print batch processing results.
-            print_results();
+            //print_results();
         }
 		//print_results();
     }
