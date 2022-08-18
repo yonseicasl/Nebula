@@ -1,8 +1,9 @@
-############################################
-# Developed by                             #
-# Intelligent Computing Systems Lab (ICSL) #
-# Yonsei University, Seoul, Korea          #
-############################################
+#######################################################
+# Nebula: Lightweight Neural Network Benchmarks       #
+# Developed by the Intelligent Computing Systems Lab  #
+# School of Electrical Engineering, Yonsei University #
+# Version: 1.4                                        #
+#######################################################
 
 #!/bin/bash
 
@@ -61,10 +62,10 @@ print_banner() {
 	echo -e "|                                                             |"
 	echo -e "|                                                             |"
 	echo -e "|                                                             |"
-    echo -e "|  Nebula: A Neural network framework                         |"
-    echo -e "|  Intelligent Computing System Lab(ICSL)                     |"
+    echo -e "|  Nebula: Lightweight Neural Network Benchmarks              |"
+    echo -e "|  Intelligent Computing System Lab (ICSL)                    |"
     echo -e "|  School of Electrical Engineering, Yonsei University        |"
-    echo -e "|  Version: 0.1                                               |"
+    echo -e "|  Version: 1.4                                               |"
     echo -e "|_____________________________________________________________|"
 }
 

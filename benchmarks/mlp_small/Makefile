@@ -1,8 +1,9 @@
-############################################
-# Developed by                             #
-# Intelligent Computing Systems Lab (ICSL) #
-# Yonsei University, Seoul, Korea          #
-############################################
+#######################################################
+# Nebula: Lightweight Neural Network Benchmarks       #
+# Developed by the Intelligent Computing Systems Lab  #
+# School of Electrical Engineering, Yonsei University #
+# Version: 1.4                                        #
+#######################################################
 
 HDR=$(wildcard *.h)
 CCSRC=$(wildcard *.cc)

@@ -3,16 +3,16 @@ TEX = $(wildcard *.tex)
 FIG = $(wildcard figures/*.pdf)
 SRC = $(wildcard *.cls *.sty)
 
-.PHONY: dist clean
+.PHONY: distclean clean
 
 $(PAPER).pdf: $(TEX) $(FIG) $(SRC)
 	@rm -rf *.glsdefs
 	@pdflatex $(PAPER) > /dev/null
 	@pdflatex $(PAPER) > /dev/null
 
-dist:
+distclean:
 	rm -rf *.glsdefs *.aux *.bbl *.blg *.log *.out
 
 clean:
-	make dist; rm -f $(PAPER).pdf
+	make distclean; rm -f $(PAPER).pdf
 
