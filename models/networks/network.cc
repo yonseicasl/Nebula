@@ -24,10 +24,6 @@ network_t::network_t() :
     input_label(NULL),
     input_layer(NULL),
     output_layer(NULL),
-#ifdef PRUNING
-    weight_threshold(0.0),
-    data_threshold(0.0),
-#endif
     num_classes(0),
     num_iterations(0),
     iteration(0),

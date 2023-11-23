@@ -69,11 +69,6 @@ public:
     layer_t *input_layer;                   // Input layer
     layer_t *output_layer;                  // Output layer
 
-#ifdef PRUNING
-    float weight_threshold;
-    float data_threshold;
-#endif
-
     unsigned num_classes;                   // Number of output classes
     unsigned num_iterations;                // Number of iterations to run
     unsigned iteration;                     // Number of processed batches

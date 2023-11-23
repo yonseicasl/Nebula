@@ -111,13 +111,6 @@ void connected_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, output_size * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
 
-#ifdef PRUNING
-    for(unsigned i = 0; i < weight_size; i++) {
-        if(weight[i] < network-> weight_threshold && weight[i] > -network->weight_threshold) {
-            weight[i] = 0.0;
-        }
-    }
-#endif
     if(batch_normalize) {
         m_input_weight.read((char*)beta, output_size * sizeof(float));
         m_input_weight.read((char*)scale, output_size * sizeof(float));

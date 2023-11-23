@@ -152,14 +152,6 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, num_filters * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
 
-#ifdef PRUNING
-    for(unsigned i = 0; i < weight_size; i++) {
-        if(weight[i] < network->weight_threshold && weight[i] > -network->weight_threshold) {
-            weight[i] = 0.0;
-        }
-    }
-#endif
-   
     if(batch_normalize) {
         m_input_weight.read((char*)scale, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
@@ -172,7 +164,6 @@ void convolutional_layer_t::init_weight() {
     std::normal_distribution<float> dist(0.0, 1.0);
     
     for(unsigned i = 0; i < weight_size; i++) {
-        //weight[i] = sqrt(2.0 / (filter_size * filter_size * input_channel / group)) * dist(rng);
         weight[i] = sqrt(2.0 / (filter_height * filter_width * input_channel / group)) * dist(rng);
     }
 }
@@ -243,18 +234,13 @@ void convolutional_layer_t::forward() {
 
     forward_bias(num_threads, output_data, bias, num_filters, num_patches, network->batch_size);
 
-    // Activate function
-    memset(non_activation_data, 0, sizeof(float) * output_size * network->batch_size);
-    memcpy(non_activation_data, output_data, sizeof(float) * output_size * network->batch_size);
     activate();
 
 #ifdef PRUNING
     unsigned zero_output = 0;
     for(unsigned i = 0; i < output_size; i++) {
-        if(output_data[i] < network->data_threshold && output_data[i] > -network->data_threshold) {
-            output_data[i] = 0.0;
-            zero_output++;
-        }
+        //if(output_data[i] < network->data_threshold && output_data[i] > -network->data_threshold) {
+        if(output_data[i] == 0.0) { zero_output++; }
     }
     std::cout << "Output data : " << (float)zero_output/(float)output_size << std::endl;
 #endif

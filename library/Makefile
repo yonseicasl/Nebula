@@ -15,7 +15,8 @@ CCOBJ=$(CCSRC:.cc=.o)
 default: $(LIB)
 
 $(LIB): $(CCOBJ) $(CUOBJ)
-	ar rcs $@ $(CCOBJ) $(CUOBJ)
+	$(CC) -g -shared -Wl,-soname,$@ -o $@ $(CCOBJ) $(CUOBJ)
+	
 
 %.o: %.cc $(HDR)
 	$(CC) $(CCFLAG) $(STD) -o $@ -c $<

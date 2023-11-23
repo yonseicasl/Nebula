@@ -20,7 +20,7 @@ layerdir=$nebuladir/models/layers
 # Nebula library directory
 libdir=$nebuladir/library
 # Nebula library
-lib=$libdir/libnebula.a
+lib=$libdir/libnebula.so
 
 
 # Nebula benchmark directory
@@ -42,7 +42,7 @@ mopt="CC=$cc CU=$cu DIR=$nebuladir LIB=$lib"
 ccopt="-Wall -fPIC -I$commondir -I$networkdir -I$layerdir -DUSE_BLAS"
 # Linker options
 ldopt="-L$libdir"
-libopt="-lnebula -lopenblas -lpthread `pkg-config --libs opencv`"
+libopt="-lnebula -lopenblas -lpthread `pkg-config --libs opencv4`"
 # C++ version
 stdc="-std=c++11"
 # CUDA support

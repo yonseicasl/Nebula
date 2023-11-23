@@ -68,12 +68,6 @@ void convolutional_t::init_network(const std::string m_network_config) {
             // Total number of iterations will be later updated in init_data()
             section_config.get_setting("num_iterations", &num_iterations);
             input_size = input_height * input_width * input_channel;
-
-#ifdef PRUNING
-            section_config.get_setting("weight_threshold", &weight_threshold);
-            section_config.get_setting("data_threshold", &data_threshold);
-            std::cout << weight_threshold << " " << data_threshold << std::endl;
-#endif
         }
 		else if(section_config.name == "data") {
 			init_data(section_config);
@@ -345,14 +339,6 @@ void convolutional_t::load_data(const unsigned m_batch_index) {
             }
         }, tid * batch_size / num_threads, (tid + 1) * batch_size / num_threads, tid));
     } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
-
-#ifdef PRUNING
-   for(unsigned i = 0; i < input_size*batch_size; i++) {
-       if(input_data[i] < data_threshold && input_data[i] > -data_threshold) {
-           input_data[i] = 0.0;
-       }
-   }
-#endif
 }
 
 // Print results.
