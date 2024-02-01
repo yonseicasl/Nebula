@@ -34,6 +34,10 @@ public:
     layer_type_t layer_type;            // Layer type
     activation_type_t activation_type;  // Activation type
 
+    float pruning_ratio;
+    float channel_pruning;
+    bool pruning;
+
     unsigned input_height;              // Input height
     unsigned input_width;               // Input width
     unsigned input_channel;             // Input channel

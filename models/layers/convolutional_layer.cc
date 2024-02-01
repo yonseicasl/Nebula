@@ -76,6 +76,13 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("hops", &hops);
     m_section_config.get_setting("group", &group);
 
+#ifdef PRUNING
+    m_section_config.get_setting("pruning", &pruning);
+    m_section_config.get_setting("ratio", &pruning_ratio);
+#elif CHANNEL_PRUNING
+    m_section_config.get_setting("pruning", &pruning);
+    m_section_config.get_setting("channel_pruning", &channel_pruning);
+#endif
 
     std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
@@ -152,6 +159,63 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, num_filters * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
 
+#ifdef PRUNING
+    if(pruning) {
+        unsigned weight_counter = 0;
+        std::vector<unsigned> indices(weight_size);
+        std::vector<unsigned> sorted(weight_size);
+        iota(sorted.begin(), sorted.end(), 0);
+
+        indices = sorted;
+        std::sort(indices.begin(), indices.end(), [&](unsigned a, unsigned b) {
+                return abs(weight[a]) < abs(weight[b]);
+        });
+        for(unsigned i = 0; i < weight_size*pruning_ratio; i++) {
+            weight[indices[i]] = 0.0;
+            //weight_counter++;
+        }
+        for(unsigned i = 0; i <weight_size; i++) {
+            if(weight[i] == 0) {weight_counter++;}
+        }
+        std::cout << weight_counter << "/" << weight_size << std::endl;
+    }
+#endif
+
+#ifdef CHANNEL_PRUNING
+    if(pruning) {
+        std::vector<unsigned> indices(input_channel);
+        std::vector<unsigned> sorted(input_channel);
+        std::vector<float> weight_sum(input_channel);
+        iota(sorted.begin(), sorted.end(), 0);
+
+        //for(unsigned i = 0; i < output_channel; i++) {
+        //    // Initialize weight sum.
+        //    weight_sum.assign(input_channel, 0.0);
+        //    for(unsigned j = 0; j < input_channel; j++) {
+        //        for(unsigned k = 0; k < filter_size*filter_size; k++) {
+        //            weight_sum[j] += abs(weight[i*input_channel*filter_size*filter_size + j*filter_size*filter_size + k]);
+        //        }
+        //    }
+        //    indices = sorted;
+        //    std::sort(indices.begin(), indices.end(), [&](unsigned a, unsigned b) {
+        //        return weight_sum[a] < weight_sum[b];
+        //    });
+
+        //    // Set weight data to 0.
+        //    for(unsigned j = 0; j < channel_pruning; j++) {
+        //        for(unsigned k = 0; k < filter_size*filter_size; k++) {
+        //            weight[i*input_channel*filter_size*filter_size + indices[j]*filter_size*filter_size + k] = 0.0;
+        //        }
+        //    }
+        //}
+        unsigned weight_count = 0;
+        for(unsigned i = 0; i < weight_size; i++) {
+            if(weight[i] == 0.0) {weight_count++;}
+        }
+        std::cout << weight_count << "/" << weight_size << std::endl;
+    }
+#endif
+
     if(batch_normalize) {
         m_input_weight.read((char*)scale, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
@@ -190,13 +254,13 @@ void convolutional_layer_t::forward() {
     for(unsigned i = 0; i < input_size; i++) {
         if(input_data[i] == 0.0) { zero_input++;}
     }
-    std::cout << "Input data : " << (float)zero_input/(float)input_size << " ";
-
-    unsigned zero_weight = 0;
-    for(unsigned i = 0; i < weight_size; i++) {
-        if(weight[i] == 0.0) {zero_weight++;}
+    std::cout << "Input data : " << zero_input << "/" << input_size << " ";
+#elif CHANNEL_PRUNING
+    unsigned zero_input = 0;
+    for(unsigned i = 0; i < input_size; i++) {
+        if(input_data[i] == 0.0) { zero_input++;}
     }
-    std::cout << "Weight : " << (float)zero_weight/(float)weight_size << " ";
+    std::cout << "Input data : " << zero_input << "/" << input_size << " ";
 
 #endif
 	// Convolution
@@ -223,7 +287,6 @@ void convolutional_layer_t::forward() {
 					1.0,
 					&output_data[(i * group + j) * num_patches * num_filters / group], num_patches);
 #endif
-
 		}
 	}
 
@@ -243,7 +306,14 @@ void convolutional_layer_t::forward() {
         if(output_data[i] == 0.0) { zero_output++; }
     }
     std::cout << "Output data : " << (float)zero_output/(float)output_size << std::endl;
+#elif CHANNEL_PRUNING
+    unsigned zero_output = 0;
+    for(unsigned i = 0; i < output_size; i++) {
+        if(output_data[i] == 0.0) {zero_output++;}
+    }
+    std::cout << "Output data : " << (float)zero_output/(float)output_size << std::endl;
 #endif
+
 }
 
 void convolutional_layer_t::backward() {

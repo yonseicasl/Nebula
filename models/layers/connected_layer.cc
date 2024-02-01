@@ -61,6 +61,14 @@ void connected_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("output", &output_size);
     output_channel = output_size;
     m_section_config.get_setting("batch_normalize", &batch_normalize);  
+
+#ifdef PRUNING
+    m_section_config.get_setting("pruning", &pruning);
+    m_section_config.get_setting("ratio", &pruning_ratio);
+#elif CHANNEL_PRUNING
+    m_section_config.get_setting("pruning", &pruning);
+    m_section_config.get_setting("channel_pruning", &channel_pruning);
+#endif
     
     std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
@@ -110,6 +118,48 @@ void connected_layer_t::init(section_config_t m_section_config) {
 void connected_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, output_size * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
+
+#ifdef PRUNING
+    if(pruning) {
+        unsigned weight_counter = 0;
+        std::vector<unsigned> indices(weight_size);
+        std::vector<unsigned> sorted(weight_size);
+        iota(sorted.begin(), sorted.end(), 0);
+
+        indices = sorted;
+        std::sort(indices.begin(), indices.end(), [&](unsigned a, unsigned b) {
+                return abs(weight[a]) < abs(weight[b]);
+        });
+        for(unsigned i = 0; i < weight_size*pruning_ratio; i++) {
+            weight[indices[i]] = 0.0;
+            weight_counter++;
+        }
+        std::cout << weight_counter << "/" << weight_size << std::endl;
+    }
+#elif CHANNEL_PRUNING
+    if(pruning) {
+        std::vector<unsigned> indices(input_size);
+        std::vector<unsigned> sorted(input_size);
+        iota(sorted.begin(), sorted.end(), 0);
+
+        for(unsigned i = 0; i < output_size; i++) {
+            indices = sorted;
+            std::sort(indices.begin(), indices.end(), [&](unsigned a, unsigned b) {
+                return abs(weight[i*input_size + a]) < abs(weight[i*input_size + b]);
+            });
+
+            // Set weight data to 0.
+            for(unsigned j = 0; j < channel_pruning; j++) {
+                weight[i*input_size + indices[j]] = 0.0;
+            }
+        }
+        unsigned weight_count = 0;
+        for(unsigned i = 0; i < weight_size; i++) {
+            if(weight[i] == 0.0) {weight_count++;}
+        }
+        std::cout << weight_count << "/" << weight_size << std::endl;
+    }
+#endif
 
     if(batch_normalize) {
         m_input_weight.read((char*)beta, output_size * sizeof(float));
@@ -185,14 +235,6 @@ void connected_layer_t::forward() {
     // Activate function
     activate();
 
-#ifdef PRUNING
-    for(unsigned i = 0; i < output_size; i++) {
-
-        if(output_data[i] < network->data_threshold && output_data[i] > -network->data_threshold) {
-            output_data[i] = 0.0;
-        }
-    }
-#endif
 }
 
 void connected_layer_t::forward(float *m_input_data) {

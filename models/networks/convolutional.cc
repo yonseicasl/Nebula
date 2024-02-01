@@ -191,9 +191,10 @@ void convolutional_t::run(const std::string m_output_weight) {
             // Forward propagation
             forward();
 
+            print_results();
+
             std::cout << "done" << std::endl;
             // Print batch processing results.
-            //print_results();
         }
 		//print_results();
     }

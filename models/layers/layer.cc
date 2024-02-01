@@ -13,6 +13,9 @@ namespace nebula {
 layer_t::layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_type(m_layer_type),
     activation_type(UNDEFINED_ACTIVATION),
+    pruning_ratio(0.0),
+    channel_pruning(0.0),
+    pruning(false),
     input_height(1),
     input_width(1),
     input_channel(1),
