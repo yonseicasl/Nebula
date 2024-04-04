@@ -3,7 +3,7 @@
 print_help() {
     echo -e "Usage: $0 <network> <size>"
     echo -e ""
-    echo -e "<network> options: alexnet, dbn, mlp, resnet, vgg"
+    echo -e "<network> options: alexnet, dbn, mlp, resnet50, vgg"
     echo -e "<size> options: large, medium, small"
     exit 0
 }
@@ -65,11 +65,13 @@ weight_ID() {
 			FILEID="1dertTo4oNPxb8u4I3RVP9g1absIyAV78" ;;
 		dbn_small )
 			FILEID="1eT8bN0DPPtQNLumF92IEHQI31vTLV9gx" ;;
-		resnet_large )
-			FILEID="1XYuSRsPm1HlDXQRLtvTx9sVmXbgXTCG2" ;;
-		resnet_medium )
+		resnet50_large )
+			FILEID="9iotd5dh3yenn1v1gonee" 
+            RLKEY="mj4dfjtoyi7v353r44n8uxipk"
+            ;;
+		resnet50_medium )
             FILEID="1KzzvRJkYE4Qu5n7kjwBwbfKyAYYbROui" ;;
-		resnet_small )
+		resnet50_small )
             FILEID="1DlERgUr2dOPZbPUP16EZ7y2EWjxR0Qy5" ;;
 		rnn_large )
 			echo -e "Does not support weight file of $1"
@@ -96,6 +98,8 @@ weight_ID() {
 } 
 
 weight_ID $network
+
+cd weights
 
 wget --no-check-certificate "https://www.dropbox.com/scl/fi/$FILEID/$network.wgh?rlkey=$RLKEY"
 mv $network.wgh?rlkey=$RLKEY input.wgh 

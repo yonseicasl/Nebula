@@ -82,6 +82,8 @@ data_ID $dataset
 
 # Download Nebula dataset from Dropbox
 
+cd $datadir/$dataset
+
 wget --no-check-certificate "https://www.dropbox.com/scl/fi/$DATAID/$dataset.tar?rlkey=$RLKEY"
 mv $dataset.tar?rlkey=$RLKEY $dataset.tar
 
