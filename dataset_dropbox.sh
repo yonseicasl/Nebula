@@ -89,4 +89,3 @@ mv $dataset.tar?rlkey=$RLKEY $dataset.tar
 
 # Unzip the dataset and make list(label list, test list, and train list)
 tar xf $dataset.tar && rm $dataset.tar
-sh list.sh && rm list.sh 
