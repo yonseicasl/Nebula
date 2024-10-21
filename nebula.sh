@@ -43,7 +43,7 @@ mopt="CC=$cc CU=$cu DIR=$nebuladir LIB=$lib"
 ccopt="-Wall -fPIC -I$commondir -I$networkdir -I$layerdir -DUSE_BLAS"
 # Linker options
 ldopt="-L$libdir"
-libopt="-lnebula -lopenblas -lpthread `pkg-config --libs opencv`"
+libopt="-lnebula -lopenblas -lpthread `pkg-config --libs opencv4`"
 # C++ version
 stdc="-std=c++11"
 # CUDA support
@@ -125,6 +125,10 @@ cudnn_enabled=0
 custom_blas=0
 # Do not load weight for training by default.
 load_weight=0
+# Pruning
+pruning=0
+# Channel pruning
+chan_prune=0
 
 # Parse optional arguments for load weight when training.
 while [[ "$1" != '' ]]; do
@@ -162,6 +166,14 @@ fi
 # Append Makefile options when select custom blas.
 if [[ $custom_blas -eq 1 ]]; then
 	ccopt+=" -DCUSTOM_BLAS"
+fi
+
+if [[ $pruning -eq 1 ]]; then
+    ccopt+=" -DPRUNING"
+fi
+
+if [[ $chan_prune -eq 1 ]]; then
+    ccopt+=" -DCHANNEL_PRUNING"
 fi
 
 # Makefile MFLAG
