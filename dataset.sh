@@ -41,23 +41,38 @@ fi
 data_ID() {
 	case $dataset in 
 		imagenet_large )
-            DATAID="1qUzFfKqihTVsH9kds0taYYu2Vc7lrIcs" ;;
+            DATAID="o1yo5az42nsfj8gezb5d1"
+            RLKEY="2nebshox1jbjy7xlosqkgqhxg"
+            ;;
 		imagenet_medium )
-            DATAID="1RspmHUeV3qyOYnqtbramv61mCDiu1B7r" ;;
+            DATAID="o1yo5az42nsfj8gezb5d1"
+            RLKEY="2nebshox1jbjy7xlosqkgqhxg"
+            ;;
 		imagenet_small )
-			DATAID="1ueT5X7ICjuBuC9DkVGWm8j6u7hWakCNn" ;;
+            DATAID="7560yxeurqs5qcvyhadrx"
+            RLKEY="6vy9q68zgz26lwp1v580mgt63"
+            ;;
 		nist_large )
-			DATAID="1TO1cIXUQtNeb3InQf4iDV9hDbA97MJGx" ;;
+            DATAID="ww9hoxm3rdyyr5edvdhbb"
+            RLKEY="8s4kgzb4sftwy2d7mscn8d5np"
+            ;;
 		nist_medium )
-			DATAID="1d_Wue5Dype3KucgWZnqQbhqGcGd20o8E" ;;
+            DATAID="c1d2hkksij0ghv863tqwd"
+            RLKEY="6s4wh8i368xwiz1s96b2o58lu"
+            ;;
 		nist_small )
-			DATAID="1ufIjaGJTJNdyAdY-jZkx9PUSshqYeEIX" ;;
+            DATAIS="wstw38ckcv0d0b9cbfei9"
+            RLKEY="kwu05v94gnagrw3lzf7nz59js"
+            ;;
 		ptb_large )
-            DATAID="1ErHMRMyxTNqaEKk4tuPrq-f-EVpW0enK" ;;
+            echo -e "Does not support dataset of $1" 
+			exit 1 ;;
 		ptb_medium )
-            DATAID="164c-EBWwPmcfUUeauBwCS5tx1CCO8uXQ" ;;
+            echo -e "Does not support dataset of $1" 
+			exit 1 ;;
 		ptb_small )
-            DATAID="1WImqQjk1hC4ZtNWci29zl8f8Zfmv4RbX" ;;
+            echo -e "Does not support dataset of $1" 
+			exit 1 ;;
 		mnist )
             echo -e "Does not support dataset of $1" 
 			exit 1 ;;
@@ -75,13 +90,15 @@ if [[ ! -d $datadir/$dataset ]]; then
 	mkdir $datadir/$dataset
 fi
 
-# Get google drive ID of Nebula dataset.
+# Get Dropbox ID of Nebula dataset
 data_ID $dataset
-# Download Nebula dataset from google drive.
-# Store the dataset to data directory
+
+# Download Nebula dataset from Dropbox
+
 cd $datadir/$dataset
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$DATAID" -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=$DATAID" -O $dataset.tar && rm -rf /tmp/cookies.txt
+
+wget --no-check-certificate "https://www.dropbox.com/scl/fi/$DATAID/$dataset.tar?rlkey=$RLKEY"
+mv $dataset.tar?rlkey=$RLKEY $dataset.tar
 
 # Unzip the dataset and make list(label list, test list, and train list)
 tar xf $dataset.tar && rm $dataset.tar
-sh list.sh && rm list.sh 

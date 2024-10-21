@@ -1,10 +1,9 @@
 #!/bin/bash
 
-
 print_help() {
     echo -e "Usage: $0 <network> <size>"
     echo -e ""
-    echo -e "<network> options: alexnet, dbn, mlp, resnet, vgg"
+    echo -e "<network> options: alexnet, dbn, mlp, resnet50, vgg"
     echo -e "<size> options: large, medium, small"
     exit 0
 }
@@ -34,8 +33,6 @@ fi
 
 # Nebula main directory
 nebuladir=$PWD
-# Benchmark directory
-benchdir=$PWD/benchmarks/$network
 
 ##### Translate google drive ID of Nebula benchmark #####
 weight_ID() {
@@ -43,7 +40,9 @@ weight_ID() {
 		lenet )
 			FILEID="1i1FvFqeyjlTAqyh0Dji9FUo97uhbFXxR" ;;
 		alexnet_large )
-			FILEID="1CJyYVci0vgjZAf3kl_i1_VJaowFkZ6qV" ;;
+			FILEID="aq8rxjj5w3a4akkaqy8n7"
+            RLKEY="3c4y0yuc6366c1e6enj55o1bq"
+            ;;
 		alexnet_medium )
             FILEID="1MYFsiV-LHt4sK-OumUlbfWooOcsFze7Y" ;;
 		alexnet_small )
@@ -66,11 +65,13 @@ weight_ID() {
 			FILEID="1dertTo4oNPxb8u4I3RVP9g1absIyAV78" ;;
 		dbn_small )
 			FILEID="1eT8bN0DPPtQNLumF92IEHQI31vTLV9gx" ;;
-		resnet_large )
-			FILEID="1XYuSRsPm1HlDXQRLtvTx9sVmXbgXTCG2" ;;
-		resnet_medium )
+		resnet50_large )
+			FILEID="9iotd5dh3yenn1v1gonee" 
+            RLKEY="mj4dfjtoyi7v353r44n8uxipk"
+            ;;
+		resnet50_medium )
             FILEID="1KzzvRJkYE4Qu5n7kjwBwbfKyAYYbROui" ;;
-		resnet_small )
+		resnet50_small )
             FILEID="1DlERgUr2dOPZbPUP16EZ7y2EWjxR0Qy5" ;;
 		rnn_large )
 			echo -e "Does not support weight file of $1"
@@ -96,12 +97,9 @@ weight_ID() {
 	esac
 } 
 
-# Get google drive ID of nebula benchmark target.
 weight_ID $network
 
-# Download Nebula benchmark weight from google drive.
-# store the weight to each benchmark directory with the name of <input.wgh>.
-cd $benchdir
+cd weights
 
-# Get weight from google drive.
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$FILEID" -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=$FILEID" -O input.wgh && rm -rf /tmp/cookies.txt
+wget --no-check-certificate "https://www.dropbox.com/scl/fi/$FILEID/$network.wgh?rlkey=$RLKEY"
+mv $network.wgh?rlkey=$RLKEY input.wgh 
