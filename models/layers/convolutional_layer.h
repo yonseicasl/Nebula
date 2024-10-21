@@ -43,6 +43,12 @@ public:
 #endif
 
 private:
+    
+    float input_threshold;
+    float weight_threshold;
+    unsigned channel_pruning;
+    bool  pruning;
+
     float *workspace;               // Workspace
     size_t workspace_size;          // workspace size
 

@@ -110,7 +110,6 @@ extern "C++" void convolutional_layer_t::_backward_() {
 					input_channel/group, input_height, input_width, filter_size, stride, padding,
 					workspace_dev);
 #ifdef CUSTOM_BLAS
-
 			_gemm_(CUBLAS_OP_T, CUBLAS_OP_N, patch_size, num_filters/group, num_patches, 
 					alpha, 
 					workspace_dev, num_patches,
@@ -173,6 +172,52 @@ extern "C++" void convolutional_layer_t::_update_() {
     cublasSaxpy(network->cublas_handle, num_filters, 
                 &learning_rate, bias_update_dev, 1, bias_dev, 1);
     cublasSscal(network->cublas_handle, num_filters, &momentum, bias_update_dev, 1);
+#endif
+
+#ifdef PRUNING
+    if(pruning) {
+        cudaMemcpy(weight, weight_dev, weight_size*sizeof(float), cudaMemcpyDeviceToHost);
+        for(unsigned i = 0; i < weight_size; i++) {
+            if(weight[i] < weight_threshold && weight[i] > -weight_threshold) {
+                weight[i] = 0.0;
+            }
+        }
+        cudaMemcpy(weight_dev, weight, weight_size*sizeof(float), cudaMemcpyHostToDevice);
+    }
+#endif
+
+#ifdef CHANNEL_PRUNING
+    if(pruning) {
+        cudaMemcpy(weight, weight_dev, weight_size*sizeof(float), cudaMemcpyDeviceToHost);
+        std::vector<unsigned> indices(input_channel);
+        std::vector<unsigned> sorted(input_channel);
+        std::vector<float> weight_sum(input_channel);
+        for(unsigned i = 0; i < input_channel; i++) {
+            sorted[i] = i;
+        }
+
+        for(unsigned i = 0; i < output_channel; i++) {
+            // Initialize weight sum.
+            weight_sum.assign(input_channel, 0.0);
+            for(unsigned j = 0; j < input_channel; j++) {
+                for(unsigned k = 0; k < filter_size*filter_size; k++) {
+                    weight_sum[j] += weight[i*input_channel*filter_size*filter_size + j*filter_size*filter_size + k];
+                }
+            }
+            indices = sorted;
+            std::sort(indices.begin(), indices.end(), [&](unsigned a, unsigned b) {
+                return weight_sum[a] < weight_sum[b];
+            });
+
+            // Set weight data to 0.
+            for(unsigned j = 0; j < channel_pruning; j++) {
+                for(unsigned k = 0; k < filter_size*filter_size; k++) {
+                    weight[i*input_channel*filter_size*filter_size + indices[j]*filter_size*filter_size + k] = 0.0;
+                }
+            }
+        }
+        cudaMemcpy(weight_dev, weight, weight_size*sizeof(float), cudaMemcpyHostToDevice);
+    }
 #endif
 }
 

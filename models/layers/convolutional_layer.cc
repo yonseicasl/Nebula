@@ -19,6 +19,10 @@ namespace nebula {
 
 convolutional_layer_t::convolutional_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
+    input_threshold(0.0),
+    weight_threshold(0.0),
+    channel_pruning(0),
+    pruning(false),
     workspace(NULL),
     workspace_size(0),
     bias(NULL),
@@ -120,6 +124,16 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     m_section_config.get_setting("padding", &padding);
     m_section_config.get_setting("stride", &stride);
 
+#ifdef PRUNING
+    m_section_config.get_setting("input_threshold", &input_threshold);
+    m_section_config.get_setting("weight_threshold", &weight_threshold);
+    m_section_config.get_setting("pruning", &pruning);
+#endif
+#ifdef CHANNEL_PRUNING
+    m_section_config.get_setting("pruning", &pruning);
+    m_section_config.get_setting("channel_pruning", &channel_pruning);
+#endif
+
     std::string activation_str;
     if(m_section_config.get_setting("activation", &activation_str)) {
         activation_type = (activation_type_t)get_type(activation_type_str, activation_str);
@@ -148,9 +162,6 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
     workspace = new float[workspace_size]();
-
-    // Print out structure of the network.
-    //std::cout << input_height << " " << input_width << " " << input_channel << " " << filter_size << " " << filter_size << " " << num_filters << std::endl;
 
     // Initialize parameters for batch normalization.
     if(batch_normalize) {
@@ -246,7 +257,58 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
 void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, num_filters * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
-   
+
+#ifdef PRUNING
+    if(pruning) {
+        unsigned weight_counter = 0;
+        for(unsigned i = 0; i < weight_size; i++) {
+            if(weight[i] < weight_threshold && weight[i] > -weight_threshold) {
+                weight[i] = 0.0;
+                weight_counter++;
+            }
+        }
+        std::cout << weight_counter << "/" << weight_size << std::endl;
+    }
+#endif
+
+#ifdef CHANNEL_PRUNING
+    if(pruning) {
+        std::vector<unsigned> indices(input_channel);
+        std::vector<unsigned> sorted(input_channel);
+        std::vector<float> weight_sum(input_channel);
+        iota(sorted.begin(), sorted.end(), 0);
+        //for(unsigned i = 0; i < input_channel; i++) {
+        //    std::cout << sorted[i] << " ";
+        //} std::cout << std::endl;
+
+        for(unsigned i = 0; i < output_channel; i++) {
+            // Initialize weight sum.
+            weight_sum.assign(input_channel, 0.0);
+            for(unsigned j = 0; j < input_channel; j++) {
+                for(unsigned k = 0; k < filter_size*filter_size; k++) {
+                    weight_sum[j] += weight[i*input_channel*filter_size*filter_size + j*filter_size*filter_size + k];
+                }
+            }
+            indices = sorted;
+            std::sort(indices.begin(), indices.end(), [&](unsigned a, unsigned b) {
+                return weight_sum[a] < weight_sum[b];
+            });
+
+            // Set weight data to 0.
+            for(unsigned j = 0; j < channel_pruning; j++) {
+                for(unsigned k = 0; k < filter_size*filter_size; k++) {
+                    weight[i*input_channel*filter_size*filter_size + indices[j]*filter_size*filter_size + k] = 0.0;
+                }
+            }
+        }
+        unsigned weight_count = 0;
+        for(unsigned i = 0; i < weight_size; i++) {
+            if(weight[i] == 0.0) {weight_count++;}
+        }
+        std::cout << weight_count << "/" << weight_size << std::endl;
+    }
+#endif
+
     if(batch_normalize) {
         m_input_weight.read((char*)scale, num_filters * sizeof(float));
         m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
