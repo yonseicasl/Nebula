@@ -18,6 +18,9 @@ namespace nebula {
 
 rbm_layer_t::rbm_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
+#ifdef QUANTIZATION
+    step_size(0.0),
+#endif
     weight(NULL),
     weight_update(NULL),
     weight_size(0),
@@ -150,6 +153,14 @@ void rbm_layer_t::init(section_config_t m_section_config) {
 void rbm_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)hidden_bias, output_size * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
+    
+#ifdef QUANTIZATION
+    for(unsigned i = 0; i < weight_size; i++) {
+        step_size += fabs(weight[i]);
+    }
+    step_size /= weight_size;
+#endif
+
 #ifdef GPU_ENABLED
     cudaMemcpy(hidden_bias_dev, hidden_bias, output_size * sizeof(float), cudaMemcpyHostToDevice); 
     cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);
@@ -165,6 +176,14 @@ void rbm_layer_t::init_weight() {
     for(unsigned i = 0; i < weight_size; i++) {
         weight[i] = sqrt(2.0 / input_size) * dist(rng);
     }
+
+#ifdef QUANTIZATION
+    for(unsigned i = 0; i < weight_size; i++) {
+        step_size += fabs(weight[i]);
+    }
+    step_size /= weight_size;
+#endif
+
 #ifdef GPU_ENABLED 
     cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);    
 #endif
@@ -346,6 +365,20 @@ void rbm_layer_t::forward() {
     memset(output_data, 0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0, output_size * network->batch_size * sizeof(float));
     float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+
+#ifdef QUANTIZATION
+    if(network->iteration%100==99) {
+        quantization(weight, DATA_BIT, weight_size, step_size, false); 
+        for(unsigned i = 0; i < network->batch_size; i++) {
+            float t_step_size = 0.0;
+            for(unsigned j = 0; j < input_size; j++) {
+                t_step_size += 2*fabs(input_data[j]);
+            }
+            t_step_size /= input_size;
+            quantization(input_data + i*input_size, DATA_BIT, input_size, t_step_size, false);
+        }
+    }
+#endif
    
     // Matrix multiplication
 #ifdef CUSTOM_BLAS

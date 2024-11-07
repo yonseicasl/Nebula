@@ -196,5 +196,35 @@ void backward_bias(unsigned num_threads, float *m_bias_update, float *m_delta,
     } std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
+
+float gradscale(float m_value, float m_scale, bool backward) {
+    if(!backward) { return m_value; }
+    else { return m_value*m_scale; }
+}
+
+float roundpass(float m_value, bool backward) {
+    if(!backward) { return round(m_value); }
+    else { return m_value; }
+}
+
+void quantization(float *m_source, unsigned bit_precision, unsigned m_size, float m_step_size, bool backward) {
+    float ret_min = -pow(2,bit_precision-1);
+    float ret_max = pow(2,bit_precision-1)-1;
+
+    m_step_size /= sqrt(ret_max);
+
+    float grad_scale = 1/sqrt(ret_max*m_size);
+    float s_scale = gradscale(m_step_size, grad_scale, backward);
+    for(unsigned i = 0; i < m_size; i++) {
+        m_source[i] = m_source[i]/s_scale;
+        if(m_source[i] < ret_min) {m_source[i] = ret_min;}
+        else if(m_source[i] > ret_max) {m_source[i] = ret_max;}
+        m_source[i] = roundpass(m_source[i], backward);
+        //std::cout << m_source[i] << " ";
+        //if(i%30==29){ std::cout << std::endl; }
+        m_source[i] = m_source[i]*s_scale;
+    }
+}
+
 }
 // End of namespace nebula.

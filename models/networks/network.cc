@@ -21,6 +21,7 @@ network_t::network_t() :
     input_channel(1),
     input_size(0),
     batch_size(1),
+    iteration(0),
     time_step(1),
     input_data(NULL),
     input_label(NULL),
@@ -37,7 +38,6 @@ network_t::network_t() :
     num_layers(0),
     num_classes(0),
     num_iterations(0),
-    iteration(0),
     top_k(1),
 	pipe_index(0),
     cumulative_cost(0.0) {

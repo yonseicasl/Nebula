@@ -15,7 +15,13 @@ extern "C++" void connected_layer_t::_forward_() {
     const float beta  = 1.0;
     float *input_data_dev = prev_layer ? prev_layer->output_data_dev : network->input_data_dev;
 
-
+//#ifdef QUANTIZATION
+//    cudaMemcpy(weight, weight_dev, 
+//               weight_size*sizeof(float), cudaMemcpyDeviceToHost);
+//    quantization(weight, DATA_BIT, weight_size, step_size, false);
+//    cudaMemcpy(weight_dev, weight, 
+//               weight_size*sizeof(float), cudaMemcpyHostToDevice);
+//#endif
 
     // Matrix multiplication
 #ifdef CUSTOM_BLAS
@@ -44,6 +50,16 @@ extern "C++" void connected_layer_t::_forward_() {
     _forward_bias_(output_data_dev, bias_dev, 1, output_size, network->batch_size);
     // Activate function
     _activate_();
+
+//#ifdef QUANTIZATION
+//  cudaMemcpy(output_data, output_data_dev, 
+//             output_size*network->batch_size*sizeof(float), cudaMemcpyDeviceToHost);
+//  //for(unsigned i = 0; i < network->batch_size; i++) {
+//  quantization(output_data, DATA_BIT, output_size*network->batch_size, false);
+//  //}
+//  cudaMemcpy(output_data_dev, output_data, 
+//             output_size*network->batch_size*sizeof(float), cudaMemcpyHostToDevice);
+//#endif
 }
 
 extern "C++" void connected_layer_t::_forward_(float *m_input_data_dev) {

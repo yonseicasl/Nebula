@@ -19,6 +19,9 @@ namespace nebula {
 
 connected_layer_t::connected_layer_t(network_t *m_network, layer_t *m_prev_layer, layer_type_t m_layer_type) :
     layer_t(m_network, m_prev_layer, m_layer_type),
+#ifdef QUANTIZATION
+    step_size(0.0),
+#endif
     bias(NULL),
     bias_update(NULL),
     weight(NULL),
@@ -187,11 +190,19 @@ void connected_layer_t::init_weight(std::fstream &m_input_weight) {
     m_input_weight.read((char*)bias, output_size * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
     
+#ifdef QUANTIZATION
+    for(unsigned i = 0; i < weight_size; i++) {
+        step_size += fabs(weight[i]);
+    }
+    step_size /= weight_size;
+#endif
+
     if(batch_normalize) {
         m_input_weight.read((char*)scale, output_size * sizeof(float));
         m_input_weight.read((char*)rolling_mean, output_size * sizeof(float));
         m_input_weight.read((char*)rolling_variance, output_size * sizeof(float));
     }
+
 #ifdef GPU_ENABLED
     cudaMemcpy(bias_dev, bias, output_size * sizeof(float), cudaMemcpyHostToDevice); 
     cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);
@@ -215,6 +226,14 @@ void connected_layer_t::init_weight() {
     for(unsigned i = 0; i < weight_size; i++) {
         weight[i] = sqrt(2.0 / input_size) * dist(rng);
     }
+
+#ifdef QUANTIZATION
+    for(unsigned i = 0; i < weight_size; i++) {
+        step_size += fabs(weight[i]);
+    }
+    step_size /= (float)weight_size;
+#endif
+
 #ifdef GPU_ENABLED 
     cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);    
 #endif
@@ -246,6 +265,20 @@ void connected_layer_t::forward() {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
     float *input_data = prev_layer ? prev_layer->output_data : network->input_data;
+
+#ifdef QUANTIZATION
+    //if(network->iteration%100==99) {
+        quantization(weight, DATA_BIT, weight_size, step_size, false); 
+        for(unsigned i = 0; i < network->batch_size; i++) {
+            float t_step_size = 0.0;
+            for(unsigned j = 0; j < input_size; j++) {
+                t_step_size += fabs(input_data[j]);
+            }
+            t_step_size /= input_size;
+            quantization(input_data + i*input_size, DATA_BIT, input_size, t_step_size, false);
+        }
+    //}
+#endif
    
 // Matrix multiplication
 #ifdef CUSTOM_BLAS
@@ -279,7 +312,7 @@ void connected_layer_t::forward() {
 void connected_layer_t::forward(float *m_input_data) {
     memset(output_data, 0.0, output_size * network->batch_size * sizeof(float));
     memset(delta , 0.0, output_size * network->batch_size * sizeof(float));
-   
+
     float *input_data = m_input_data ? m_input_data :   
                         prev_layer ? prev_layer->output_data : network->input_data;
 // Matrix multiplication
@@ -309,7 +342,6 @@ void connected_layer_t::forward(float *m_input_data) {
    
     // Activate function
     activate();
-
 }
 
 void connected_layer_t::backward() {

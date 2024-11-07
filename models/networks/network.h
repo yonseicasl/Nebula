@@ -9,6 +9,7 @@
         #include <cudnn.h>
     #endif
 #endif
+#include "data-def.h"
 #include "def.h"
 #include "stopwatch.h"
 
@@ -47,10 +48,11 @@ public:
     unsigned input_channel;                 // Input data channel
     unsigned input_size;                    // Input data size
     unsigned batch_size;                    // Batch size
+    unsigned iteration;                     // Number of processed batches
 
     unsigned time_step;                     // Time steps used for recurrent networks
 
-    float *input_data;                      // Input data
+    float *input_data;                     // Input data
     float *input_label;                     // Input label
     
 #ifdef GPU_ENABLED
@@ -87,7 +89,6 @@ protected:
     unsigned num_layers;                    // Number of layers
     unsigned num_classes;                   // Number of output classes
     unsigned num_iterations;                // Number of iterations to run
-    unsigned iteration;                     // Number of processed batches
     unsigned epoch_length;                  // Number of iterations in an epoch
     unsigned top_k;                         // Top-k indices for inference
 	unsigned pipe_index;					// Index of the layer.

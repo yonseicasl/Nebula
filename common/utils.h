@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "data-def.h"
 
 namespace nebula {
 
@@ -59,6 +60,10 @@ void _forward_bias_(float *m_output_data_dev, float *m_bias_dev,
 void _backward_bias_(float *m_bias_update_dev, float *m_delta_dev, 
                      unsigned m_channel, unsigned m_size, unsigned m_batch);
 #endif
+
+float gradscale(float m_value, float m_scale, bool backward);
+float roundpass(float m_vlue, bool backward);
+void quantization(float *m_source, unsigned bit_precision, unsigned m_size, float m_step_size, bool backward);
 
 }
 // End of namespace nebula.

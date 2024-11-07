@@ -189,7 +189,7 @@ void convolutional_t::run(const std::string m_output_weight) {
 		unsigned batch_count = num_iterations -1;
         
         for(iteration = 0; iteration < batch_count; iteration++) {
-            // Loda batch data.
+            // Load batch data.
             load_data(iteration);
             // Forward propagation
             forward();
@@ -413,6 +413,10 @@ void convolutional_t::load_data(const unsigned m_batch_index) {
                 }
             }, tid * batch_size / num_threads, (tid + 1) * batch_size / num_threads, tid));
         } std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
+    }
+
+    for(unsigned i = 0; i < input_size * batch_size;  i++) {
+        input_data[i] = 1.0 - input_data[i];
     }
 
 #ifdef GPU_ENABLED

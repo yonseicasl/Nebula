@@ -211,6 +211,14 @@ extern "C++" void rbm_layer_t::_forward_() {
     const float beta  = 1.0;
     float *input_data_dev = prev_layer ? prev_layer->output_data_dev : network->input_data_dev;
 
+#ifdef QUANTIZATION
+    cudaMemcpy(weight, weight_dev, 
+               weight_size*sizeof(float), cudaMemcpyDeviceToHost);
+    quantization(weight, DATA_BIT, weight_size, step_size, false);
+    cudaMemcpy(weight_dev, weight, 
+               weight_size*sizeof(float), cudaMemcpyHostToDevice);
+#endif
+
 #ifdef CUSTOM_BLAS
   
     _gemm_(CUBLAS_OP_T, CUBLAS_OP_N,

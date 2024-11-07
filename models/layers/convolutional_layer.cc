@@ -255,8 +255,15 @@ void convolutional_layer_t::init(section_config_t m_section_config) {
 }
 
 void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
+
     m_input_weight.read((char*)bias, num_filters * sizeof(float));
     m_input_weight.read((char*)weight, weight_size * sizeof(float));
+
+    if(batch_normalize) {
+        m_input_weight.read((char*)scale, num_filters * sizeof(float));
+        m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
+        m_input_weight.read((char*)rolling_variance, num_filters * sizeof(float));
+    }
 
 #ifdef PRUNING
     if(pruning) {
@@ -277,9 +284,6 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
         std::vector<unsigned> sorted(input_channel);
         std::vector<float> weight_sum(input_channel);
         iota(sorted.begin(), sorted.end(), 0);
-        //for(unsigned i = 0; i < input_channel; i++) {
-        //    std::cout << sorted[i] << " ";
-        //} std::cout << std::endl;
 
         for(unsigned i = 0; i < output_channel; i++) {
             // Initialize weight sum.
@@ -309,11 +313,6 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
     }
 #endif
 
-    if(batch_normalize) {
-        m_input_weight.read((char*)scale, num_filters * sizeof(float));
-        m_input_weight.read((char*)rolling_mean, num_filters * sizeof(float));
-        m_input_weight.read((char*)rolling_variance, num_filters * sizeof(float));
-    }
 #ifdef GPU_ENABLED
     cudaMemcpy(bias_dev, bias, num_filters * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);
@@ -326,15 +325,17 @@ void convolutional_layer_t::init_weight(std::fstream &m_input_weight) {
                    num_filters * sizeof(float), cudaMemcpyHostToDevice);
     }
 #endif
+
 }
 
 void convolutional_layer_t::init_weight() {
     std::minstd_rand rng(std::random_device{}());
     std::normal_distribution<float> dist(0.0, 1.0);
-    
+
     for(unsigned i = 0; i < weight_size; i++) {
         weight[i] = sqrt(2.0 / (filter_size * filter_size * input_channel / group)) * dist(rng);
     }
+
 #ifdef GPU_ENABLED
     cudaMemcpy(weight_dev, weight, weight_size * sizeof(float), cudaMemcpyHostToDevice);
 #endif

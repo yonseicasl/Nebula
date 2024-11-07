@@ -99,7 +99,9 @@ size=${1,,}; shift
 
 # Concat the size option to the benchmark.
 if [[ $target != 'lib' && $target != 'all' ]]; then
-    if [[ $size = 'small' ]]; then
+    if [[ $size = 'tiny' ]]; then
+        target+=_tiny
+    elif [[ $size = 'small' ]]; then
         target+=_small
     elif [[ $size = 'medium' ]]; then
         target+=_medium
@@ -129,6 +131,8 @@ load_weight=0
 pruning=0
 # Channel pruning
 chan_prune=0
+# quantization
+quantization=1
 
 # Parse optional arguments for load weight when training.
 while [[ "$1" != '' ]]; do
@@ -174,6 +178,10 @@ fi
 
 if [[ $chan_prune -eq 1 ]]; then
     ccopt+=" -DCHANNEL_PRUNING"
+fi
+
+if [[ $quantization -eq 1 ]]; then
+    ccopt+=" -DQUANTIZATION"
 fi
 
 # Makefile MFLAG

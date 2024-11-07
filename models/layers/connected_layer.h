@@ -51,6 +51,10 @@ public:
 #endif
 
 private:
+
+#ifdef QUANTIZATION
+    float step_size;
+#endif
     float *bias;                    // Bias.
     float *bias_update;             // Bias update.
 
