@@ -41,8 +41,8 @@ fi
 data_ID() {
 	case $dataset in 
 		imagenet_large )
-            DATAID="o1yo5az42nsfj8gezb5d1"
-            RLKEY="2nebshox1jbjy7xlosqkgqhxg"
+            DATAID="dk7dqy27equ0qbxsx71so"
+            RLKEY="v0zt350i6swoph5dhb0yue7r6"
             ;;
 		imagenet_medium )
             DATAID="o1yo5az42nsfj8gezb5d1"
@@ -102,3 +102,5 @@ mv $dataset.tar?rlkey=$RLKEY $dataset.tar
 
 # Unzip the dataset and make list(label list, test list, and train list)
 tar xf $dataset.tar && rm $dataset.tar
+
+./list.sh 
