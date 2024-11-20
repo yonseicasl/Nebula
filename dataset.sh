@@ -45,8 +45,8 @@ data_ID() {
             RLKEY="v0zt350i6swoph5dhb0yue7r6"
             ;;
 		imagenet_medium )
-            DATAID="o1yo5az42nsfj8gezb5d1"
-            RLKEY="2nebshox1jbjy7xlosqkgqhxg"
+            DATAID="hh5x16pdokes2wmbwos54"
+            RLKEY="ce6nspqvyrylknemr69s6rsr9"
             ;;
 		imagenet_small )
             DATAID="7560yxeurqs5qcvyhadrx"
