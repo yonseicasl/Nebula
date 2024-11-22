@@ -3,6 +3,20 @@ Developed by Bogil Kim, Sungjae Lee, Chanho Park, Hyeonjin Kim, and William J. S
 Intelligent Computing Systems Lab, Yonsei University\
 Current release: v1.4.1 (Nov. 2020)
 
+## Update 
+We do not provide ImageNet large and medium datasets due to limited space quota of our cloud drive. If you want to execute DNN workloads with ImageNet large and medium datasets. Please download ImageNet dataset (ILSVRC2012) at the following link: 
+https://image-net.org/challenges/LSVRC/2012/2012-downloads.php
+After downloading training and validation images, it is required to move training datasets to train directory.
+
+    $ mkdir train
+    $ mv ILSVRC2012_img_train.tar train
+
+And, unzip training and test datasets with the following command. 
+
+    $ tar xf ILSVRC2012_img_val_v10102019.tar
+    $ cd train/
+    $ tar xf ILSVRC2012_img_train.tar
+
 ## Introduction
 The evolution of computing systems and explosive data production propel the advance of machine learning. As neural networks become increasingly important applications, developing neural network benchmarks has emerged as an imminent engineering challenge to tackle. Recent neural networks tend to form deeper networks to enhance accuracy and applicability, but such approaches impose great challenges on the modeling, simulation, and analysis of computing systems since they require unbearably long execution time to process a large amount of operations and sizable data. Neural networks are mostly comprised of matrix and vector calculations that repeat numerous times on multi-dimensional data across channels, layers, batches, etc. This observation becomes a motive to develop a lightweight neural network benchmark suite named Nebula.
 
@@ -37,11 +51,11 @@ https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html. For example
     $ sudo chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn*
 
 ## Download
-The latest release of Nebula benchmark suite is v1.4.1 (as of Nov., 2020). To obatin a copy of Nebula v1.4,1, use the following git command in a terminal.
+The latest release of Nebula benchmark suite is v1.4.1 (as of Nov., 2020). To obtain a copy of Nebula v1.4,1, use the following git command in a terminal.
 
     $ git clone --branch v1.4.1 https://github.com/yonsei-icsl/nebula
 
-Or, if you wish to use the latest development version, simply clone the git respository as is.
+Or, if you wish to use the latest development version, simply clone the git repository as is.
 
     $ git clone https://github.com/yonsei-icsl/nebula
 
@@ -125,4 +139,4 @@ To reference our work, please use our TC paper.
         pages   = {1887-1900},
     }
 
-For troubleshooting, bug reports, or any questions regarding the use of Nebula benchmark suite, please contact Bogil Kim via email: bogilkim {\at} yonsei {\dot} ac {\dot} kr. Or, visit our lab webpage: https://icsl.yonsei.ac.kr
+For troubleshooting, bug reports, or any questions regarding the use of Nebula benchmark suite, please contact Bogil Kim via email: bogilkim {\at} yonsei {\dot} ac {\dot} kr. Or, visit our lab webpage: https://casl.yonsei.ac.kr

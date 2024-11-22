@@ -49,30 +49,33 @@ data_ID() {
             RLKEY="ce6nspqvyrylknemr69s6rsr9"
             ;;
 		imagenet_small )
-            DATAID="7560yxeurqs5qcvyhadrx"
-            RLKEY="6vy9q68zgz26lwp1v580mgt63"
+            DATAID="wwnpvkhp05ab5fvidccfy"
+            RLKEY="2oiprelet8e3decgxy8fah9qi"
             ;;
 		nist_large )
-            DATAID="ww9hoxm3rdyyr5edvdhbb"
-            RLKEY="8s4kgzb4sftwy2d7mscn8d5np"
+            DATAID="4n2tqnmz6z67iemky0vfg"
+            RLKEY="ikz2l8bpdza10uuhg5s8hznsh"
             ;;
 		nist_medium )
-            DATAID="c1d2hkksij0ghv863tqwd"
-            RLKEY="6s4wh8i368xwiz1s96b2o58lu"
+            DATAID="vw2kli048c0u2g5ba5si3"
+            RLKEY="09yjc2esgbrgfzy6cei28l8sn"
             ;;
 		nist_small )
-            DATAIS="wstw38ckcv0d0b9cbfei9"
-            RLKEY="kwu05v94gnagrw3lzf7nz59js"
+            DATAID="6n3prj8gtf1yjghsls740"
+            RLKEY="fiwqracaf1aep73upk4mc3dba"
             ;;
 		ptb_large )
-            echo -e "Does not support dataset of $1" 
-			exit 1 ;;
+            DATAID="5g3whqx7wu91u4oabwihg"
+            RLKEY="jeyenm1qr4t1ctgkhlby9j2qj"
+            ;;
 		ptb_medium )
-            echo -e "Does not support dataset of $1" 
-			exit 1 ;;
+            DATAID="5krv13vfjiu2snfbv8csk"
+            RLKEY="5wnpae1s3zco7gw91oz68yjvf"
+            ;;
 		ptb_small )
-            echo -e "Does not support dataset of $1" 
-			exit 1 ;;
+            DATAID="fcbv4uyeb9vd1h194livu"
+            RLKEY="lyom6acdjhpz6vxm85uxjgre6"
+            ;;
 		mnist )
             echo -e "Does not support dataset of $1" 
 			exit 1 ;;
@@ -101,6 +104,6 @@ wget --no-check-certificate "https://www.dropbox.com/scl/fi/$DATAID/$dataset.tar
 mv $dataset.tar?rlkey=$RLKEY $dataset.tar
 
 # Unzip the dataset and make list(label list, test list, and train list)
-tar xf $dataset.tar && rm $dataset.tar
+tar jxf $dataset.tar && rm $dataset.tar
 
 ./list.sh 
