@@ -49,8 +49,23 @@ data_ID() {
             RLKEY="ce6nspqvyrylknemr69s6rsr9"
             ;;
 		imagenet_small )
-            DATAID="wwnpvkhp05ab5fvidccfy"
-            RLKEY="2oiprelet8e3decgxy8fah9qi"
+            while true; do
+                read -p "Do you have ImageNet file? (y/n) " yn
+                case $yn in 
+                    [yY]* ) 
+                        DATAID="i3zy0tai78kfzrwbjga8s"
+                        RLKEY="ui33vsy7twg24fik5wcxa4106"
+                        break
+                        ;;
+                    [nN]* )
+                        DATAID="wwnpvkhp05ab5fvidccfy"
+                        RLKEY="2oiprelet8e3decgxy8fah9qi"
+                        break
+                        ;;
+                    * ) echo -e "Invalid response"
+                        ;;
+                esac
+            done
             ;;
 		nist_large )
             DATAID="4n2tqnmz6z67iemky0vfg"
@@ -105,5 +120,6 @@ mv $dataset.tar?rlkey=$RLKEY $dataset.tar
 
 # Unzip the dataset and make list(label list, test list, and train list)
 tar jxf $dataset.tar && rm $dataset.tar
+#tar xf $dataset.tar && rm $dataset.tar
 
 ./list.sh 
