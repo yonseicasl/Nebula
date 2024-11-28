@@ -41,12 +41,12 @@ fi
 data_ID() {
 	case $dataset in 
 		imagenet_large )
-            DATAID="dk7dqy27equ0qbxsx71so"
-            RLKEY="v0zt350i6swoph5dhb0yue7r6"
+            DATAID="8ter2n0u5n7603k2ne5zx"
+            RLKEY="vdgyxm39wvvvdhzpisoo3h8p8"
             ;;
 		imagenet_medium )
-            DATAID="hh5x16pdokes2wmbwos54"
-            RLKEY="ce6nspqvyrylknemr69s6rsr9"
+            DATAID="yyzpfngl7j7kl55d5wwvm"
+            RLKEY="j4f9lxikhg317t0bna0nkloq4"
             ;;
 		imagenet_small )
             while true; do
@@ -58,8 +58,8 @@ data_ID() {
                         break
                         ;;
                     [nN]* )
-                        DATAID="wwnpvkhp05ab5fvidccfy"
-                        RLKEY="2oiprelet8e3decgxy8fah9qi"
+                        DATAID="9kkwiqvretg8xrw74ds0t"
+                        RLKEY="krkkz1gv7i2guvr4rb11dww66"
                         break
                         ;;
                     * ) echo -e "Invalid response"
