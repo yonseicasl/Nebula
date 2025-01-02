@@ -1,4 +1,4 @@
-# Nebula: Lightweight Neural Network Benchmarks
+# Nebula: Deep Neural Network Benchmarks in C++
 Developed by Bogil Kim, Sungjae Lee, Chanho Park, Hyeonjin Kim, and William J. Song\
 Intelligent Computing Systems Lab, Yonsei University\
 Current release: v1.4.1 (Nov. 2020)
