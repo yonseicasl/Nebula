@@ -39,7 +39,7 @@ lc=$cc
 # Makefile options
 mopt="CC=$cc CU=$cu DIR=$nebuladir LIB=$lib"
 # Compiler options
-ccopt="-Wall -fPIC -I$commondir -I$networkdir -I$layerdir -DUSE_BLAS"
+ccopt="-Wall -fPIC -I$commondir -I$networkdir -I$layerdir -DUSE_BLAS $(pkg-config --cflags opencv4)"
 # Linker options
 ldopt="-L$libdir"
 libopt="-lnebula -lopenblas -lpthread `pkg-config --libs opencv4`"
