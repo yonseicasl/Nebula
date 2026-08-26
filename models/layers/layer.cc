@@ -117,8 +117,16 @@ void layer_t::activate() {
             hsigmoid_activation(output_data, output_size * network->batch_size);
             break;
         }
-        case HSWISH_ACTIVATION: { 
+        case HSWISH_ACTIVATION: {
             hswish_activation(output_data, output_size * network->batch_size);
+            break;
+        }
+        case GELU_ACTIVATION: {
+            gelu_activation(output_data, output_size * network->batch_size);
+            break;
+        }
+        case SILU_ACTIVATION: {
+            silu_activation(output_data, output_size * network->batch_size);
             break;
         }
         default : {
@@ -180,8 +188,18 @@ void layer_t::gradient() {
             stair_gradient(delta, output_data, output_size * network->batch_size);
             break;
         }
-        case TANH_ACTIVATION: { 
+        case TANH_ACTIVATION: {
             tanh_gradient(delta, output_data, output_size * network->batch_size);
+            break;
+        }
+        case GELU_ACTIVATION: {
+            // Aborts: forward/inference only on this branch (see activations.cc).
+            gelu_gradient(delta, output_data, output_size * network->batch_size);
+            break;
+        }
+        case SILU_ACTIVATION: {
+            // Aborts: forward/inference only on this branch (see activations.cc).
+            silu_gradient(delta, output_data, output_size * network->batch_size);
             break;
         }
         default : {

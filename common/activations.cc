@@ -1,5 +1,7 @@
 #include "activations.h"
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
 namespace nebula {
 
@@ -183,6 +185,41 @@ void tanh_gradient(float *m_delta, float *m_output, unsigned m_size){
     for(unsigned i = 0; i < m_size; i++) {
         m_delta[i] *= 1.0 - m_output[i] * m_output[i];
     }
+}
+
+// Transformer/LLM activations (NPUsim SFU plan Phase 6).
+// GELU, tanh approximation (Hendrycks & Gimpel):
+//   0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
+void gelu_activation(float *m_output, unsigned m_size){
+    for(unsigned i = 0; i < m_size; i++) {
+        float x = m_output[i];
+        m_output[i] = 0.5 * x * (1.0 + tanh(0.7978845608 * (x + 0.044715 * x * x * x)));
+    }
+}
+// SiLU (swish): x * sigmoid(x).
+void silu_activation(float *m_output, unsigned m_size){
+    for(unsigned i = 0; i < m_size; i++) {
+        m_output[i] = m_output[i] / (1.0 + exp(0.0 - m_output[i]));
+    }
+}
+
+// Forward/inference only: this gradient interface receives the POST-activation output,
+// and neither the GELU nor the SiLU derivative can be reconstructed from y alone
+// (both need the pre-activation x). Aborting is the honest behavior -- a fabricated
+// gradient would silently corrupt a training run.
+void gelu_gradient(float *m_delta, float *m_output, unsigned m_size){
+    (void)m_delta; (void)m_output; (void)m_size;
+    fprintf(stderr, "Error: gelu backward is not supported on this branch "
+                    "(forward/inference only; the gradient needs the pre-activation "
+                    "input, which layer_t::gradient() does not provide)\n");
+    exit(1);
+}
+void silu_gradient(float *m_delta, float *m_output, unsigned m_size){
+    (void)m_delta; (void)m_output; (void)m_size;
+    fprintf(stderr, "Error: silu backward is not supported on this branch "
+                    "(forward/inference only; the gradient needs the pre-activation "
+                    "input, which layer_t::gradient() does not provide)\n");
+    exit(1);
 }
 
 }

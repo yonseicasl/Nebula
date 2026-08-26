@@ -20,6 +20,10 @@ void tanh_activation(float *m_output, unsigned m_size);
 void sigmoid_activation(float *m_output, unsigned m_size);
 void hsigmoid_activation(float *m_output, unsigned m_size);
 void hswish_activation(float *m_output, unsigned m_size);
+// Transformer/LLM activations (NPUsim SFU plan Phase 6). GELU uses the tanh
+// approximation (Hendrycks & Gimpel); SiLU (a.k.a. swish) is x * sigmoid(x).
+void gelu_activation(float *m_output, unsigned m_size);
+void silu_activation(float *m_output, unsigned m_size);
 
 // Gradient function
 void elu_gradient(float *m_delta, float *m_output, unsigned m_size);
@@ -35,6 +39,11 @@ void relie_gradient(float *m_delta, float *m_output, unsigned m_size);
 void relu_gradient(float *m_delta, float *m_output, unsigned m_size);
 void stair_gradient(float *m_delta, float *m_output, unsigned m_size);
 void tanh_gradient(float *m_delta, float *m_output, unsigned m_size);
+// Forward/inference only: the gradient() interface receives the POST-activation output
+// alone, from which GELU/SiLU derivatives cannot be reconstructed. These abort with a
+// clear message instead of silently corrupting a training run.
+void gelu_gradient(float *m_delta, float *m_output, unsigned m_size);
+void silu_gradient(float *m_delta, float *m_output, unsigned m_size);
 
 }
 // End of namespace nebula.

@@ -83,6 +83,11 @@ enum activation_type_t {
     SIGMOID_ACTIVATION,
     HSIGMOID_ACTIVATION,
     HSWISH_ACTIVATION,
+    // Transformer/LLM activations (NPUsim SFU plan Phase 6). Forward/inference only on
+    // this branch: their gradients cannot be reconstructed from the post-activation
+    // output alone (the gradient() interface's only input), so backward aborts.
+    GELU_ACTIVATION,
+    SILU_ACTIVATION,
     NUM_ACTIVATION_TYPES,
 };
 
@@ -104,6 +109,8 @@ static std::vector<std::string> activation_type_str __attribute__((unused)) = {
     "sigmoid",
     "hsigmoid",
     "hswish",
+    "gelu",
+    "silu",
     "num_activation_types",
 };
 
