@@ -3,7 +3,9 @@
 #endif
 #include <cfloat>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include "softmax_layer.h"
 
 namespace nebula {
@@ -22,8 +24,18 @@ void softmax_layer_t::init(section_config_t m_section_config) {
     // Initialize layer parameters.
     input_size = prev_layer ? prev_layer->output_size : network->input_size;
     input_data = prev_layer ? prev_layer->output_data : network->input_data;
-    output_size = input_size;  
-    
+    output_size = input_size;
+
+    // Softmax groups (Darknet semantics): the vector splits into `groups` independent
+    // spans and softmax normalizes each span on its own. The setting was previously
+    // parsed nowhere, so `groups = 4` silently behaved as 1.
+    m_section_config.get_setting("groups", &group);
+    if(group == 0 || input_size % group != 0) {
+        std::cerr << "Error: softmax groups = " << group << " must be non-zero and divide"
+                  << " the input size " << input_size << std::endl;
+        exit(1);
+    }
+
     output_data = new float[output_size * network->batch_size]();
     delta = new float[output_size * network->batch_size]();
 }
@@ -66,24 +78,25 @@ void softmax_layer_t::update() {/* Nothing to do */}
 // Store weight.
 void softmax_layer_t::store_weight(std::fstream &m_weight_file) {/*Nothing to do*/}
 
-// Softmax function.
+// Softmax function: one independent normalization per (batch, group) span.
 void softmax_layer_t::softmax() {
- 
-    for(unsigned i = 0; i < network->batch_size; i++) {
+
+    const unsigned span = input_size / group;
+    for(unsigned i = 0; i < network->batch_size * group; i++) {
         float sum = 0.0;
         float max = 0.0 - FLT_MAX;
-        
-        float *input  = &input_data[i * input_size];
-        float *output = &output_data[i * output_size];
-        for(unsigned j = 0; j < input_size; j++) {
+
+        float *input  = &input_data[i * span];
+        float *output = &output_data[i * span];
+        for(unsigned j = 0; j < span; j++) {
             if(input[j] > max) { max = input[j]; }
         }
-        for(unsigned j = 0; j < input_size; j++) {
+        for(unsigned j = 0; j < span; j++) {
             float e = exp(input[j] - max);
             sum += e;
             output[j] = e;
         }
-        for(unsigned j = 0; j < input_size; j++) {
+        for(unsigned j = 0; j < span; j++) {
             output[j] /= sum;
         }
     }
